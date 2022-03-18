@@ -37,7 +37,11 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
     implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
+
     implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
+    //implementation("io.ktor:ktor-client-java:${Versions.ktor}")
+    //implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
+
     implementation("commons-logging:commons-logging:${Versions.commonsLogging}")
     implementation("ch.qos.logback:logback-classic:${Versions.logback}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
