@@ -10,12 +10,10 @@ import kotlinx.serialization.SerialName
  * the ledger tip will be acquired.
  */
 @kotlinx.serialization.Serializable
-@SerialName("Acquire")
-data class MsgAcquire(
-    @SerialName("args")
-    val args: PointOrOrigin,
+@SerialName("Release")
+data class MsgRelease(
     @kotlinx.serialization.Transient
-    val completableDeferred: CompletableDeferred<MsgAcquireResponse> = CompletableDeferred(),
+    val completableDeferred: CompletableDeferred<MsgReleaseResponse> = CompletableDeferred(),
 ) : JsonWspRequest()
 
 // JSON Example
@@ -23,6 +21,5 @@ data class MsgAcquire(
 //    "type": "jsonwsp/request",
 //    "version": "1.0",
 //    "servicename": "ogmios",
-//    "methodname": "Acquire",
-//    "args": { "point": {slot:1234, hash:"9e871633f7aa356ef11cdcabb6fdd6d8f4b00bc919c57aed71a91af8f86df590" }
+//    "methodname": "Release"
 // }
