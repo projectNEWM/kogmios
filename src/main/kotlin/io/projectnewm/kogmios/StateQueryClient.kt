@@ -25,6 +25,6 @@ interface StateQueryClient : Client {
 
 }
 
-fun createStateQueryClient(websocketHost: String, websocketPort: Int): StateQueryClient {
-    return ClientImpl(websocketHost, websocketPort)
+fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String?=null): StateQueryClient {
+    return ClientImpl(websocketHost, websocketPort, loggerName)
 }

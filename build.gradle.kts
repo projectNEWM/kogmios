@@ -19,10 +19,11 @@ object Versions {
     const val googleTruth = "1.1.3"
     const val junit = "5.8.2"
     const val kotlin = "1.6.10"
+    const val kotlinxSerialization = "1.3.2"
     const val ktor = "2.0.0-beta-1"
     const val logback = "1.2.11"
     const val mockk = "1.12.3"
-    const val kotlinxSerialization = "1.3.2"
+    const val tyrus = "2.0.2"
 }
 
 repositories {
@@ -36,8 +37,11 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-    implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
-    implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
+//    implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
+//    implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
+//    implementation("io.ktor:ktor-client-logging:${Versions.ktor}")
+    implementation("org.glassfish.tyrus:tyrus-client:${Versions.tyrus}")
+
     implementation("commons-logging:commons-logging:${Versions.commonsLogging}")
     implementation("ch.qos.logback:logback-classic:${Versions.logback}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
@@ -48,6 +52,7 @@ dependencies {
     testImplementation("com.google.truth:truth:${Versions.googleTruth}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
+    testImplementation("org.glassfish.tyrus:tyrus-container-grizzly-client:${Versions.tyrus}")
 }
 
 fun isNonStable(version: String): Boolean {

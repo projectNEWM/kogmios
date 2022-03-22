@@ -1,17 +1,11 @@
 package io.projectnewm.kogmios
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.util.reflect.*
-import io.ktor.utils.io.charsets.*
-import io.ktor.websocket.*
 import io.projectnewm.kogmios.protocols.localstatequery.*
 import io.projectnewm.kogmios.protocols.model.PointOrOrigin
 import io.projectnewm.kogmios.protocols.model.QueryChainTip
 import io.projectnewm.kogmios.utils.bigIntegerSerializerModule
+import io.projectnewm.kogmios.websocket.WebsocketClient
+import io.projectnewm.kogmios.websocket.WebsocketContentConverter
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
@@ -28,13 +22,21 @@ import kotlin.coroutines.CoroutineContext
 internal class ClientImpl(
     private val websocketHost: String,
     private val websocketPort: Int,
+    loggerName: String? = null,
 ) : CoroutineScope, StateQueryClient {
 
-    private val log by lazy { LoggerFactory.getLogger(ClientImpl::class.java) }
+    private val log by lazy {
+        if (loggerName == null) {
+            LoggerFactory.getLogger(ClientImpl::class.java)
+        } else {
+            LoggerFactory.getLogger(loggerName)
+        }
+    }
 
     private var _isConnected = false
     override val isConnected: Boolean
         get() = _isConnected
+    private var isClosing = false
 
     private val sendQueue = MutableSharedFlow<JsonWspRequest>(extraBufferCapacity = Int.MAX_VALUE)
 
@@ -42,73 +44,56 @@ internal class ClientImpl(
     private lateinit var releaseCompletableDeferred: CompletableDeferred<MsgReleaseResponse>
     private lateinit var queryCompletableDeferred: CompletableDeferred<MsgQueryResponse>
 
-    private val httpClient by lazy {
-        HttpClient(CIO) {
-            install(WebSockets) {
-                contentConverter = object : WebsocketContentConverter {
-                    override fun isApplicable(frame: Frame): Boolean = frame.frameType == FrameType.TEXT
-
-                    override suspend fun serialize(charset: Charset, typeInfo: TypeInfo, value: Any): Frame {
-                        if (log.isTraceEnabled) {
-                            log.trace("serialize() - charset: $charset, typeInfo: $typeInfo, value: $value")
-                        }
-                        return Frame.Text(
-                            when (value) {
-                                is JsonWspRequest -> json.encodeToString(value)
-                                else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
-                            }
-                        )
-                    }
-
-                    override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: Frame): Any {
-                        if (log.isTraceEnabled) {
-                            log.trace("deserialize() - charset: $charset, typeInfo: $typeInfo, content: $content")
-                        }
-                        val jsonString = (content as Frame.Text).readText()
-                        log.info(jsonString)
-                        return json.decodeFromString<JsonWspResponse>(jsonString)
-                    }
-                }
+    private val websocketClient = WebsocketClient(object : WebsocketContentConverter {
+        override fun serialize(value: Any): String {
+            return when (value) {
+                is JsonWspRequest -> json.encodeToString(value)
+                else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
             }
         }
-    }
+
+        override fun deserialize(value: String): Any {
+            return json.decodeFromString<JsonWspResponse>(value)
+        }
+    }, loggerName)
 
     override suspend fun connect(): Boolean {
-        log.trace("start connect()")
+        log.info("start connect()")
         return connectInternal().await()
     }
 
     private fun connectInternal(): CompletableDeferred<Boolean> {
         val result = CompletableDeferred<Boolean>()
         launch {
-            httpClient.webSocket(method = HttpMethod.Get, host = websocketHost, port = websocketPort) {
-                val session = this
+            log.info("open websocketClient")
+            if (websocketClient.connectAsync(websocketHost, websocketPort).await()) {
                 _isConnected = true
                 result.complete(true)
                 awaitAll(
                     // Receive Loop
                     async {
-                        while (!session.incoming.isClosedForReceive) {
+                        while (!websocketClient.incoming.isClosedForReceive) {
                             try {
-                                val response = session.receiveDeserialized<JsonWspResponse>()
-                                log.info("response: $response")
+                                val response = websocketClient.incoming.receive()
                                 when (response) {
                                     is MsgAcquireResponse -> acquireCompletableDeferred.complete(response)
                                     is MsgReleaseResponse -> releaseCompletableDeferred.complete(response)
                                     is MsgQueryResponse -> queryCompletableDeferred.complete(response)
                                 }
-                            } catch (_: ClosedReceiveChannelException) {
-                                log.warn("session.incoming was closed.")
+                            } catch (e: ClosedReceiveChannelException) {
+                                if (isClosing) {
+                                    log.info("websocketClient.incoming was closed.")
+                                } else {
+                                    log.error("websocketClient.incoming was closed.", e)
+                                }
                             }
                         }
                     },
-
                     // Send Loop
                     async {
-                        while (!session.outgoing.isClosedForSend) {
+                        while (!websocketClient.outgoing.isClosedForSend) {
                             try {
                                 sendQueue.onEach { request ->
-                                    log.info("request: $request")
                                     when (request) {
                                         is MsgAcquire -> {
                                             acquireCompletableDeferred = request.completableDeferred
@@ -120,10 +105,14 @@ internal class ClientImpl(
                                             queryCompletableDeferred = request.completableDeferred
                                         }
                                     }
-                                    session.sendSerialized(request)
+                                    websocketClient.outgoing.send(request)
                                 }.collect()
-                            } catch (_: ClosedSendChannelException) {
-                                log.warn("session.outgoing was closed.")
+                            } catch (e: ClosedSendChannelException) {
+                                if (isClosing) {
+                                    log.info("websocketClient.outgoing was closed.")
+                                } else {
+                                    log.error("websocketClient.outgoing was closed.", e)
+                                }
                             }
                         }
                     }
@@ -159,10 +148,14 @@ internal class ClientImpl(
      */
     override fun shutdown() {
         if (_isConnected) {
-            log.warn("Closing WebSocket...")
-            httpClient.close()
             runBlocking {
+                isClosing = true
+                log.warn("Closing WebSocket...")
+                websocketClient.close()
+                log.warn("Closing WebSocket...done")
+                log.warn("cancelAndJoin()")
                 job.cancelAndJoin()
+                log.warn("cancelAndJoin() done")
             }
             _isConnected = false
         }

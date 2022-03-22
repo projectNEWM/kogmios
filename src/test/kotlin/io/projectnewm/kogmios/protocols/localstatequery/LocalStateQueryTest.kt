@@ -3,6 +3,8 @@ package io.projectnewm.kogmios.protocols.localstatequery
 import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.createStateQueryClient
 import io.projectnewm.kogmios.protocols.model.Point
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
@@ -18,6 +20,7 @@ class LocalStateQueryTest {
         assertThat(result.result).isInstanceOf(AcquireFailure::class.java)
         assertThat((result.result as AcquireFailure).acquireFailure.failure).isEqualTo("pointTooOld")
         client.shutdown()
+        assertThat(client.isConnected).isFalse()
     }
 
     @Test
@@ -34,6 +37,7 @@ class LocalStateQueryTest {
         assertThat((result.result as AcquireSuccess).acquireSuccess.point.slot).isEqualTo(point.point.slot)
         assertThat((result.result as AcquireSuccess).acquireSuccess.point.hash).isEqualTo(point.point.hash)
         client.shutdown()
+        assertThat(client.isConnected).isFalse()
     }
 
     @Test
@@ -59,6 +63,7 @@ class LocalStateQueryTest {
         assertThat((result.result as AcquireSuccess).acquireSuccess.point.hash).isEqualTo(point.point.hash)
 
         client.shutdown()
+        assertThat(client.isConnected).isFalse()
     }
 
     @Test
@@ -74,6 +79,30 @@ class LocalStateQueryTest {
         assertThat(releaseResult.result).isEqualTo("Released")
 
         client.shutdown()
+        assertThat(client.isConnected).isFalse()
+    }
+
+    @Test
+    fun `test twenty connections`() = runBlocking {
+//        val deferreds = mutableListOf<Deferred<Unit>>()
+        repeat(3) {
+//            deferreds.add(
+            async {
+                val client = createStateQueryClient(websocketHost = "localhost", websocketPort = 1337, "client$it")
+                val connectResult = client.connect()
+                assertThat(connectResult).isTrue()
+                assertThat(client.isConnected).isTrue()
+                val tipResult = client.chainTip()
+                assertThat(tipResult).isNotNull()
+
+                client.shutdown()
+                assertThat(client.isConnected).isFalse()
+            }.await()
+            delay(1000)
+//            )
+        }
+//        awaitAll(*deferreds.toTypedArray())
+        Unit
     }
 
 }
