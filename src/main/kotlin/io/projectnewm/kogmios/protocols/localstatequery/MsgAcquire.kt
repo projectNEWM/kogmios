@@ -14,6 +14,8 @@ import kotlinx.serialization.SerialName
 data class MsgAcquire(
     @SerialName("args")
     val args: PointOrOrigin,
+    @SerialName("mirror")
+    val mirror: String,
     @kotlinx.serialization.Transient
     val completableDeferred: CompletableDeferred<MsgAcquireResponse> = CompletableDeferred(),
 ) : JsonWspRequest()

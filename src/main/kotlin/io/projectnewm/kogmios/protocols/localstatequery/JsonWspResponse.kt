@@ -13,4 +13,6 @@ sealed class JsonWspResponse(
     val version: String = JSONWSP_VERSION,
     @SerialName("servicename")
     val servicename: String = JSONWSP_SERVICENAME,
+    @SerialName("reflection")
+    val reflection: String = "dummy",
 )

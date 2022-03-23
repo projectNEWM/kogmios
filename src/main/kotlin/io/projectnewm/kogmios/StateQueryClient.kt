@@ -23,6 +23,10 @@ interface StateQueryClient : Client {
      */
     suspend fun chainTip(): MsgQueryResponse
 
+    /**
+     * Get the parameters for a given pool(s)
+     */
+    suspend fun poolParameters(pools: List<String>): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String?=null): StateQueryClient {
