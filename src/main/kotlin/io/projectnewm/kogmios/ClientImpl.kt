@@ -10,7 +10,10 @@ import io.ktor.utils.io.charsets.*
 import io.ktor.websocket.*
 import io.projectnewm.kogmios.protocols.localstatequery.*
 import io.projectnewm.kogmios.protocols.model.PointOrOrigin
+import io.projectnewm.kogmios.protocols.model.PoolParameters
 import io.projectnewm.kogmios.protocols.model.QueryChainTip
+import io.projectnewm.kogmios.protocols.model.QueryPoolParameters
+import io.projectnewm.kogmios.utils.bigDecimalSerializerModule
 import io.projectnewm.kogmios.utils.bigIntegerSerializerModule
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -22,6 +25,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.LoggerFactory
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
 internal class ClientImpl(
@@ -47,21 +52,13 @@ internal class ClientImpl(
 
     private val sendQueue = Channel<JsonWspRequest>(Channel.BUFFERED)
 
-    private lateinit var acquireCompletableDeferred: CompletableDeferred<MsgAcquireResponse>
-    private lateinit var releaseCompletableDeferred: CompletableDeferred<MsgReleaseResponse>
-    private lateinit var queryCompletableDeferred: CompletableDeferred<MsgQueryResponse>
+    private val acquireRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgAcquireResponse>>()
+    private val releaseRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgReleaseResponse>>()
+    private val queryRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgQueryResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
         HttpClient(CIO) {
-//            engine {
-//                config {
-//                    readTimeout(Duration.ofMillis(10_000L))
-//                    writeTimeout(Duration.ofMillis(10_000L))
-//                    callTimeout(Duration.ofMillis(20_000L))
-//                    connectTimeout(Duration.ofMillis(10_000L))
-//                }
-//            }
             install(WebSockets) {
                 contentConverter = object : WebsocketContentConverter {
                     override fun isApplicable(frame: Frame): Boolean = frame.frameType == FrameType.TEXT
@@ -83,7 +80,8 @@ internal class ClientImpl(
                             log.trace("deserialize() - charset: $charset, typeInfo: $typeInfo, content: $content")
                         }
                         val jsonString = (content as Frame.Text).readText()
-                        log.info(jsonString)
+                        // temporary while we need to figure out how all the responses look
+                        log.debug(jsonString)
                         return json.decodeFromString<JsonWspResponse>(jsonString)
                     }
                 }
@@ -92,7 +90,6 @@ internal class ClientImpl(
     }
 
     override suspend fun connect(): Boolean {
-        log.info("start connect()")
         return connectInternal().await()
     }
 
@@ -113,19 +110,31 @@ internal class ClientImpl(
                         while (!session.incoming.isClosedForReceive) {
                             try {
                                 val response = session.receiveDeserialized<JsonWspResponse>()
-                                log.info("response: $response")
+                                if (log.isDebugEnabled) {
+                                    log.debug("response: $response")
+                                }
                                 when (response) {
-                                    is MsgAcquireResponse -> acquireCompletableDeferred.complete(response)
-                                    is MsgReleaseResponse -> releaseCompletableDeferred.complete(response)
-                                    is MsgQueryResponse -> queryCompletableDeferred.complete(response)
+                                    is MsgAcquireResponse -> {
+                                        acquireRequestResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
+                                    is MsgReleaseResponse -> {
+                                        releaseRequestResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
+                                    is MsgQueryResponse -> {
+                                        queryRequestResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
                                 }
                             } catch (e: ClosedReceiveChannelException) {
-                                if (isClosing) {
-                                    log.info("websocketClient.incoming was closed.")
-                                } else {
+                                if (!isClosing) {
                                     log.error("websocketClient.incoming was closed.", e)
                                 }
                             }
+                        }
+                        if (isClosing) {
+                            log.debug("websocketClient.incoming was closed.")
                         }
                         receiveClose.complete(Unit)
                     },
@@ -135,32 +144,35 @@ internal class ClientImpl(
                         while (!session.outgoing.isClosedForSend) {
                             try {
                                 sendQueue.consumeEach { request ->
-                                    log.info("request: $request")
+                                    if (log.isDebugEnabled) {
+                                        log.debug("request: $request")
+                                    }
                                     when (request) {
                                         is MsgAcquire -> {
-                                            acquireCompletableDeferred = request.completableDeferred
+                                            acquireRequestResponseMap[request.mirror] = request.completableDeferred
                                         }
                                         is MsgRelease -> {
-                                            releaseCompletableDeferred = request.completableDeferred
+                                            releaseRequestResponseMap[request.mirror] = request.completableDeferred
                                         }
                                         is MsgQuery -> {
-                                            queryCompletableDeferred = request.completableDeferred
+                                            queryRequestResponseMap[request.mirror] = request.completableDeferred
                                         }
                                     }
                                     session.sendSerialized(request)
                                 }
                             } catch (e: ClosedSendChannelException) {
-                                if (isClosing) {
-                                    log.info("websocketClient.outgoing was closed.")
-                                } else {
+                                if (!isClosing) {
                                     log.error("websocketClient.outgoing was closed.", e)
                                 }
                             }
                         }
+                        if (isClosing) {
+                            log.debug("websocketClient.outgoing was closed.")
+                        }
                         sendClose.complete(Unit)
                     }
                 )
-                log.info("Websocket completed normally.")
+                log.debug("Websocket completed normally.")
             }
         }
         return result
@@ -168,23 +180,53 @@ internal class ClientImpl(
 
     override suspend fun acquire(pointOrOrigin: PointOrOrigin): MsgAcquireResponse {
         assertConnected()
-        val deferred = CompletableDeferred<MsgAcquireResponse>()
-        sendQueue.send(MsgAcquire(pointOrOrigin, deferred))
-        return deferred.await()
+        val completableDeferred = CompletableDeferred<MsgAcquireResponse>()
+        sendQueue.send(
+            MsgAcquire(
+                args = pointOrOrigin,
+                mirror = "Acquire:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
     }
 
     override suspend fun release(): MsgReleaseResponse {
         assertConnected()
-        val deferred = CompletableDeferred<MsgReleaseResponse>()
-        sendQueue.send(MsgRelease(deferred))
-        return deferred.await()
+        val completableDeferred = CompletableDeferred<MsgReleaseResponse>()
+        sendQueue.send(
+            MsgRelease(
+                mirror = "Release:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
     }
 
     override suspend fun chainTip(): MsgQueryResponse {
         assertConnected()
-        val deferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(MsgQuery(QueryChainTip(), deferred))
-        return deferred.await()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryChainTip(),
+                mirror = "QueryChainTip:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun poolParameters(pools: List<String>): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryPoolParameters(PoolParameters(pools)),
+                mirror = "QueryPoolParameters:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
     }
 
     /**
@@ -194,7 +236,7 @@ internal class ClientImpl(
         if (_isConnected) {
             runBlocking {
                 isClosing = true
-                log.info("Closing WebSocket...")
+                log.debug("Closing WebSocket...")
                 session.close(CloseReason(CloseReason.Codes.NORMAL, "Ok"))
                 receiveClose.await()
                 sendQueue.close()
@@ -224,8 +266,10 @@ internal class ClientImpl(
             encodeDefaults = true
             explicitNulls = true
             ignoreUnknownKeys = true
+            isLenient = true
             serializersModule = SerializersModule {
                 include(bigIntegerSerializerModule)
+                include(bigDecimalSerializerModule)
             }
         }
     }

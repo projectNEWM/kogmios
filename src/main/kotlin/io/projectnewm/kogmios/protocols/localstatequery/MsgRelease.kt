@@ -12,6 +12,8 @@ import kotlinx.serialization.SerialName
 @kotlinx.serialization.Serializable
 @SerialName("Release")
 data class MsgRelease(
+    @SerialName("mirror")
+    val mirror: String,
     @kotlinx.serialization.Transient
     val completableDeferred: CompletableDeferred<MsgReleaseResponse> = CompletableDeferred(),
 ) : JsonWspRequest()

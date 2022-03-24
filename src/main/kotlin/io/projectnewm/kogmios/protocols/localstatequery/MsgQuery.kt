@@ -4,6 +4,7 @@ import io.projectnewm.kogmios.protocols.model.PointOrOrigin
 import io.projectnewm.kogmios.protocols.model.Query
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
+import java.util.UUID
 
 
 /**
@@ -15,6 +16,8 @@ import kotlinx.serialization.SerialName
 data class MsgQuery(
     @SerialName("args")
     val args: Query,
+    @SerialName("mirror")
+    val mirror: String,
     @kotlinx.serialization.Transient
     val completableDeferred: CompletableDeferred<MsgQueryResponse> = CompletableDeferred(),
 ) : JsonWspRequest()

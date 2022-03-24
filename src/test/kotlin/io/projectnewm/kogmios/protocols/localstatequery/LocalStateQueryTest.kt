@@ -29,7 +29,7 @@ class LocalStateQueryTest {
         assertThat(client.isConnected).isTrue()
 
         val tipResult = client.chainTip()
-        val point = Point((tipResult.result as QueryPointDetail).toPointDetail())
+        val point = Point((tipResult.result as QueryPointResult).toPointDetail())
         val result = client.acquire(point)
         assertThat(result.result).isInstanceOf(AcquireSuccess::class.java)
         assertThat((result.result as AcquireSuccess).acquireSuccess.point.slot).isEqualTo(point.point.slot)
@@ -45,7 +45,7 @@ class LocalStateQueryTest {
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
         val tipResult = client.chainTip()
-        val point = Point((tipResult.result as QueryPointDetail).toPointDetail())
+        val point = Point((tipResult.result as QueryPointResult).toPointDetail())
         var result = client.acquire(point)
         assertThat(result.result).isInstanceOf(AcquireSuccess::class.java)
         assertThat((result.result as AcquireSuccess).acquireSuccess.point.slot).isEqualTo(point.point.slot)
@@ -100,6 +100,32 @@ class LocalStateQueryTest {
         }
         awaitAll(*deferreds.toTypedArray())
         Unit
+    }
+
+    @Test
+    fun `test query poolParameters for single pool not found`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.poolParameters(listOf("00000000000000000000000000000000000000000000000000000000"))
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(EmptyQueryResult::class.java)
+    }
+
+    @Test
+    fun `test query poolParameters for single pool`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.poolParameters(listOf("3299895e62b13de5a5a52f4bb5726db5fb38928c8d2c21ff8d78517d"))
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(QueryPoolParametersResult::class.java)
+        assertThat((response.result as QueryPoolParametersResult).size).isEqualTo(1)
+        assertThat(response.result as QueryPoolParametersResult).containsKey("pool1x2vcjhnzky77tfd99a9m2undkhan3y5v35kzrlud0pgh6nsdw0z")
     }
 
 }
