@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.utils
+package io.projectnewm.kogmios.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
@@ -7,7 +7,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.modules.SerializersModule
 import java.math.BigInteger
 
 @Serializer(forClass = BigInteger::class)
@@ -24,8 +23,4 @@ object BigIntegerSerializer : KSerializer<BigInteger> {
         return BigInteger(decoder.decodeString(), 10)
     }
 
-}
-
-val bigIntegerSerializerModule = SerializersModule {
-    contextual(BigInteger::class, BigIntegerSerializer)
 }

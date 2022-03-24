@@ -3,8 +3,8 @@ package io.projectnewm.kogmios
 import io.projectnewm.kogmios.protocols.localstatequery.MsgAcquireResponse
 import io.projectnewm.kogmios.protocols.localstatequery.MsgQueryResponse
 import io.projectnewm.kogmios.protocols.localstatequery.MsgReleaseResponse
-import io.projectnewm.kogmios.protocols.model.Origin
-import io.projectnewm.kogmios.protocols.model.PointOrOrigin
+import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
+import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
 
 interface StateQueryClient : Client {
     /**
@@ -27,8 +27,13 @@ interface StateQueryClient : Client {
      * Get the parameters for a given pool(s)
      */
     suspend fun poolParameters(pools: List<String>): MsgQueryResponse
+
+    /**
+     * Get the current block number of the network
+     */
+    suspend fun blockHeight(): MsgQueryResponse
 }
 
-fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String?=null): StateQueryClient {
+fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
     return ClientImpl(websocketHost, websocketPort, loggerName)
 }

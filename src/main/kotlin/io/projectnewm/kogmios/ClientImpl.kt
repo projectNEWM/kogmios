@@ -9,12 +9,9 @@ import io.ktor.util.reflect.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.websocket.*
 import io.projectnewm.kogmios.protocols.localstatequery.*
-import io.projectnewm.kogmios.protocols.model.PointOrOrigin
-import io.projectnewm.kogmios.protocols.model.PoolParameters
-import io.projectnewm.kogmios.protocols.model.QueryChainTip
-import io.projectnewm.kogmios.protocols.model.QueryPoolParameters
-import io.projectnewm.kogmios.utils.bigDecimalSerializerModule
-import io.projectnewm.kogmios.utils.bigIntegerSerializerModule
+import io.projectnewm.kogmios.protocols.localstatequery.model.*
+import io.projectnewm.kogmios.serializers.BigDecimalSerializer
+import io.projectnewm.kogmios.serializers.BigIntegerSerializer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
@@ -25,6 +22,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -229,6 +228,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun blockHeight(): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryBlockHeight(),
+                mirror = "QueryBlockHeight:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     /**
      * Disconnect from the Ogmios server
      */
@@ -268,8 +280,8 @@ internal class ClientImpl(
             ignoreUnknownKeys = true
             isLenient = true
             serializersModule = SerializersModule {
-                include(bigIntegerSerializerModule)
-                include(bigDecimalSerializerModule)
+                contextual(BigInteger::class, BigIntegerSerializer)
+                contextual(BigDecimal::class, BigDecimalSerializer)
             }
         }
     }

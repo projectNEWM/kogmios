@@ -1,29 +1,12 @@
-package io.projectnewm.kogmios.protocols.model
+package io.projectnewm.kogmios.protocols.localstatequery.serializers
 
-import io.projectnewm.kogmios.protocols.Const.ORIGIN
+import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
+import io.projectnewm.kogmios.protocols.localstatequery.model.Point
+import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
-
-@kotlinx.serialization.Serializable(with = PointOrOriginSerializer::class)
-abstract class PointOrOrigin
-
-@kotlinx.serialization.Serializable
-data class Origin(
-    val point: String = ORIGIN
-) : PointOrOrigin()
-
-@kotlinx.serialization.Serializable
-data class Point(
-    val point: PointDetail
-) : PointOrOrigin()
-
-@kotlinx.serialization.Serializable
-data class PointDetail(
-    val slot: Long,
-    val hash: String,
-)
 
 object PointOrOriginSerializer : JsonContentPolymorphicSerializer<PointOrOrigin>(PointOrOrigin::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out PointOrOrigin> {
