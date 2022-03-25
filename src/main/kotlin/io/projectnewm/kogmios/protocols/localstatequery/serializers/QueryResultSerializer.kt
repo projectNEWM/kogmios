@@ -13,6 +13,8 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
             is JsonObject -> {
                 if ("slot" in element) {
                     QueryPointResult.serializer()
+                } else if ("minFeeCoefficient" in element) {
+                    QueryCurrentProtocolParametersResult.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
                     QueryPoolParametersResult.serializer()
                 } else if (element.keys.isEmpty()) {

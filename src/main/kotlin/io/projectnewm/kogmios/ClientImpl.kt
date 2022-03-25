@@ -241,6 +241,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun currentProtocolParameters(): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryCurrentProtocolParameters(),
+                mirror = "QueryCurrentProtocolParameters:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     /**
      * Disconnect from the Ogmios server
      */
