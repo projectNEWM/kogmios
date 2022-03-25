@@ -32,6 +32,11 @@ interface StateQueryClient : Client {
      * Get the current block number of the network
      */
     suspend fun blockHeight(): MsgQueryResponse
+
+    /**
+     * Get the current network protocol parameters
+     */
+    suspend fun currentProtocolParameters(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
