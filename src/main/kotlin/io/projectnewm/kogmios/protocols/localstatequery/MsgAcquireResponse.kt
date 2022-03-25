@@ -1,6 +1,6 @@
 package io.projectnewm.kogmios.protocols.localstatequery
 
-import io.projectnewm.kogmios.protocols.model.PointDetail
+import io.projectnewm.kogmios.protocols.localstatequery.model.PointDetail
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer

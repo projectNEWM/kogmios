@@ -2,9 +2,9 @@ package io.projectnewm.kogmios.protocols.localstatequery
 
 import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.ClientImpl
-import io.projectnewm.kogmios.protocols.model.Origin
-import io.projectnewm.kogmios.protocols.model.Point
-import io.projectnewm.kogmios.protocols.model.PointDetail
+import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
+import io.projectnewm.kogmios.protocols.localstatequery.model.Point
+import io.projectnewm.kogmios.protocols.localstatequery.model.PointDetail
 import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Test
 

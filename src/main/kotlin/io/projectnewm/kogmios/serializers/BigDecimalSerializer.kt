@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.utils
+package io.projectnewm.kogmios.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
@@ -7,7 +7,6 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.modules.SerializersModule
 import java.math.BigDecimal
 
 @Serializer(forClass = BigDecimal::class)
@@ -33,8 +32,4 @@ object BigDecimalSerializer : KSerializer<BigDecimal> {
         }
     }
 
-}
-
-val bigDecimalSerializerModule = SerializersModule {
-    contextual(BigDecimal::class, BigDecimalSerializer)
 }

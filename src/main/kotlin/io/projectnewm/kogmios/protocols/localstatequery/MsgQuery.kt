@@ -1,10 +1,8 @@
 package io.projectnewm.kogmios.protocols.localstatequery
 
-import io.projectnewm.kogmios.protocols.model.PointOrOrigin
-import io.projectnewm.kogmios.protocols.model.Query
+import io.projectnewm.kogmios.protocols.localstatequery.model.Query
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
-import java.util.UUID
 
 
 /**
