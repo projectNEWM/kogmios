@@ -152,4 +152,17 @@ class LocalStateQueryTest {
         assertThat(response).isNotNull()
         assertThat(response.result).isInstanceOf(QueryCurrentProtocolParametersResult::class.java)
     }
+
+    @Test
+    fun `test query currentEpoch`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.currentEpoch()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(LongQueryResult::class.java)
+        assertThat((response.result as LongQueryResult).value).isGreaterThan(196L)
+    }
 }

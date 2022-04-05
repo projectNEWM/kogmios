@@ -32,7 +32,7 @@ internal class ClientImpl(
     private val websocketHost: String,
     private val websocketPort: Int,
     loggerName: String? = null,
-) : CoroutineScope, StateQueryClient {
+) : CoroutineScope, StateQueryClient, LocalTxMonitorClient {
 
     private val log by lazy {
         if (loggerName == null) {
@@ -251,6 +251,33 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
+        return completableDeferred.await()
+    }
+
+    override suspend fun currentEpoch(): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryCurrentEpoch(),
+                mirror = "QueryCurrentEpoch:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun hasTx(txId: String): JsonWspResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        //FIXME: Implement
+//        sendQueue.send(
+//            MsgHasTx(
+//                args = QueryCurrentProtocolParameters(),
+//                mirror = "QueryCurrentProtocolParameters:${UUID.randomUUID()}",
+//                completableDeferred = completableDeferred
+//            )
+//        )
         return completableDeferred.await()
     }
 
