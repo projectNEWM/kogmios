@@ -37,6 +37,11 @@ interface StateQueryClient : Client {
      * Get the current network protocol parameters
      */
     suspend fun currentProtocolParameters(): MsgQueryResponse
+
+    /**
+     * Get the current network epoch
+     */
+    suspend fun currentEpoch(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
