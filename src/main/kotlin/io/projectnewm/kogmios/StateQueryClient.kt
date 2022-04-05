@@ -42,6 +42,11 @@ interface StateQueryClient : Client {
      * Get the current network epoch
      */
     suspend fun currentEpoch(): MsgQueryResponse
+
+    /**
+     * Get the list of pool ids
+     */
+    suspend fun poolIds(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
