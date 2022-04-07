@@ -14,7 +14,6 @@ object BigIntegerSerializer : KSerializer<BigInteger> {
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BigInteger", PrimitiveKind.STRING)
 
-
     override fun serialize(encoder: Encoder, value: BigInteger) {
         encoder.encodeString(value.toString(10))
     }
@@ -22,5 +21,4 @@ object BigIntegerSerializer : KSerializer<BigInteger> {
     override fun deserialize(decoder: Decoder): BigInteger {
         return BigInteger(decoder.decodeString(), 10)
     }
-
 }

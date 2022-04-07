@@ -2,7 +2,6 @@ package io.projectnewm.kogmios.protocols.localstatequery
 
 import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.createStateQueryClient
-import io.projectnewm.kogmios.protocols.localstatequery.model.*
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Test
 

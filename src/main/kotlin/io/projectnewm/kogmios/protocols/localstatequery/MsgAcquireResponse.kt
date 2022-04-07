@@ -7,7 +7,6 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 
-
 /**
  * Response that comes back from Ogmios after an acquire message is sent.
  */

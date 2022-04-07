@@ -4,7 +4,6 @@ import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 
-
 /**
  * Acquire a ledger state for the Local State Query miniprotocol. If you don't specify a ChainPoint argument,
  * the ledger tip will be acquired.
