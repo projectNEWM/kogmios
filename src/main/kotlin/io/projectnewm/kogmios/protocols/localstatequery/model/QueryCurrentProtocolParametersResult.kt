@@ -4,7 +4,6 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import java.math.BigDecimal
 
-
 @kotlinx.serialization.Serializable
 data class QueryCurrentProtocolParametersResult(
     @SerialName("minFeeCoefficient")

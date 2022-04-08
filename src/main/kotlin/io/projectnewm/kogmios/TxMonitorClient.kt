@@ -14,7 +14,6 @@ interface LocalTxMonitorClient : Client {
 //    suspend fun release(): MsgReleaseResponse
 
     suspend fun hasTx(txId: String): JsonWspResponse
-
 }
 
 fun createLocalTxMonitorClient(

@@ -39,8 +39,8 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
 
     implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
-    //implementation("io.ktor:ktor-client-java:${Versions.ktor}")
-    //implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
+    // implementation("io.ktor:ktor-client-java:${Versions.ktor}")
+    // implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
 
     implementation("commons-logging:commons-logging:${Versions.commonsLogging}")
     implementation("ch.qos.logback:logback-classic:${Versions.logback}")
@@ -89,10 +89,12 @@ tasks.withType<DependencyUpdatesTask> {
 }
 
 project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain>().configureEach {
-    kotlinJavaToolchain.jdk.use(
-        "/usr/lib/jvm/java-16-openjdk-amd64",
-        JavaVersion.VERSION_16
-    )
+    val service = project.extensions.getByType<JavaToolchainService>()
+    val customLauncher = service.launcherFor {
+        this.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_16.majorVersion))
+    }
+
+    this.kotlinJavaToolchain.toolchain.use(customLauncher)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

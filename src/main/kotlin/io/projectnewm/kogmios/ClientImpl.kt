@@ -270,7 +270,7 @@ internal class ClientImpl(
     override suspend fun hasTx(txId: String): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        //FIXME: Implement
+        // FIXME: Implement
 //        sendQueue.send(
 //            MsgHasTx(
 //                args = QueryCurrentProtocolParameters(),

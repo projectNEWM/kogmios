@@ -3,7 +3,6 @@ package io.projectnewm.kogmios.protocols.localstatequery
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 
-
 /**
  * Release the Acquired ledger state for the Local State Query miniprotocol.
  */

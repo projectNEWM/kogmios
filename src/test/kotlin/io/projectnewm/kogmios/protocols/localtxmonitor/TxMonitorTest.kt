@@ -13,12 +13,11 @@ class TxMonitorTest {
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
-        //TODO finish test
+        // TODO finish test
 //        val result = client.hasTx()
 //        assertThat(result.result).isInstanceOf(AcquireFailure::class.java)
 //        assertThat((result.result as AcquireFailure).acquireFailure.failure).isEqualTo("pointTooOld")
 //        client.shutdown()
 //        assertThat(client.isConnected).isFalse()
     }
-
 }
