@@ -2,6 +2,7 @@ package io.projectnewm.kogmios.protocols.localstatequery
 
 import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.createStateQueryClient
+import io.projectnewm.kogmios.protocols.localstatequery.model.*
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Test
 
@@ -163,5 +164,19 @@ class LocalStateQueryTest {
         assertThat(response).isNotNull()
         assertThat(response.result).isInstanceOf(LongQueryResult::class.java)
         assertThat((response.result as LongQueryResult).value).isGreaterThan(196L)
+    }
+
+    @Test
+    fun `test query poolIds`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.poolIds()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(StringArrayQueryResult::class.java)
+        assertThat((response.result as StringArrayQueryResult).value.size).isGreaterThan(1245)
+        assertThat((response.result as StringArrayQueryResult).value[0]).startsWith("pool1")
     }
 }

@@ -2,10 +2,7 @@ package io.projectnewm.kogmios.protocols.localstatequery.serializers
 
 import io.projectnewm.kogmios.protocols.localstatequery.model.*
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.*
 
 object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(QueryResult::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out QueryResult> {
@@ -22,6 +19,9 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                 } else {
                     throw IllegalStateException("No Serializer found to decode: $element")
                 }
+            }
+            is JsonArray -> {
+                StringArrayQueryResult.serializer()
             }
             is JsonPrimitive -> {
                 LongQueryResult.serializer()

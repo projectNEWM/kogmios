@@ -3,6 +3,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 plugins {
     java
     id("com.github.ben-manes.versions") version "0.42.0"
+    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
     kotlin("jvm") version "1.6.20"
     kotlin("plugin.serialization") version "1.6.20"
 }
@@ -19,7 +20,7 @@ object Versions {
     const val googleTruth = "1.1.3"
     const val junit = "5.8.2"
     const val kotlin = "1.6.20"
-    const val ktor = "2.0.0-beta-1"
+    const val ktor = "2.0.0"
     const val logback = "1.2.11"
     const val mockk = "1.12.3"
     const val kotlinxSerialization = "1.3.2"
