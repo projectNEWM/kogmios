@@ -68,7 +68,10 @@ internal class ClientImpl(
                         }
                         return Frame.Text(
                             when (value) {
-                                is JsonWspRequest -> json.encodeToString(value)
+                                is JsonWspRequest -> json.encodeToString(value).also {
+                                    // temporary while we need to figure out how all the requests look
+                                    log.debug(it)
+                                }
                                 else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
                             }
                         )
@@ -274,6 +277,19 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryPoolIds(),
                 mirror = "QueryPoolIds:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun delegationsAndRewards(stakeAddresses: List<String>): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryDelegationsAndRewards(DelegationsAndRewards(stakeAddresses)),
+                mirror = "QueryDelegationsAndRewards:${UUID.randomUUID()}",
                 completableDeferred = completableDeferred
             )
         )

@@ -179,4 +179,22 @@ class LocalStateQueryTest {
         assertThat((response.result as StringArrayQueryResult).value.size).isGreaterThan(1245)
         assertThat((response.result as StringArrayQueryResult).value[0]).startsWith("pool1")
     }
+
+    @Test
+    fun `test query delegationsAndRewards`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val stakeHash = "db9927472f4a99e2de84cfae3b3b128d62e7792e7c36d2b2bbd08f7d"
+        val response = client.delegationsAndRewards(listOf(stakeHash))
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(QueryDelegationsAndRewardsResult::class.java)
+        assertThat((response.result as QueryDelegationsAndRewardsResult).size).isEqualTo(1)
+        assertThat((response.result as QueryDelegationsAndRewardsResult)[stakeHash]?.delegate)
+            .isEqualTo("pool1x2vcjhnzky77tfd99a9m2undkhan3y5v35kzrlud0pgh6nsdw0z")
+        assertThat((response.result as QueryDelegationsAndRewardsResult)[stakeHash]?.rewards)
+            .isEqualTo(0L)
+    }
 }
