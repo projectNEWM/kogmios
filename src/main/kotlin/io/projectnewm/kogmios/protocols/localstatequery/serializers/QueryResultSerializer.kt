@@ -14,6 +14,8 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     QueryCurrentProtocolParametersResult.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
                     QueryPoolParametersResult.serializer()
+                } else if (element.keys.firstOrNull()?.matches(Regex("[a-f0-9]{56}")) == true) {
+                    QueryDelegationsAndRewardsResult.serializer()
                 } else if (element.keys.isEmpty()) {
                     EmptyQueryResult.serializer()
                 } else {

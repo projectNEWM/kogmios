@@ -47,6 +47,11 @@ interface StateQueryClient : Client {
      * Get the list of pool ids
      */
     suspend fun poolIds(): MsgQueryResponse
+
+    /**
+     * Get the rewards and delegation information for the given stake addresses.
+     */
+    suspend fun delegationsAndRewards(stakeAddresses: List<String>): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
