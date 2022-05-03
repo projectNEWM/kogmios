@@ -10,7 +10,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test acquire origin`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -23,7 +23,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test acquire tip`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -40,7 +40,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test acquire and release and acquire`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -66,7 +66,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test release without acquire failure`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -87,7 +87,7 @@ class LocalStateQueryTest {
             deferreds.add(
                 async {
                     delay(it * 100L)
-                    val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337, "client$it")
+                    val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337, "client$it")
                     val connectResult = client.connect()
                     assertThat(connectResult).isTrue()
                     assertThat(client.isConnected).isTrue()
@@ -104,7 +104,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query poolParameters for single pool not found`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -116,7 +116,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query poolParameters for single pool`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -130,7 +130,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query blockHeight`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -143,7 +143,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query currentProtocolParameters`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -155,7 +155,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query currentEpoch`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -168,7 +168,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query poolIds`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -182,7 +182,7 @@ class LocalStateQueryTest {
 
     @Test
     fun `test query delegationsAndRewards`() = runBlocking {
-        val client = createStateQueryClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
@@ -196,5 +196,18 @@ class LocalStateQueryTest {
             .isEqualTo("pool1x2vcjhnzky77tfd99a9m2undkhan3y5v35kzrlud0pgh6nsdw0z")
         assertThat((response.result as QueryDelegationsAndRewardsResult)[stakeHash]?.rewards)
             .isEqualTo(0L)
+    }
+
+    @Test
+    fun `test query eraStart`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.eraStart()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(Bound::class.java)
+        assertThat(response.result).isEqualTo(Bound(time = 66528000, slot = 36158400, epoch = 154))
     }
 }
