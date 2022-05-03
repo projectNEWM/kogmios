@@ -1,6 +1,7 @@
 package io.projectnewm.kogmios.protocols.localstatequery.model
 
 import io.projectnewm.kogmios.protocols.localstatequery.serializers.QueryResultSerializer
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable(with = QueryResultSerializer::class)
+@Serializable(with = QueryResultSerializer::class)
 interface QueryResult

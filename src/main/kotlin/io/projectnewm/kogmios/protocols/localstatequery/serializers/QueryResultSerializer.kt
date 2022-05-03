@@ -25,7 +25,10 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                 }
             }
             is JsonArray -> {
-                StringArrayQueryResult.serializer()
+                when (element[0]) {
+                    is JsonObject -> EraSummariesQueryResult.serializer()
+                    else -> StringArrayQueryResult.serializer()
+                }
             }
             is JsonPrimitive -> {
                 LongQueryResult.serializer()

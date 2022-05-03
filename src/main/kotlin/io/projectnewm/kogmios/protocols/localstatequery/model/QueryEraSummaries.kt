@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Point(
-    @SerialName("point")
-    val point: PointDetail
-) : PointOrOrigin()
+data class QueryEraSummaries(
+    @SerialName("query")
+    val query: String = "eraSummaries"
+) : Query()

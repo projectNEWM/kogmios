@@ -2,11 +2,12 @@ package io.projectnewm.kogmios.protocols.localstatequery
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Release the Acquired ledger state for the Local State Query miniprotocol.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 @SerialName("Release")
 data class MsgRelease(
     @SerialName("mirror")

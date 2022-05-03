@@ -3,6 +3,7 @@ package io.projectnewm.kogmios.protocols.localstatequery
 import io.projectnewm.kogmios.protocols.localstatequery.model.PointDetail
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
@@ -10,35 +11,35 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Response that comes back from Ogmios after an acquire message is sent.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 @SerialName("Acquire")
 data class MsgAcquireResponse(
     @SerialName("result")
     val result: AcquireResult
 ) : JsonWspResponse()
 
-@kotlinx.serialization.Serializable(with = AcquireSuccessOrFailureSerializer::class)
+@Serializable(with = AcquireSuccessOrFailureSerializer::class)
 abstract class AcquireResult
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class AcquireSuccess(
     @SerialName("AcquireSuccess")
     val acquireSuccess: AcquireSuccessData
 ) : AcquireResult()
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class AcquireSuccessData(
     @SerialName("point")
     val point: PointDetail
 )
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class AcquireFailure(
     @SerialName("AcquireFailure")
     val acquireFailure: AcquireFailureData
 ) : AcquireResult()
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class AcquireFailureData(
     @SerialName("failure")
     val failure: String

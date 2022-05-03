@@ -1,6 +1,7 @@
 package io.projectnewm.kogmios.protocols.localstatequery.model
 
 import io.projectnewm.kogmios.protocols.localstatequery.serializers.PointOrOriginSerializer
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable(with = PointOrOriginSerializer::class)
+@Serializable(with = PointOrOriginSerializer::class)
 abstract class PointOrOrigin

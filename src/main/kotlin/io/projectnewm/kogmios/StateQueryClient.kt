@@ -57,6 +57,11 @@ interface StateQueryClient : Client {
      * Get the beginning of this era.
      */
     suspend fun eraStart(): MsgQueryResponse
+
+    /**
+     * Get summaries of all Cardano eras, necessary to do proper slotting arithmetic.
+     */
+    suspend fun eraSummaries(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

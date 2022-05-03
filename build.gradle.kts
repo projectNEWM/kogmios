@@ -92,7 +92,7 @@ tasks.withType<DependencyUpdatesTask> {
 project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain>().configureEach {
     val service = project.extensions.getByType<JavaToolchainService>()
     val customLauncher = service.launcherFor {
-        this.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_16.majorVersion))
+        this.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.majorVersion))
     }
 
     this.kotlinJavaToolchain.toolchain.use(customLauncher)
@@ -106,7 +106,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
         )
-        jvmTarget = "16"
+        jvmTarget = "17"
     }
 }
 
