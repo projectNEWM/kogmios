@@ -9,7 +9,7 @@ class TxMonitorTest {
 
     @Test
     fun `test acquire origin`() = runBlocking {
-        val client = createLocalTxMonitorClient(websocketHost = "127.0.0.1", websocketPort = 1337)
+        val client = createLocalTxMonitorClient(websocketHost = "clockwork", websocketPort = 1337)
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()

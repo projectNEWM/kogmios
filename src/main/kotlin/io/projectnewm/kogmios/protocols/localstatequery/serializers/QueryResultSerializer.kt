@@ -8,10 +8,12 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out QueryResult> {
         return when (element) {
             is JsonObject -> {
-                if ("slot" in element) {
+                if (("hash" in element) and ("slot" in element)) {
                     QueryPointResult.serializer()
                 } else if ("minFeeCoefficient" in element) {
                     QueryCurrentProtocolParametersResult.serializer()
+                } else if (("time" in element) and ("epoch" in element) and ("slot" in element)) {
+                    Bound.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
                     QueryPoolParametersResult.serializer()
                 } else if (element.keys.firstOrNull()?.matches(Regex("[a-f0-9]{56}")) == true) {

@@ -4,8 +4,8 @@ plugins {
     java
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    kotlin("jvm") version "1.6.20"
-    kotlin("plugin.serialization") version "1.6.20"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
 }
 
 group = "io.projectnewm"
@@ -19,8 +19,8 @@ object Versions {
     const val coroutines = "1.6.1"
     const val googleTruth = "1.1.3"
     const val junit = "5.8.2"
-    const val kotlin = "1.6.20"
-    const val ktor = "2.0.0"
+    const val kotlin = "1.6.21"
+    const val ktor = "2.0.1"
     const val logback = "1.2.11"
     const val mockk = "1.12.3"
     const val kotlinxSerialization = "1.3.2"
@@ -28,11 +28,11 @@ object Versions {
 
 repositories {
     mavenLocal()
+    mavenCentral()
     maven {
         name = "jitpack.io"
         url = uri("https://jitpack.io")
     }
-    mavenCentral()
 }
 
 dependencies {
@@ -102,9 +102,9 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf(
             "-Xjsr305=strict",
-            "-Xopt-in=kotlin.RequiresOptIn",
-            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
         )
         jvmTarget = "16"
     }

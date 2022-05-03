@@ -52,6 +52,11 @@ interface StateQueryClient : Client {
      * Get the rewards and delegation information for the given stake addresses.
      */
     suspend fun delegationsAndRewards(stakeAddresses: List<String>): MsgQueryResponse
+
+    /**
+     * Get the beginning of this era.
+     */
+    suspend fun eraStart(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
