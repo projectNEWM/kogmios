@@ -4,8 +4,9 @@ import io.projectnewm.kogmios.protocols.Const.JSONWSP_RESPONSE
 import io.projectnewm.kogmios.protocols.Const.JSONWSP_SERVICENAME
 import io.projectnewm.kogmios.protocols.Const.JSONWSP_VERSION
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@kotlinx.serialization.Serializable
+@Serializable
 sealed class JsonWspResponse(
     @SerialName("type")
     val type: String = JSONWSP_RESPONSE,

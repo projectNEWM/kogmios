@@ -210,4 +210,47 @@ class LocalStateQueryTest {
         assertThat(response.result).isInstanceOf(Bound::class.java)
         assertThat(response.result).isEqualTo(Bound(time = 66528000, slot = 36158400, epoch = 154))
     }
+
+    @Test
+    fun `test query eraSummaries`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.eraSummaries()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(EraSummariesQueryResult::class.java)
+        assertThat(response.result).isEqualTo(
+            EraSummariesQueryResult(
+                listOf(
+                    EraSummary(
+                        start = Bound(0, 0, 0),
+                        end = Bound(31968000, 1598400, 74),
+                        parameters = EraParameters(21600, 20, 4320),
+                    ),
+                    EraSummary(
+                        start = Bound(31968000, 1598400, 74),
+                        end = Bound(44064000, 13694400, 102),
+                        parameters = EraParameters(432000, 1, 129600),
+                    ),
+                    EraSummary(
+                        start = Bound(44064000, 13694400, 102),
+                        end = Bound(48384000, 18014400, 112),
+                        parameters = EraParameters(432000, 1, 129600),
+                    ),
+                    EraSummary(
+                        start = Bound(48384000, 18014400, 112),
+                        end = Bound(66528000, 36158400, 154),
+                        parameters = EraParameters(432000, 1, 129600),
+                    ),
+                    EraSummary(
+                        start = Bound(66528000, 36158400, 154),
+                        end = null,
+                        parameters = EraParameters(432000, 1, 129600),
+                    ),
+                )
+            )
+        )
+    }
 }

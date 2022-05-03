@@ -3,12 +3,13 @@ package io.projectnewm.kogmios.protocols.localstatequery
 import io.projectnewm.kogmios.protocols.localstatequery.model.Query
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Acquire a ledger state for the Local State Query miniprotocol. If you don't specify a ChainPoint argument,
  * the ledger tip will be acquired.
  */
-@kotlinx.serialization.Serializable
+@Serializable
 @SerialName("Query")
 data class MsgQuery(
     @SerialName("args")

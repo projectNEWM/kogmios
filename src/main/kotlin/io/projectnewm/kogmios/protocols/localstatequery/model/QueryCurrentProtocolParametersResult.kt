@@ -2,9 +2,10 @@ package io.projectnewm.kogmios.protocols.localstatequery.model
 
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class QueryCurrentProtocolParametersResult(
     @SerialName("minFeeCoefficient")
     val minFeeCoefficient: Int,
