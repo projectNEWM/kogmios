@@ -12,6 +12,8 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     QueryPointResult.serializer()
                 } else if ("minFeeCoefficient" in element) {
                     QueryCurrentProtocolParametersResult.serializer()
+                } else if ("systemStart" in element) {
+                    CompactGenesis.serializer()
                 } else if (("time" in element) and ("epoch" in element) and ("slot" in element)) {
                     Bound.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {

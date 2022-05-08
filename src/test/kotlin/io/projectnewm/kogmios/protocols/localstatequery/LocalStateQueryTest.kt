@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.createStateQueryClient
 import io.projectnewm.kogmios.protocols.localstatequery.model.*
 import kotlinx.coroutines.*
+import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 
 class LocalStateQueryTest {
@@ -252,5 +253,18 @@ class LocalStateQueryTest {
                 )
             )
         )
+    }
+
+    @Test
+    fun `test query genesisConfig`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.genesisConfig()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(CompactGenesis::class.java)
+        assertThat((response.result as CompactGenesis).systemStart).isEqualTo(Instant.fromEpochSeconds(1563999616L))
     }
 }
