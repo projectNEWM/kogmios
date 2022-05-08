@@ -23,6 +23,7 @@ object Versions {
     const val ktor = "2.0.1"
     const val logback = "1.2.11"
     const val mockk = "1.12.3"
+    const val kotlinxDatetime = "0.2.0"
     const val kotlinxSerialization = "1.3.2"
 }
 
@@ -48,6 +49,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.coroutines}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerialization}")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.kotlinxDatetime}")
 
     testImplementation("io.mockk:mockk:${Versions.mockk}")
     testImplementation("com.google.truth:truth:${Versions.googleTruth}")
