@@ -335,6 +335,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun nonMyopicMemberRewards(inputs: List<NonMyopicMemberRewardsInput>): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryNonMyopicMemberRewards(NonMyopicMemberRewardsInputs(inputs)),
+                mirror = "QueryNonMyopicMemberRewards:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     override suspend fun hasTx(txId: String): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()

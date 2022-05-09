@@ -267,4 +267,22 @@ class LocalStateQueryTest {
         assertThat(response.result).isInstanceOf(CompactGenesis::class.java)
         assertThat((response.result as CompactGenesis).systemStart).isEqualTo(Instant.fromEpochSeconds(1563999616L))
     }
+
+    @Test
+    fun `test query nonMyopicMemberRewards`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.nonMyopicMemberRewards(
+            listOf(
+                LovelaceInput(1000000000L.toBigInteger()),
+                Blake2bDigestCredential("2545e4c6056511796eed607fbe7db53bc8f88ab5505f3d87ca7c0c5c")
+            )
+        )
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(QueryNonMyopicMemberRewardsResult::class.java)
+        assertThat((response.result as QueryNonMyopicMemberRewardsResult).size).isEqualTo(2)
+    }
 }

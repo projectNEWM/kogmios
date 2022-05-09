@@ -3,6 +3,7 @@ package io.projectnewm.kogmios
 import io.projectnewm.kogmios.protocols.localstatequery.MsgAcquireResponse
 import io.projectnewm.kogmios.protocols.localstatequery.MsgQueryResponse
 import io.projectnewm.kogmios.protocols.localstatequery.MsgReleaseResponse
+import io.projectnewm.kogmios.protocols.localstatequery.model.NonMyopicMemberRewardsInput
 import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
 import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
 
@@ -67,6 +68,13 @@ interface StateQueryClient : Client {
      * Get the Shelley's genesis configuration.
      */
     suspend fun genesisConfig(): MsgQueryResponse
+
+    /**
+     * Get non-myopic member rewards from a projected delegation amount;
+     * this is used to rank pools such that the system converges towards
+     * a fixed number of pools at equilibrium.
+     */
+    suspend fun nonMyopicMemberRewards(inputs: List<NonMyopicMemberRewardsInput>): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

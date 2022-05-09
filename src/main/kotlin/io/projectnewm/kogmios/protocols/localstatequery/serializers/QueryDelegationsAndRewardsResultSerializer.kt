@@ -18,7 +18,7 @@ object QueryDelegationsAndRewardsResultSerializer : KSerializer<QueryDelegations
     }
 
     override val descriptor: SerialDescriptor =
-        SerialDescriptor("QueryPoolParametersResult", delegateMapSerializer.descriptor)
+        SerialDescriptor("QueryDelegationsAndRewardsResult", delegateMapSerializer.descriptor)
 
     override fun serialize(encoder: Encoder, value: QueryDelegationsAndRewardsResult) {
         delegateMapSerializer.serialize(encoder, value)
