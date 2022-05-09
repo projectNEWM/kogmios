@@ -5,6 +5,10 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.*
 
 object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(QueryResult::class) {
+
+    private val twentyEightByteHex = Regex("[a-f\\d]{56}")
+    private val digitString = Regex("\\d+")
+
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out QueryResult> {
         return when (element) {
             is JsonObject -> {
@@ -18,8 +22,16 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     Bound.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
                     QueryPoolParametersResult.serializer()
-                } else if (element.keys.firstOrNull()?.matches(Regex("[a-f0-9]{56}")) == true) {
-                    QueryDelegationsAndRewardsResult.serializer()
+                } else if (element.keys.firstOrNull()?.matches(twentyEightByteHex) == true) {
+                    val firstElement = element[element.keys.first()]!!.jsonObject
+                    if (firstElement.keys.firstOrNull()?.startsWith("stake") == true) {
+                        QueryDelegationsAndRewardsResult.serializer()
+                    } else {
+                        // must start with "pool"
+                        QueryNonMyopicMemberRewardsResult.serializer()
+                    }
+                } else if (element.keys.firstOrNull()?.matches(digitString) == true) {
+                    QueryNonMyopicMemberRewardsResult.serializer()
                 } else if (element.keys.isEmpty()) {
                     EmptyQueryResult.serializer()
                 } else {
