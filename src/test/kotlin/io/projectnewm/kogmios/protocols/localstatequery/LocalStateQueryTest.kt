@@ -278,7 +278,7 @@ class LocalStateQueryTest {
         val response = client.nonMyopicMemberRewards(
             listOf(
                 LovelaceInput(1000000000L.toBigInteger()),
-                Blake2bDigestCredential("2545e4c6056511796eed607fbe7db53bc8f88ab5505f3d87ca7c0c5c")
+                Blake2bDigestCredential("0bc846c1e00d07c6b49eb36e3236090c01e5a41faab6c2aa95c645f6")
             )
         )
         assertThat(response).isNotNull()
