@@ -348,6 +348,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun proposedProtocolParameters(): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryProposedProtocolParameters(),
+                mirror = "QueryProposedProtocolParameters:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     override suspend fun hasTx(txId: String): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
