@@ -75,6 +75,11 @@ interface StateQueryClient : Client {
      * a fixed number of pools at equilibrium.
      */
     suspend fun nonMyopicMemberRewards(inputs: List<NonMyopicMemberRewardsInput>): MsgQueryResponse
+
+    /**
+     * Get proposed protocol parameters for update, if any.
+     */
+    suspend fun proposedProtocolParameters(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

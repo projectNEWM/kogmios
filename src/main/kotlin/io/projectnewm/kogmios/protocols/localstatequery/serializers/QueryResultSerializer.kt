@@ -24,7 +24,7 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     QueryPoolParametersResult.serializer()
                 } else if (element.keys.firstOrNull()?.matches(twentyEightByteHex) == true) {
                     val firstElement = element[element.keys.first()]!!.jsonObject
-                    if (firstElement.keys.firstOrNull()?.startsWith("stake") == true) {
+                    if ("delegate" in firstElement) {
                         QueryDelegationsAndRewardsResult.serializer()
                     } else {
                         // must start with "pool"

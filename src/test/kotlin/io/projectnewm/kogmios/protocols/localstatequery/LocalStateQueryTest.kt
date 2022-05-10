@@ -285,4 +285,18 @@ class LocalStateQueryTest {
         assertThat(response.result).isInstanceOf(QueryNonMyopicMemberRewardsResult::class.java)
         assertThat((response.result as QueryNonMyopicMemberRewardsResult).size).isEqualTo(2)
     }
+
+    @Test
+    fun `test query proposedProtocolParameters`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.proposedProtocolParameters()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(EmptyQueryResult::class.java)
+        // FIXME: We don't currently have a way to test until they change a param on testnet. Then we'll
+        // have to implement the correct response object.
+    }
 }
