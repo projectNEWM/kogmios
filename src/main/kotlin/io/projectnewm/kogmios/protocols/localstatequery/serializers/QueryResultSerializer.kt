@@ -21,7 +21,12 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                 } else if (("time" in element) and ("epoch" in element) and ("slot" in element)) {
                     Bound.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
-                    QueryPoolParametersResult.serializer()
+                    val firstElement = element[element.keys.first()]!!.jsonObject
+                    if ("stake" in firstElement) {
+                        QueryStakeDistributionResult.serializer()
+                    } else {
+                        QueryPoolParametersResult.serializer()
+                    }
                 } else if (element.keys.firstOrNull()?.matches(twentyEightByteHex) == true) {
                     val firstElement = element[element.keys.first()]!!.jsonObject
                     if ("delegate" in firstElement) {

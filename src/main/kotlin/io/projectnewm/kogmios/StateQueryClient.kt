@@ -80,6 +80,11 @@ interface StateQueryClient : Client {
      * Get proposed protocol parameters for update, if any.
      */
     suspend fun proposedProtocolParameters(): MsgQueryResponse
+
+    /**
+     * Get the current stake pool distribution. This request may be quite long, use with care.
+     */
+    suspend fun stakeDistribution(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

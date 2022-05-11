@@ -299,4 +299,16 @@ class LocalStateQueryTest {
         // FIXME: We don't currently have a way to test until they change a param on testnet. Then we'll
         // have to implement the correct response object.
     }
+
+    @Test
+    fun `test query stakeDistribution`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.stakeDistribution()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(QueryStakeDistributionResult::class.java)
+    }
 }

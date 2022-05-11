@@ -8,6 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Serializer(forClass = BigDecimal::class)
 object BigDecimalSerializer : KSerializer<BigDecimal> {
@@ -20,10 +21,15 @@ object BigDecimalSerializer : KSerializer<BigDecimal> {
 
     override fun deserialize(decoder: Decoder): BigDecimal {
         val decodedString = decoder.decodeString()
-        return if (decodedString.contains('/')) {
+        return if ('/' in decodedString) {
             // decode rational like "3/4"
-            decodedString.split('/', ignoreCase = true, limit = 2).let {
-                BigDecimal(it[0]).divide(BigDecimal(it[1]))
+            decodedString.split('/', limit = 2).let {
+                try {
+                    BigDecimal(it[0]).divide(BigDecimal(it[1]))
+                } catch (e: ArithmeticException) {
+                    // if we can't be exact, round to 32 decimal places
+                    BigDecimal(it[0]).divide(BigDecimal(it[1]), 32, RoundingMode.HALF_UP)
+                }
             }
         } else {
             // decode decimal like "0.75"

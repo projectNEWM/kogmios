@@ -361,6 +361,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun stakeDistribution(): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryStakeDistribution(),
+                mirror = "QueryStakeDistribution:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     override suspend fun hasTx(txId: String): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
