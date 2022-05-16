@@ -22,9 +22,9 @@ object Versions {
     const val kotlin = "1.6.21"
     const val ktor = "2.0.1"
     const val logback = "1.2.11"
-    const val mockk = "1.12.3"
-    const val kotlinxDatetime = "0.2.0"
-    const val kotlinxSerialization = "1.3.2"
+    const val mockk = "1.12.4"
+    const val kotlinxDatetime = "0.3.3"
+    const val kotlinxSerialization = "1.3.3"
 }
 
 repositories {
@@ -41,8 +41,6 @@ dependencies {
     implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
 
     implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
-    // implementation("io.ktor:ktor-client-java:${Versions.ktor}")
-    // implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
 
     implementation("commons-logging:commons-logging:${Versions.commonsLogging}")
     implementation("ch.qos.logback:logback-classic:${Versions.logback}")

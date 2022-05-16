@@ -311,4 +311,17 @@ class LocalStateQueryTest {
         assertThat(response).isNotNull()
         assertThat(response.result).isInstanceOf(QueryStakeDistributionResult::class.java)
     }
+
+    @Test
+    fun `test query systemStart`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.systemStart()
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(InstantQueryResult::class.java)
+        assertThat((response.result as InstantQueryResult).value.toEpochMilliseconds()).isEqualTo(1563999616000L)
+    }
 }
