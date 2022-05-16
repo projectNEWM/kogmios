@@ -85,6 +85,11 @@ interface StateQueryClient : Client {
      * Get the current stake pool distribution. This request may be quite long, use with care.
      */
     suspend fun stakeDistribution(): MsgQueryResponse
+
+    /**
+     * Get the start date of the network.
+     */
+    suspend fun systemStart(): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

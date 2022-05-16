@@ -50,7 +50,11 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                 }
             }
             is JsonPrimitive -> {
-                LongQueryResult.serializer()
+                if (element.isString) {
+                    InstantQueryResult.serializer()
+                } else {
+                    LongQueryResult.serializer()
+                }
             }
             else -> throw IllegalStateException("No Serializer found to decode: $element")
         }
