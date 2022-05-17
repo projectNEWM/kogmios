@@ -324,4 +324,47 @@ class LocalStateQueryTest {
         assertThat(response.result).isInstanceOf(InstantQueryResult::class.java)
         assertThat((response.result as InstantQueryResult).value.toEpochMilliseconds()).isEqualTo(1563999616000L)
     }
+
+    @Test
+    fun `test query utxoByTxIn`() = runBlocking {
+        val client = createStateQueryClient(websocketHost = "clockwork", websocketPort = 1337)
+        val connectResult = client.connect()
+        assertThat(connectResult).isTrue()
+        assertThat(client.isConnected).isTrue()
+
+        val response = client.utxoByTxIn(
+            listOf(
+                TxIn(
+                    txId = "244fc52beb24cda13ddcc1ece701e81bc17f78e0f76099230cc1274ed9ebb339",
+                    index = 1L,
+                ),
+                TxIn(
+                    txId = "244fc52beb24cda13ddcc1ece701e81bc17f78e0f76099230cc1274ed9ebb339",
+                    index = 2L,
+                ),
+                TxIn(
+                    txId = "b2dae597ba2c91959d3d34599d1d859fa09d4598b0b10935b4ddd512bc58920b",
+                    index = 1L,
+                ),
+                TxIn(
+                    txId = "b06f6d9c13a1687310a398144a05e2f1798739291e07d2b2d38649a27e4f6a8f",
+                    index = 9L,
+                ),
+                // one with a datum hash
+                TxIn(
+                    txId = "575a1a55ac96a5cc5dee08a120b3ff8bddd540f9fd6dd229e2ab049c589704b0",
+                    index = 0L,
+                ),
+                // one that is empty/spent
+                TxIn(
+                    txId = "b2bcb553bc5ebc149cce792ef3ad2957bea10919039657e4d6a140e9c71bb7fe",
+                    index = 1L,
+                )
+            )
+        )
+
+        assertThat(response).isNotNull()
+        assertThat(response.result).isInstanceOf(UtxoByTxInQueryResult::class.java)
+        assertThat((response.result as UtxoByTxInQueryResult).value.size).isEqualTo(4)
+    }
 }
