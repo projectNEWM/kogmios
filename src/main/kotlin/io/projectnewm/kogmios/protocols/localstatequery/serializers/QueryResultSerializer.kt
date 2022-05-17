@@ -44,9 +44,14 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                 }
             }
             is JsonArray -> {
-                when (element[0]) {
-                    is JsonObject -> EraSummariesQueryResult.serializer()
-                    else -> StringArrayQueryResult.serializer()
+                if (element.jsonArray.size == 0) {
+                    UtxoByTxInQueryResult.serializer()
+                } else {
+                    when (element[0]) {
+                        is JsonObject -> EraSummariesQueryResult.serializer()
+                        is JsonArray -> UtxoByTxInQueryResult.serializer()
+                        else -> StringArrayQueryResult.serializer()
+                    }
                 }
             }
             is JsonPrimitive -> {

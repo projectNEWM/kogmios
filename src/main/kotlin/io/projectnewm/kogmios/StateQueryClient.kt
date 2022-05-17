@@ -6,6 +6,7 @@ import io.projectnewm.kogmios.protocols.localstatequery.MsgReleaseResponse
 import io.projectnewm.kogmios.protocols.localstatequery.model.NonMyopicMemberRewardsInput
 import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
 import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
+import io.projectnewm.kogmios.protocols.localstatequery.model.TxIn
 
 interface StateQueryClient : Client {
     /**
@@ -90,6 +91,11 @@ interface StateQueryClient : Client {
      * Get the start date of the network.
      */
     suspend fun systemStart(): MsgQueryResponse
+
+    /**
+     * Queries the Utxo details associated with some TxIn value(s)
+     */
+    suspend fun utxoByTxIn(filters: List<TxIn>): MsgQueryResponse
 }
 
 fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {

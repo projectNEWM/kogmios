@@ -387,6 +387,19 @@ internal class ClientImpl(
         return completableDeferred.await()
     }
 
+    override suspend fun utxoByTxIn(filters: List<TxIn>): MsgQueryResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
+        sendQueue.send(
+            MsgQuery(
+                args = QueryUtxoByTxIn(TxInFilters(filters)),
+                mirror = "QueryUtxoByTxIn:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
     override suspend fun hasTx(txId: String): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
