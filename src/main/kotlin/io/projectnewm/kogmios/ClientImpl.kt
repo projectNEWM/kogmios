@@ -32,7 +32,7 @@ internal class ClientImpl(
     private val websocketHost: String,
     private val websocketPort: Int,
     loggerName: String? = null,
-) : CoroutineScope, StateQueryClient, LocalTxMonitorClient {
+) : CoroutineScope, StateQueryClient, LocalTxMonitorClient, LocalChainSyncClient {
 
     private val log by lazy {
         if (loggerName == null) {
@@ -54,6 +54,8 @@ internal class ClientImpl(
     private val acquireRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgAcquireResponse>>()
     private val releaseRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgReleaseResponse>>()
     private val queryRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgQueryResponse>>()
+    private val findIntersectRequestResponseMap =
+        ConcurrentHashMap<String, CompletableDeferred<MsgFindIntersectResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
@@ -82,8 +84,12 @@ internal class ClientImpl(
                             log.trace("deserialize() - charset: $charset, typeInfo: $typeInfo, content: $content")
                         }
                         val jsonString = (content as Frame.Text).readText()
-                        // temporary while we need to figure out how all the responses look
-                        log.debug(jsonString)
+                        if ("jsonwsp/fault" in jsonString) {
+                            log.error(jsonString)
+                        } else {
+                            // temporary while we need to figure out how all the responses look
+                            log.debug(jsonString)
+                        }
                         return json.decodeFromString<JsonWspResponse>(jsonString)
                     }
                 }
@@ -128,6 +134,10 @@ internal class ClientImpl(
                                         queryRequestResponseMap.remove(response.reflection)?.complete(response)
                                             ?: log.warn("No handler found for: ${response.reflection}")
                                     }
+                                    is MsgFindIntersectResponse -> {
+                                        findIntersectRequestResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
                                 }
                             } catch (e: ClosedReceiveChannelException) {
                                 if (!isClosing) {
@@ -151,13 +161,20 @@ internal class ClientImpl(
                                     }
                                     when (request) {
                                         is MsgAcquire -> {
-                                            acquireRequestResponseMap[request.mirror] = request.completableDeferred
+                                            acquireRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
                                         }
                                         is MsgRelease -> {
-                                            releaseRequestResponseMap[request.mirror] = request.completableDeferred
+                                            releaseRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
                                         }
                                         is MsgQuery -> {
-                                            queryRequestResponseMap[request.mirror] = request.completableDeferred
+                                            queryRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
+                                        }
+                                        is MsgFindIntersect -> {
+                                            findIntersectRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
                                         }
                                     }
                                     session.sendSerialized(request)
@@ -411,6 +428,19 @@ internal class ClientImpl(
 //                completableDeferred = completableDeferred
 //            )
 //        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun findIntersect(points: List<PointDetailOrOrigin>): MsgFindIntersectResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgFindIntersectResponse>()
+        sendQueue.send(
+            MsgFindIntersect(
+                args = FindIntersect(points),
+                mirror = "MsgFindIntersect:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
         return completableDeferred.await()
     }
 
