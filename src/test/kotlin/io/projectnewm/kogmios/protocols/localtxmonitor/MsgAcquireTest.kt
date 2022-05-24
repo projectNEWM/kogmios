@@ -1,7 +1,9 @@
-package io.projectnewm.kogmios.protocols.localstatequery
+package io.projectnewm.kogmios.protocols.localtxmonitor
 
 import com.google.common.truth.Truth.assertThat
 import io.projectnewm.kogmios.ClientImpl
+import io.projectnewm.kogmios.protocols.localstatequery.JsonWspRequest
+import io.projectnewm.kogmios.protocols.localstatequery.MsgAcquire
 import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
 import io.projectnewm.kogmios.protocols.localstatequery.model.Point
 import io.projectnewm.kogmios.protocols.localstatequery.model.PointDetail
