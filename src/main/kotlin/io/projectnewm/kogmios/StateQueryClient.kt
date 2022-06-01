@@ -1,12 +1,12 @@
 package io.projectnewm.kogmios
 
-import io.projectnewm.kogmios.protocols.localstatequery.MsgAcquireResponse
-import io.projectnewm.kogmios.protocols.localstatequery.MsgQueryResponse
-import io.projectnewm.kogmios.protocols.localstatequery.MsgReleaseResponse
-import io.projectnewm.kogmios.protocols.localstatequery.model.NonMyopicMemberRewardsInput
-import io.projectnewm.kogmios.protocols.localstatequery.model.Origin
-import io.projectnewm.kogmios.protocols.localstatequery.model.PointOrOrigin
-import io.projectnewm.kogmios.protocols.localstatequery.model.TxIn
+import io.projectnewm.kogmios.protocols.messages.MsgAcquireResponse
+import io.projectnewm.kogmios.protocols.messages.MsgQueryResponse
+import io.projectnewm.kogmios.protocols.messages.MsgReleaseResponse
+import io.projectnewm.kogmios.protocols.model.NonMyopicMemberRewardsInput
+import io.projectnewm.kogmios.protocols.model.Origin
+import io.projectnewm.kogmios.protocols.model.PointOrOrigin
+import io.projectnewm.kogmios.protocols.model.TxIn
 
 interface StateQueryClient : Client {
     /**
@@ -98,6 +98,11 @@ interface StateQueryClient : Client {
     suspend fun utxoByTxIn(filters: List<TxIn>): MsgQueryResponse
 }
 
-fun createStateQueryClient(websocketHost: String, websocketPort: Int, loggerName: String? = null): StateQueryClient {
-    return ClientImpl(websocketHost, websocketPort, loggerName)
+fun createStateQueryClient(
+    websocketHost: String,
+    websocketPort: Int,
+    ogmiosCompact: Boolean = false,
+    loggerName: String? = null
+): StateQueryClient {
+    return ClientImpl(websocketHost, websocketPort, ogmiosCompact, loggerName)
 }

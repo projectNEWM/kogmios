@@ -1,6 +1,6 @@
 package io.projectnewm.kogmios
 
-import io.projectnewm.kogmios.protocols.localstatequery.JsonWspResponse
+import io.projectnewm.kogmios.protocols.messages.JsonWspResponse
 
 interface LocalTxMonitorClient : Client {
 //    /**
@@ -19,7 +19,8 @@ interface LocalTxMonitorClient : Client {
 fun createLocalTxMonitorClient(
     websocketHost: String,
     websocketPort: Int,
+    ogmiosCompact: Boolean = false,
     loggerName: String? = null
 ): LocalTxMonitorClient {
-    return ClientImpl(websocketHost, websocketPort, loggerName)
+    return ClientImpl(websocketHost, websocketPort, ogmiosCompact, loggerName)
 }

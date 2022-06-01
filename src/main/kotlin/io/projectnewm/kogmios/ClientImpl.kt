@@ -3,13 +3,14 @@ package io.projectnewm.kogmios
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.websocket.*
-import io.projectnewm.kogmios.protocols.localstatequery.*
-import io.projectnewm.kogmios.protocols.localstatequery.model.*
+import io.projectnewm.kogmios.protocols.messages.*
+import io.projectnewm.kogmios.protocols.model.*
 import io.projectnewm.kogmios.serializers.BigDecimalSerializer
 import io.projectnewm.kogmios.serializers.BigIntegerSerializer
 import kotlinx.coroutines.*
@@ -22,15 +23,18 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 
 internal class ClientImpl(
     private val websocketHost: String,
     private val websocketPort: Int,
+    private val ogmiosCompact: Boolean = false,
     loggerName: String? = null,
 ) : CoroutineScope, StateQueryClient, LocalTxMonitorClient, LocalChainSyncClient {
 
@@ -56,10 +60,15 @@ internal class ClientImpl(
     private val queryRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgQueryResponse>>()
     private val findIntersectRequestResponseMap =
         ConcurrentHashMap<String, CompletableDeferred<MsgFindIntersectResponse>>()
+    private val requestNextRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgRequestNextResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
         HttpClient(CIO) {
+            engine {
+                // no timeout for websockets since they will stay open
+                requestTimeout = 0L
+            }
             install(WebSockets) {
                 contentConverter = object : WebsocketContentConverter {
                     override fun isApplicable(frame: Frame): Boolean = frame.frameType == FrameType.TEXT
@@ -84,13 +93,49 @@ internal class ClientImpl(
                             log.trace("deserialize() - charset: $charset, typeInfo: $typeInfo, content: $content")
                         }
                         val jsonString = (content as Frame.Text).readText()
-                        if ("jsonwsp/fault" in jsonString) {
-                            log.error(jsonString)
-                        } else {
-                            // temporary while we need to figure out how all the responses look
-                            log.debug(jsonString)
+                        // temporary while we need to figure out how all the responses look
+                        log.debug(jsonString)
+                        return try {
+                            json.decodeFromString<JsonWspResponse>(jsonString)
+                        } catch (e: Throwable) {
+                            handleError(jsonString, e)
                         }
-                        return json.decodeFromString<JsonWspResponse>(jsonString)
+                    }
+
+                    @kotlin.jvm.Throws(IOException::class)
+                    private fun handleError(jsonString: String, e: Throwable) {
+                        val ioException = IOException(jsonString, e)
+                        requestNextRequestResponseMap.keys.forEach { key ->
+                            if (key in jsonString) {
+                                requestNextRequestResponseMap.remove(key)
+                                    ?.completeExceptionally(ioException)
+                            }
+                        }
+                        acquireRequestResponseMap.keys.forEach { key ->
+                            if (key in jsonString) {
+                                acquireRequestResponseMap.remove(key)
+                                    ?.completeExceptionally(ioException)
+                            }
+                        }
+                        releaseRequestResponseMap.keys.forEach { key ->
+                            if (key in jsonString) {
+                                releaseRequestResponseMap.remove(key)
+                                    ?.completeExceptionally(ioException)
+                            }
+                        }
+                        queryRequestResponseMap.keys.forEach { key ->
+                            if (key in jsonString) {
+                                queryRequestResponseMap.remove(key)
+                                    ?.completeExceptionally(ioException)
+                            }
+                        }
+                        findIntersectRequestResponseMap.keys.forEach { key ->
+                            if (key in jsonString) {
+                                findIntersectRequestResponseMap.remove(key)
+                                    ?.completeExceptionally(ioException)
+                            }
+                        }
+                        throw ioException
                     }
                 }
             }
@@ -107,7 +152,14 @@ internal class ClientImpl(
             httpClient.webSocket(
                 method = HttpMethod.Get,
                 host = websocketHost,
-                port = websocketPort
+                port = websocketPort,
+                request = {
+                    if (ogmiosCompact) {
+                        headers {
+                            append("Sec-WebSocket-Protocol", "ogmios.v1:compact")
+                        }
+                    }
+                }
             ) {
                 session = this
                 _isConnected = true
@@ -136,6 +188,10 @@ internal class ClientImpl(
                                     }
                                     is MsgFindIntersectResponse -> {
                                         findIntersectRequestResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
+                                    is MsgRequestNextResponse -> {
+                                        requestNextRequestResponseMap.remove(response.reflection)?.complete(response)
                                             ?: log.warn("No handler found for: ${response.reflection}")
                                     }
                                 }
@@ -174,6 +230,10 @@ internal class ClientImpl(
                                         }
                                         is MsgFindIntersect -> {
                                             findIntersectRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
+                                        }
+                                        is MsgRequestNext -> {
+                                            requestNextRequestResponseMap[request.mirror] =
                                                 request.completableDeferred
                                         }
                                     }
@@ -438,6 +498,18 @@ internal class ClientImpl(
             MsgFindIntersect(
                 args = FindIntersect(points),
                 mirror = "MsgFindIntersect:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun requestNext(): MsgRequestNextResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgRequestNextResponse>()
+        sendQueue.send(
+            MsgRequestNext(
+                mirror = "MsgRequestNext:${UUID.randomUUID()}",
                 completableDeferred = completableDeferred
             )
         )
