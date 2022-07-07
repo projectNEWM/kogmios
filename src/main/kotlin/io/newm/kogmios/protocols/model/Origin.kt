@@ -1,7 +1,7 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.protocols.Const.ORIGIN
-import io.projectnewm.kogmios.protocols.model.serializers.OriginStringSerializer
+import io.newm.kogmios.protocols.Const.ORIGIN
+import io.newm.kogmios.protocols.model.serializers.OriginStringSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

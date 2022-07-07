@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.protocols
+package io.newm.kogmios.protocols
 
 object Const {
     const val JSONWSP_REQUEST = "jsonwsp/request"

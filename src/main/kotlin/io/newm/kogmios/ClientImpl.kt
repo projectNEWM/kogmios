@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -9,10 +9,10 @@ import io.ktor.serialization.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.websocket.*
-import io.projectnewm.kogmios.protocols.messages.*
-import io.projectnewm.kogmios.protocols.model.*
-import io.projectnewm.kogmios.serializers.BigDecimalSerializer
-import io.projectnewm.kogmios.serializers.BigIntegerSerializer
+import io.newm.kogmios.protocols.messages.*
+import io.newm.kogmios.protocols.model.*
+import io.newm.kogmios.serializers.BigDecimalSerializer
+import io.newm.kogmios.serializers.BigIntegerSerializer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException

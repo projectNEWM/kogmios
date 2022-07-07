@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
-import io.projectnewm.kogmios.protocols.model.QueryResult
+import io.newm.kogmios.protocols.model.QueryResult
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

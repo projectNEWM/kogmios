@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.protocols.model.serializers.StringArrayQueryResultSerializer
+import io.newm.kogmios.protocols.model.serializers.StringArrayQueryResultSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = StringArrayQueryResultSerializer::class)

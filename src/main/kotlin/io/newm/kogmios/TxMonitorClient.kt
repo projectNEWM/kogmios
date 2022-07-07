@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
-import io.projectnewm.kogmios.protocols.messages.JsonWspResponse
+import io.newm.kogmios.protocols.messages.JsonWspResponse
 
 interface LocalTxMonitorClient : Client {
 //    /**

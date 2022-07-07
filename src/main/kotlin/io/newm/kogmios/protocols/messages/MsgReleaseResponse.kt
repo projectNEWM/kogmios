@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

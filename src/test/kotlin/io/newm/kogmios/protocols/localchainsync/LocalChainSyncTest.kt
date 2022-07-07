@@ -1,15 +1,15 @@
-package io.projectnewm.kogmios.protocols.localchainsync
+package io.newm.kogmios.protocols.localchainsync
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import com.google.common.truth.Truth.assertThat
-import io.projectnewm.kogmios.ClientImpl
-import io.projectnewm.kogmios.createLocalChainSyncClient
-import io.projectnewm.kogmios.protocols.messages.IntersectionFound
-import io.projectnewm.kogmios.protocols.messages.IntersectionNotFound
-import io.projectnewm.kogmios.protocols.messages.RollBackward
-import io.projectnewm.kogmios.protocols.messages.RollForward
-import io.projectnewm.kogmios.protocols.model.*
+import io.newm.kogmios.ClientImpl
+import io.newm.kogmios.createLocalChainSyncClient
+import io.newm.kogmios.protocols.messages.IntersectionFound
+import io.newm.kogmios.protocols.messages.IntersectionNotFound
+import io.newm.kogmios.protocols.messages.RollBackward
+import io.newm.kogmios.protocols.messages.RollForward
+import io.newm.kogmios.protocols.model.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import org.junit.Ignore

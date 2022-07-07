@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.protocols.model.Query
-import io.projectnewm.kogmios.protocols.model.QueryChainTip
-import io.projectnewm.kogmios.protocols.model.QueryPoolParameters
+import io.newm.kogmios.protocols.model.Query
+import io.newm.kogmios.protocols.model.QueryChainTip
+import io.newm.kogmios.protocols.model.QueryPoolParameters
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.*
 

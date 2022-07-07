@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.ClientImpl
+import io.newm.kogmios.ClientImpl
 import kotlinx.serialization.*
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor

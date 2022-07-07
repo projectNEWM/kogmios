@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.protocols.model.serializers.UtxoByTxInQueryResultSerializer
+import io.newm.kogmios.protocols.model.serializers.UtxoByTxInQueryResultSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = UtxoByTxInQueryResultSerializer::class)

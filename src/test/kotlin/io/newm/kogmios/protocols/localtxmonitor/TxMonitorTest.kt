@@ -1,7 +1,7 @@
-package io.projectnewm.kogmios.protocols.localtxmonitor
+package io.newm.kogmios.protocols.localtxmonitor
 
 import com.google.common.truth.Truth.assertThat
-import io.projectnewm.kogmios.createLocalTxMonitorClient
+import io.newm.kogmios.createLocalTxMonitorClient
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 

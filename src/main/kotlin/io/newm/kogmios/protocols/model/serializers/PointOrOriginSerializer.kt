@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.protocols.model.Origin
-import io.projectnewm.kogmios.protocols.model.Point
-import io.projectnewm.kogmios.protocols.model.PointOrOrigin
+import io.newm.kogmios.protocols.model.Origin
+import io.newm.kogmios.protocols.model.Point
+import io.newm.kogmios.protocols.model.PointOrOrigin
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement

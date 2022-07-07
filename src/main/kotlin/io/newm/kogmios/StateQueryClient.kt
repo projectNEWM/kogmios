@@ -1,12 +1,12 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
-import io.projectnewm.kogmios.protocols.messages.MsgAcquireResponse
-import io.projectnewm.kogmios.protocols.messages.MsgQueryResponse
-import io.projectnewm.kogmios.protocols.messages.MsgReleaseResponse
-import io.projectnewm.kogmios.protocols.model.NonMyopicMemberRewardsInput
-import io.projectnewm.kogmios.protocols.model.Origin
-import io.projectnewm.kogmios.protocols.model.PointOrOrigin
-import io.projectnewm.kogmios.protocols.model.TxIn
+import io.newm.kogmios.protocols.messages.MsgAcquireResponse
+import io.newm.kogmios.protocols.messages.MsgQueryResponse
+import io.newm.kogmios.protocols.messages.MsgReleaseResponse
+import io.newm.kogmios.protocols.model.NonMyopicMemberRewardsInput
+import io.newm.kogmios.protocols.model.Origin
+import io.newm.kogmios.protocols.model.PointOrOrigin
+import io.newm.kogmios.protocols.model.TxIn
 
 interface StateQueryClient : Client {
     /**

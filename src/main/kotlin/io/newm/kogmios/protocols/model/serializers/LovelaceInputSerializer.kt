@@ -1,6 +1,6 @@
 package io.newm.kogmios.protocols.model.serializers
 
-import io.newm.kogmios.protocols.model.LongQueryResult
+import io.newm.kogmios.protocols.model.LovelaceInput
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -10,16 +10,16 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 
-object LongQueryResultSerializer : KSerializer<LongQueryResult> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("LongQueryResult")
+object LovelaceInputSerializer : KSerializer<LovelaceInput> {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("LovelaceInput")
 
-    override fun deserialize(decoder: Decoder): LongQueryResult {
+    override fun deserialize(decoder: Decoder): LovelaceInput {
         require(decoder is JsonDecoder)
         val element = decoder.decodeJsonElement()
-        return LongQueryResult(element.jsonPrimitive.long)
+        return LovelaceInput(element.jsonPrimitive.long.toBigInteger())
     }
 
-    override fun serialize(encoder: Encoder, value: LongQueryResult) {
-        encoder.encodeLong(value.value)
+    override fun serialize(encoder: Encoder, value: LovelaceInput) {
+        encoder.encodeLong(value.amount.longValueExact())
     }
 }

@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
 import com.google.common.truth.Truth.assertThat
-import io.projectnewm.kogmios.createStateQueryClient
-import io.projectnewm.kogmios.protocols.model.*
+import io.newm.kogmios.createStateQueryClient
+import io.newm.kogmios.protocols.model.*
 import kotlinx.coroutines.*
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test

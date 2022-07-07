@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.serializers
+package io.newm.kogmios.serializers
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer

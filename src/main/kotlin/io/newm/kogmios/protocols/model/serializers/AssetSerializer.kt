@@ -1,7 +1,7 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.protocols.model.Asset
-import io.projectnewm.kogmios.serializers.BigIntegerSerializer
+import io.newm.kogmios.protocols.model.Asset
+import io.newm.kogmios.serializers.BigIntegerSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer

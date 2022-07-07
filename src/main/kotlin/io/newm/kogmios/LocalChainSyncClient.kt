@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
-import io.projectnewm.kogmios.protocols.messages.MsgFindIntersectResponse
-import io.projectnewm.kogmios.protocols.messages.MsgRequestNextResponse
-import io.projectnewm.kogmios.protocols.model.PointDetailOrOrigin
+import io.newm.kogmios.protocols.messages.MsgFindIntersectResponse
+import io.newm.kogmios.protocols.messages.MsgRequestNextResponse
+import io.newm.kogmios.protocols.model.PointDetailOrOrigin
 
 interface LocalChainSyncClient : Client {
 

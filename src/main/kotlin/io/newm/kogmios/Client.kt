@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
 /**
  * Base interface for all Kogmios clients

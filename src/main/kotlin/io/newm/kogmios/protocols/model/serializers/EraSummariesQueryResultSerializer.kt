@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.ClientImpl.Companion.json
-import io.projectnewm.kogmios.protocols.model.EraSummariesQueryResult
-import io.projectnewm.kogmios.protocols.model.EraSummary
+import io.newm.kogmios.ClientImpl.Companion.json
+import io.newm.kogmios.protocols.model.EraSummariesQueryResult
+import io.newm.kogmios.protocols.model.EraSummary
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor

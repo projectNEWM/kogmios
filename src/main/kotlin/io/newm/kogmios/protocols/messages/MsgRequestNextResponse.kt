@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
-import io.projectnewm.kogmios.protocols.model.Block
-import io.projectnewm.kogmios.protocols.model.PointDetailOrOrigin
-import io.projectnewm.kogmios.protocols.model.Tip
+import io.newm.kogmios.protocols.model.Block
+import io.newm.kogmios.protocols.model.PointDetailOrOrigin
+import io.newm.kogmios.protocols.model.Tip
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

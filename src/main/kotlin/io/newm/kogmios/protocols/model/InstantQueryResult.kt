@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.protocols.model.serializers.InstantQueryResultSerializer
+import io.newm.kogmios.protocols.model.serializers.InstantQueryResultSerializer
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

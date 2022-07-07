@@ -1,6 +1,6 @@
-package io.projectnewm.kogmios.protocols.model
+package io.newm.kogmios.protocols.model
 
-import io.projectnewm.kogmios.protocols.model.serializers.BlockSerializer
+import io.newm.kogmios.protocols.model.serializers.BlockSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = BlockSerializer::class)

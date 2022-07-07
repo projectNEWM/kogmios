@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName

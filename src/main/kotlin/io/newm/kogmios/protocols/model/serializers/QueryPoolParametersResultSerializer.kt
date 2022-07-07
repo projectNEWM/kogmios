@@ -1,7 +1,7 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.protocols.model.PoolResult
-import io.projectnewm.kogmios.protocols.model.QueryPoolParametersResult
+import io.newm.kogmios.protocols.model.PoolResult
+import io.newm.kogmios.protocols.model.QueryPoolParametersResult
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer

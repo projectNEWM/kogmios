@@ -1,4 +1,4 @@
-package io.projectnewm.kogmios
+package io.newm.kogmios
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineExceptionHandler

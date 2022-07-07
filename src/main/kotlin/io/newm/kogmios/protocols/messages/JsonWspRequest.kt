@@ -1,8 +1,8 @@
-package io.projectnewm.kogmios.protocols.messages
+package io.newm.kogmios.protocols.messages
 
-import io.projectnewm.kogmios.protocols.Const.JSONWSP_REQUEST
-import io.projectnewm.kogmios.protocols.Const.JSONWSP_SERVICENAME
-import io.projectnewm.kogmios.protocols.Const.JSONWSP_VERSION
+import io.newm.kogmios.protocols.Const.JSONWSP_REQUEST
+import io.newm.kogmios.protocols.Const.JSONWSP_SERVICENAME
+import io.newm.kogmios.protocols.Const.JSONWSP_VERSION
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

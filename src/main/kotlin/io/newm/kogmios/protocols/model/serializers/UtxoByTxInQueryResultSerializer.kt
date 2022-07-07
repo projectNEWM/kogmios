@@ -1,9 +1,9 @@
-package io.projectnewm.kogmios.protocols.model.serializers
+package io.newm.kogmios.protocols.model.serializers
 
-import io.projectnewm.kogmios.ClientImpl.Companion.json
-import io.projectnewm.kogmios.protocols.model.TxIn
-import io.projectnewm.kogmios.protocols.model.TxOut
-import io.projectnewm.kogmios.protocols.model.UtxoByTxInQueryResult
+import io.newm.kogmios.ClientImpl.Companion.json
+import io.newm.kogmios.protocols.model.TxIn
+import io.newm.kogmios.protocols.model.TxOut
+import io.newm.kogmios.protocols.model.UtxoByTxInQueryResult
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
