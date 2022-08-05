@@ -56,11 +56,11 @@ data class UpdateProposalBabbage(
     @SerialName("costModels")
     val costModels: CostModels?,
     @SerialName("prices")
-    val prices: Prices?,
+    val prices: ExecutionUnits?,
     @SerialName("maxExecutionUnitsPerTransaction")
-    val maxExecutionUnitsPerTransaction: Prices?,
+    val maxExecutionUnitsPerTransaction: ExecutionUnits?,
     @SerialName("maxExecutionUnitsPerBlock")
-    val maxExecutionUnitsPerBlock: Prices?,
+    val maxExecutionUnitsPerBlock: ExecutionUnits?,
     @SerialName("maxValueSize")
     @Contextual
     val maxValueSize: BigInteger?,

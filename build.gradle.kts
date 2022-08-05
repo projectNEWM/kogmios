@@ -4,8 +4,8 @@ plugins {
     java
     id("com.github.ben-manes.versions") version "0.42.0"
     id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    kotlin("jvm") version "1.7.0"
-    kotlin("plugin.serialization") version "1.7.0"
+    kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
 }
 
 group = "io.projectnewm"
@@ -16,13 +16,13 @@ java.targetCompatibility = JavaVersion.VERSION_16
 
 object Versions {
     const val commonsLogging = "1.2"
-    const val coroutines = "1.6.3"
+    const val coroutines = "1.6.4"
     const val googleTruth = "1.1.3"
-    const val junit = "5.8.2"
-    const val kotlin = "1.7.0"
+    const val junit = "5.9.0"
+    const val kotlin = "1.7.10"
     const val ktor = "2.0.3"
     const val logback = "1.2.11"
-    const val mockk = "1.12.4"
+    const val mockk = "1.12.5"
     const val kotlinxDatetime = "0.4.0"
     const val kotlinxSerialization = "1.3.3"
 }

@@ -36,7 +36,7 @@ internal class ClientImpl(
     private val websocketPort: Int,
     private val ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-) : CoroutineScope, StateQueryClient, LocalTxMonitorClient, LocalChainSyncClient {
+) : CoroutineScope, StateQueryClient, LocalTxMonitorClient, LocalChainSyncClient, LocalTxSubmitClient {
 
     private val log by lazy {
         if (loggerName == null) {
@@ -61,6 +61,7 @@ internal class ClientImpl(
     private val findIntersectRequestResponseMap =
         ConcurrentHashMap<String, CompletableDeferred<MsgFindIntersectResponse>>()
     private val requestNextRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgRequestNextResponse>>()
+    private val submitTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgSubmitTxResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
@@ -194,6 +195,10 @@ internal class ClientImpl(
                                         requestNextRequestResponseMap.remove(response.reflection)?.complete(response)
                                             ?: log.warn("No handler found for: ${response.reflection}")
                                     }
+                                    is MsgSubmitTxResponse -> {
+                                        submitTxResponseMap.remove(response.reflection)?.complete(response)
+                                            ?: log.warn("No handler found for: ${response.reflection}")
+                                    }
                                 }
                             } catch (e: ClosedReceiveChannelException) {
                                 if (!isClosing) {
@@ -234,6 +239,10 @@ internal class ClientImpl(
                                         }
                                         is MsgRequestNext -> {
                                             requestNextRequestResponseMap[request.mirror] =
+                                                request.completableDeferred
+                                        }
+                                        is MsgSubmitTx -> {
+                                            submitTxResponseMap[request.mirror] =
                                                 request.completableDeferred
                                         }
                                     }
@@ -511,6 +520,19 @@ internal class ClientImpl(
             MsgRequestNext(
                 mirror = "MsgRequestNext:${UUID.randomUUID()}",
                 completableDeferred = completableDeferred
+            )
+        )
+        return completableDeferred.await()
+    }
+
+    override suspend fun submit(tx: String): MsgSubmitTxResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgSubmitTxResponse>()
+        sendQueue.send(
+            MsgSubmitTx(
+                args = SubmitTx(tx),
+                mirror = "MsgSubmitTx:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred,
             )
         )
         return completableDeferred.await()
