@@ -58,7 +58,7 @@ class MetadataList : MetadataValue(), MutableList<MetadataValue> by mutableListO
     }
 
     override fun toString(): String {
-        return "MetadataList(${this.joinToString { metadataValue -> metadataValue.toString() }})"
+        return "MetadataList([${this.joinToString { metadataValue -> metadataValue.toString() }}])"
     }
 }
 

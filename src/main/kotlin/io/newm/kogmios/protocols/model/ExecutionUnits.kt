@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
 @Serializable
-data class Prices(
+data class ExecutionUnits(
     @SerialName("memory")
     @Contextual
     val memory: BigDecimal,

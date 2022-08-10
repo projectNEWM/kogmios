@@ -68,11 +68,11 @@ data class QueryCurrentProtocolAlonzoParametersResult(
     @SerialName("costModels")
     val costModels: CostModels,
     @SerialName("prices")
-    val prices: Prices,
+    val prices: ExecutionUnits,
     @SerialName("maxExecutionUnitsPerTransaction")
-    val maxExecutionUnitsPerTransaction: MaxExecutionUnitsPerTransaction,
+    val maxExecutionUnitsPerTransaction: ExecutionUnits,
     @SerialName("maxExecutionUnitsPerBlock")
-    val maxExecutionUnitsPerBlock: MaxExecutionUnitsPerBlock,
+    val maxExecutionUnitsPerBlock: ExecutionUnits,
     @Contextual
     @SerialName("maxValueSize")
     val maxValueSize: BigInteger,
@@ -133,11 +133,11 @@ data class QueryCurrentProtocolBabbageParametersResult(
     @SerialName("costModels")
     val costModels: CostModels,
     @SerialName("prices")
-    val prices: Prices,
+    val prices: ExecutionUnits,
     @SerialName("maxExecutionUnitsPerTransaction")
-    val maxExecutionUnitsPerTransaction: MaxExecutionUnitsPerTransaction,
+    val maxExecutionUnitsPerTransaction: ExecutionUnits,
     @SerialName("maxExecutionUnitsPerBlock")
-    val maxExecutionUnitsPerBlock: MaxExecutionUnitsPerBlock,
+    val maxExecutionUnitsPerBlock: ExecutionUnits,
     @Contextual
     @SerialName("maxValueSize")
     val maxValueSize: BigInteger,
