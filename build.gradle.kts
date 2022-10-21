@@ -2,13 +2,14 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version "0.42.0"
-    id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.serialization") version "1.7.10"
+    id("com.github.ben-manes.versions") version "0.43.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    kotlin("jvm") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
+    id("maven-publish")
 }
 
-group = "io.projectnewm"
+group = "io.newm"
 version = "0.0.1-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_16
@@ -18,13 +19,13 @@ object Versions {
     const val commonsLogging = "1.2"
     const val coroutines = "1.6.4"
     const val googleTruth = "1.1.3"
-    const val junit = "5.9.0"
-    const val kotlin = "1.7.10"
-    const val ktor = "2.0.3"
-    const val logback = "1.2.11"
-    const val mockk = "1.12.5"
+    const val junit = "5.9.1"
+    const val kotlin = "1.7.20"
+    const val ktor = "2.1.2"
+    const val logback = "1.4.4"
+    const val mockk = "1.13.2"
     const val kotlinxDatetime = "0.4.0"
-    const val kotlinxSerialization = "1.3.3"
+    const val kotlinxSerialization = "1.4.1"
 }
 
 repositories {
@@ -53,6 +54,14 @@ dependencies {
     testImplementation("com.google.truth:truth:${Versions.googleTruth}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }
 
 fun isNonStable(version: String): Boolean {

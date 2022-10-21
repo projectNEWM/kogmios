@@ -531,5 +531,5 @@ data class PlutusV2(
     val verifySchnorrSecp256k1SignatureCpuArgumentsSlope: BigInteger,
     @Contextual
     @SerialName("verifySchnorrSecp256k1Signature-memory-arguments")
-    val verifySchnorrSecp256k1SignatureMemoryArguments: Int
+    val verifySchnorrSecp256k1SignatureMemoryArguments: BigInteger,
 )

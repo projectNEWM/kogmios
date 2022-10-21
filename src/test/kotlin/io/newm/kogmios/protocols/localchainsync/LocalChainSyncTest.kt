@@ -45,13 +45,19 @@ class LocalChainSyncTest {
 
         val response = client.findIntersect(
             listOf(
-                PointDetail(slot = 1598399L, hash = "7e16781b40ebf8b6da18f7b5e8ade855d6738095ef2f1c58c77e88b6e45997a4")
+                // last byron block on preprod
+                PointDetail(
+                    slot = 84242L,
+                    hash = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af"
+                )
+                // last byron block on old testnet
+                // PointDetail(slot = 1598399L, hash = "7e16781b40ebf8b6da18f7b5e8ade855d6738095ef2f1c58c77e88b6e45997a4")
             )
         )
         assertThat(response).isNotNull()
         assertThat(response.result).isInstanceOf(IntersectionFound::class.java)
         assertThat(((response.result as IntersectionFound).intersectionFound.point as PointDetail).slot).isEqualTo(
-            1598399L
+            84242L
         )
     }
 
@@ -221,19 +227,24 @@ class LocalChainSyncTest {
 
         val intersectResponse = client.findIntersect(
             listOf(
+                // preprod
                 // last byron block
-                PointDetail(slot = 1598399L, hash = "7e16781b40ebf8b6da18f7b5e8ade855d6738095ef2f1c58c77e88b6e45997a4")
+                PointDetail(slot = 84242L, hash = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af")
+
+
+                // old testnet
+                // PointDetail(slot = 1598399L, hash = "7e16781b40ebf8b6da18f7b5e8ade855d6738095ef2f1c58c77e88b6e45997a4")
                 // last mary block
                 // PointDetail(slot = 36158304L, hash = "2b95ce628d36c3f8f37a32c2942b48e4f9295ccfe8190bcbc1f012e1e97c79eb")
                 // last alonzo block
                 // PointDetail(slot = 61625037L, hash = "f4d6cb98b12cd92fd93ebb1b60ae5c3f71f6ff48ede5cfd369c3e1894b5bf585")
             )
         )
-//        assertThat(intersectResponse).isNotNull()
-//        assertThat(intersectResponse.result).isInstanceOf(IntersectionFound::class.java)
-//        assertThat(((intersectResponse.result as IntersectionFound).intersectionFound.point as PointDetail).slot).isEqualTo(
-//            1598399L
-//        )
+        assertThat(intersectResponse).isNotNull()
+        assertThat(intersectResponse.result).isInstanceOf(IntersectionFound::class.java)
+        assertThat(((intersectResponse.result as IntersectionFound).intersectionFound.point as PointDetail).slot).isEqualTo(
+            84242L
+        )
 
         var lastLogged = Instant.EPOCH
         while (true) {
@@ -242,6 +253,7 @@ class LocalChainSyncTest {
                 is RollBackward -> {
                     log.info("RollBackward: ${(response.result as RollBackward).rollBackward.point}")
                 }
+
                 is RollForward -> {
                     (response.result as RollForward).rollForward.let { rollForward ->
                         val blockHeight = rollForward.block.header.blockHeight

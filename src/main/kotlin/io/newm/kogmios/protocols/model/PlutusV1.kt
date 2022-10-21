@@ -504,5 +504,5 @@ data class PlutusV1(
     val verifyEd25519SignatureCpuArgumentsSlope: BigInteger,
     @Contextual
     @SerialName("verifyEd25519Signature-memory-arguments")
-    val verifyEd25519SignatureMemoryArguments: Int
+    val verifyEd25519SignatureMemoryArguments: BigInteger,
 )
