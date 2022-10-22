@@ -231,7 +231,6 @@ class LocalChainSyncTest {
                 // last byron block
                 PointDetail(slot = 84242L, hash = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af")
 
-
                 // old testnet
                 // PointDetail(slot = 1598399L, hash = "7e16781b40ebf8b6da18f7b5e8ade855d6738095ef2f1c58c77e88b6e45997a4")
                 // last mary block

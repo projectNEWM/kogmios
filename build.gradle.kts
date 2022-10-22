@@ -7,6 +7,8 @@ plugins {
     kotlin("jvm") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
     id("maven-publish")
+    id("signing")
+    id("org.hibernate.build.maven-repo-auth") version "3.0.4"
 }
 
 group = "io.newm"
@@ -56,12 +58,84 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
 }
 
+tasks {
+
+    val sourcesJar by registering(Jar::class) {
+        archiveClassifier.set("sources")
+        dependsOn("classes")
+        from(sourceSets["main"].allSource)
+    }
+
+    val javadocJar by registering(Jar::class) {
+        archiveClassifier.set("javadoc")
+        dependsOn("javadoc")
+        from("$buildDir/javadoc")
+    }
+
+    artifacts {
+        archives(javadocJar)
+        archives(sourcesJar)
+    }
+
+    assemble {
+        dependsOn("sourcesJar", "javadocJar")
+    }
+}
+
 publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
+    repositories {
+        maven {
+            name = "ossrh"
+            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+            if (project.hasProperty("release")) {
+                setUrl(releasesRepoUrl)
+            } else {
+                setUrl(snapshotsRepoUrl)
+            }
         }
     }
+    publications {
+        create<MavenPublication>("mavenKotlin") {
+            from(components["kotlin"])
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+
+            pom {
+                groupId = "io.newm"
+                artifactId = "kogmios"
+
+                name.set("Kogmios")
+                description.set("Kotlin Wrapper for Ogmios")
+                url.set("https://github.com/projectNEWM/kogmios")
+                licenses {
+                    license {
+                        name.set("Apache 2.0")
+                        url.set("https://github.com/projectNEWM/kogmios/blob/master/LICENSE")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("AndrewWestberg")
+                        name.set("Andrew Westberg")
+                        email.set("andrewwestberg@gmail.com")
+                        organization.set("NEWM")
+                        organizationUrl.set("https://newm.io")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/projectNEWM/kogmios.git")
+                    developerConnection.set("scm:git:ssh://github.com/projectNEWM/kogmios.git")
+                    url.set("https://github.com/projectNEWM/kogmios")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useGpgCmd()
+    sign(publishing.publications["mavenKotlin"])
 }
 
 fun isNonStable(version: String): Boolean {
