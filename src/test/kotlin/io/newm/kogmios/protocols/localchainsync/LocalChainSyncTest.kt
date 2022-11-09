@@ -265,6 +265,36 @@ class LocalChainSyncTest {
                             log.info("RollForward: block $blockHeight of $tipBlockHeight: %.2f%% sync'd".format(percent))
                             lastLogged = now
                         }
+//                        when (rollForward.block) {
+//                            is BlockMary -> {
+//                                (rollForward.block as BlockMary).mary.body.forEach { txMary ->
+//                                    txMary.metadata?.let {
+//                                        val m721 = it.body.blob?.get(721.toBigInteger())
+//                                        log.warn(m721.toString())
+//                                    }
+//                                }
+//                            }
+//
+//                            is BlockAlonzo -> {
+//                                (rollForward.block as BlockAlonzo).alonzo.body.forEach { txMary ->
+//                                    txMary.metadata?.let {
+//                                        val m721 = it.body.blob?.get(721.toBigInteger())
+//                                        log.warn(m721.toString())
+//                                    }
+//                                }
+//                            }
+//
+//                            is BlockBabbage -> {
+//                                (rollForward.block as BlockBabbage).babbage.body.forEach { txMary ->
+//                                    txMary.metadata?.let {
+//                                        val m721 = it.body.blob?.get(721.toBigInteger())
+//                                        log.warn(m721.toString())
+//                                    }
+//                                }
+//                            }
+//
+//                            else -> {}
+//                        }
                     }
                 }
             }

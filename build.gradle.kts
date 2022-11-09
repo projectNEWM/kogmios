@@ -4,8 +4,8 @@ plugins {
     java
     id("com.github.ben-manes.versions") version "0.43.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    kotlin("jvm") version "1.7.20"
-    kotlin("plugin.serialization") version "1.7.20"
+    kotlin("jvm") version "1.7.21"
+    kotlin("plugin.serialization") version "1.7.21"
     id("maven-publish")
     id("signing")
     id("org.hibernate.build.maven-repo-auth") version "3.0.4"
@@ -14,16 +14,16 @@ plugins {
 group = "io.newm"
 version = "0.0.1-SNAPSHOT"
 
-java.sourceCompatibility = JavaVersion.VERSION_16
-java.targetCompatibility = JavaVersion.VERSION_16
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
 object Versions {
     const val commonsLogging = "1.2"
     const val coroutines = "1.6.4"
     const val googleTruth = "1.1.3"
     const val junit = "5.9.1"
-    const val kotlin = "1.7.20"
-    const val ktor = "2.1.2"
+    const val kotlin = "1.7.21"
+    const val ktor = "2.1.3"
     const val logback = "1.4.4"
     const val mockk = "1.13.2"
     const val kotlinxDatetime = "0.4.0"

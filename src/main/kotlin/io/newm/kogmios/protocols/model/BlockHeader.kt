@@ -23,6 +23,8 @@ data class BlockHeader(
     // optional for compact mode
     @SerialName("signature")
     val signature: String? = null,
+    @SerialName("vrfInput")
+    val vrfInput: CertifiedVrf? = null,
     @SerialName("nonce")
     val nonce: CertifiedVrf? = null,
     @SerialName("leaderValue")
