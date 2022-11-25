@@ -34,9 +34,10 @@ import kotlin.coroutines.CoroutineContext
 internal class ClientImpl(
     private val websocketHost: String,
     private val websocketPort: Int,
+    private val secure: Boolean = false,
     private val ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-) : CoroutineScope, StateQueryClient, LocalTxMonitorClient, LocalChainSyncClient, LocalTxSubmitClient {
+) : CoroutineScope, StateQueryClient, TxMonitorClient, ChainSyncClient, TxSubmitClient {
 
     private val log by lazy {
         if (loggerName == null) {
@@ -50,6 +51,7 @@ internal class ClientImpl(
     override val isConnected: Boolean
         get() = _isConnected
     private var isClosing = false
+    private var fatalException: Throwable? = null
     private val sendClose = CompletableDeferred<Unit>()
     private val receiveClose = CompletableDeferred<Unit>()
 
@@ -62,6 +64,7 @@ internal class ClientImpl(
         ConcurrentHashMap<String, CompletableDeferred<MsgFindIntersectResponse>>()
     private val requestNextRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgRequestNextResponse>>()
     private val submitTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgSubmitTxResponse>>()
+    private val evaluateTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgEvaluateTxResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
@@ -84,6 +87,7 @@ internal class ClientImpl(
                                     // temporary while we need to figure out how all the requests look
                                     log.debug(it)
                                 }
+
                                 else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
                             }
                         )
@@ -149,124 +153,159 @@ internal class ClientImpl(
 
     private fun connectInternal(): CompletableDeferred<Boolean> {
         val result = CompletableDeferred<Boolean>()
-        launch {
-            httpClient.webSocket(
-                method = HttpMethod.Get,
-                host = websocketHost,
-                port = websocketPort,
-                request = {
-                    if (ogmiosCompact) {
-                        headers {
-                            append("Sec-WebSocket-Protocol", "ogmios.v1:compact")
-                        }
-                    }
-                }
-            ) {
-                session = this
-                _isConnected = true
-                result.complete(true)
-                awaitAll(
-                    // Receive Loop
-                    async {
-                        while (!session.incoming.isClosedForReceive) {
-                            try {
-                                val response = session.receiveDeserialized<JsonWspResponse>()
-                                if (log.isDebugEnabled) {
-                                    log.debug("response: $response")
-                                }
-                                when (response) {
-                                    is MsgAcquireResponse -> {
-                                        acquireRequestResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                    is MsgReleaseResponse -> {
-                                        releaseRequestResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                    is MsgQueryResponse -> {
-                                        queryRequestResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                    is MsgFindIntersectResponse -> {
-                                        findIntersectRequestResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                    is MsgRequestNextResponse -> {
-                                        requestNextRequestResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                    is MsgSubmitTxResponse -> {
-                                        submitTxResponseMap.remove(response.reflection)?.complete(response)
-                                            ?: log.warn("No handler found for: ${response.reflection}")
-                                    }
-                                }
-                            } catch (e: ClosedReceiveChannelException) {
-                                if (!isClosing) {
-                                    log.error("websocketClient.incoming was closed.", e)
-                                }
-                            }
-                        }
-                        if (isClosing) {
-                            log.debug("websocketClient.incoming was closed.")
-                        }
-                        receiveClose.complete(Unit)
-                    },
 
-                    // Send Loop
-                    async {
-                        while (!session.outgoing.isClosedForSend) {
-                            try {
-                                sendQueue.consumeEach { request ->
-                                    if (log.isDebugEnabled) {
-                                        log.debug("request: $request")
-                                    }
-                                    when (request) {
-                                        is MsgAcquire -> {
-                                            acquireRequestResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                        is MsgRelease -> {
-                                            releaseRequestResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                        is MsgQuery -> {
-                                            queryRequestResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                        is MsgFindIntersect -> {
-                                            findIntersectRequestResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                        is MsgRequestNext -> {
-                                            requestNextRequestResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                        is MsgSubmitTx -> {
-                                            submitTxResponseMap[request.mirror] =
-                                                request.completableDeferred
-                                        }
-                                    }
-                                    session.sendSerialized(request)
-                                }
-                            } catch (e: ClosedSendChannelException) {
-                                if (!isClosing) {
-                                    log.error("websocketClient.outgoing was closed.", e)
-                                }
+        launch {
+            try {
+                httpClient.webSocket(
+                    method = HttpMethod.Get,
+                    host = websocketHost,
+                    port = websocketPort,
+                    request = {
+                        if (secure) {
+                            url("wss", websocketHost, websocketPort)
+                        }
+                        if (ogmiosCompact) {
+                            headers {
+                                append("Sec-WebSocket-Protocol", "ogmios.v1:compact")
                             }
                         }
-                        if (isClosing) {
-                            log.debug("websocketClient.outgoing was closed.")
-                        }
-                        sendClose.complete(Unit)
                     }
-                )
-                log.debug("Websocket completed normally.")
+                ) {
+                    session = this
+                    _isConnected = true
+                    result.complete(true)
+                    awaitAll(
+                        // Receive Loop
+                        async {
+                            while (!session.incoming.isClosedForReceive) {
+                                try {
+                                    val response = session.receiveDeserialized<JsonWspResponse>()
+                                    if (log.isDebugEnabled) {
+                                        log.debug("response: $response")
+                                    }
+                                    when (response) {
+                                        is MsgAcquireResponse -> {
+                                            acquireRequestResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgReleaseResponse -> {
+                                            releaseRequestResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgQueryResponse -> {
+                                            queryRequestResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgFindIntersectResponse -> {
+                                            findIntersectRequestResponseMap.remove(response.reflection)
+                                                ?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgRequestNextResponse -> {
+                                            requestNextRequestResponseMap.remove(response.reflection)
+                                                ?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgSubmitTxResponse -> {
+                                            submitTxResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgEvaluateTxResponse -> {
+                                            evaluateTxResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+                                    }
+                                } catch (e: ClosedReceiveChannelException) {
+                                    if (!isClosing) {
+                                        log.warn("websocketClient.incoming was closed unexpectedly.")
+                                        fatalException = e
+                                        _isConnected = false
+                                    }
+                                }
+                            }
+                            if (isClosing) {
+                                log.debug("websocketClient.incoming was closed.")
+                            }
+                            receiveClose.complete(Unit)
+                        },
+
+                        // Send Loop
+                        async {
+                            while (!session.outgoing.isClosedForSend) {
+                                try {
+                                    sendQueue.consumeEach { request ->
+                                        if (log.isDebugEnabled) {
+                                            log.debug("request: $request")
+                                        }
+                                        when (request) {
+                                            is MsgAcquire -> {
+                                                acquireRequestResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgRelease -> {
+                                                releaseRequestResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgQuery -> {
+                                                queryRequestResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgFindIntersect -> {
+                                                findIntersectRequestResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgRequestNext -> {
+                                                requestNextRequestResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgSubmitTx -> {
+                                                submitTxResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgEvaluateTx -> {
+                                                evaluateTxResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+                                        }
+                                        session.sendSerialized(request)
+                                    }
+                                } catch (e: ClosedSendChannelException) {
+                                    if (!isClosing) {
+                                        log.warn("websocketClient.outgoing was closed unexpectedly.")
+                                        fatalException = e
+                                        _isConnected = false
+                                    }
+                                }
+                            }
+                            if (isClosing) {
+                                log.debug("websocketClient.outgoing was closed.")
+                            }
+                            sendClose.complete(Unit)
+                        }
+                    )
+                    log.debug("Websocket completed normally.")
+                }
+            } catch (e: Throwable) {
+                log.error("Connection Error!", e)
+                result.complete(false)
             }
         }
         return result
     }
 
-    override suspend fun acquire(pointOrOrigin: PointOrOrigin): MsgAcquireResponse {
+    override suspend fun acquire(pointOrOrigin: PointOrOrigin, timeoutMs: Long): MsgAcquireResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgAcquireResponse>()
         sendQueue.send(
@@ -276,10 +315,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun release(): MsgReleaseResponse {
+    override suspend fun release(timeoutMs: Long): MsgReleaseResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgReleaseResponse>()
         sendQueue.send(
@@ -288,10 +331,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun chainTip(): MsgQueryResponse {
+    override suspend fun chainTip(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -301,10 +348,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun poolParameters(pools: List<String>): MsgQueryResponse {
+    override suspend fun poolParameters(pools: List<String>, timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -314,10 +365,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun blockHeight(): MsgQueryResponse {
+    override suspend fun blockHeight(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -327,10 +382,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun currentProtocolParameters(): MsgQueryResponse {
+    override suspend fun currentProtocolParameters(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -340,10 +399,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun currentEpoch(): MsgQueryResponse {
+    override suspend fun currentEpoch(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -353,10 +416,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun poolIds(): MsgQueryResponse {
+    override suspend fun poolIds(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -366,10 +433,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun delegationsAndRewards(stakeAddresses: List<String>): MsgQueryResponse {
+    override suspend fun delegationsAndRewards(stakeAddresses: List<String>, timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -379,10 +450,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun eraStart(): MsgQueryResponse {
+    override suspend fun eraStart(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -392,10 +467,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun eraSummaries(): MsgQueryResponse {
+    override suspend fun eraSummaries(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -405,10 +484,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun genesisConfig(): MsgQueryResponse {
+    override suspend fun genesisConfig(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -418,10 +501,17 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun nonMyopicMemberRewards(inputs: List<NonMyopicMemberRewardsInput>): MsgQueryResponse {
+    override suspend fun nonMyopicMemberRewards(
+        inputs: List<NonMyopicMemberRewardsInput>,
+        timeoutMs: Long
+    ): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -431,10 +521,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun proposedProtocolParameters(): MsgQueryResponse {
+    override suspend fun proposedProtocolParameters(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -444,10 +538,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun stakeDistribution(): MsgQueryResponse {
+    override suspend fun stakeDistribution(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -457,10 +555,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun systemStart(): MsgQueryResponse {
+    override suspend fun systemStart(timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -470,10 +572,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun utxoByTxIn(filters: List<TxIn>): MsgQueryResponse {
+    override suspend fun utxoByTxIn(filters: List<TxIn>, timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
@@ -483,10 +589,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun hasTx(txId: String): JsonWspResponse {
+    override suspend fun hasTx(txId: String, timeoutMs: Long): JsonWspResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         // FIXME: Implement
@@ -497,10 +607,14 @@ internal class ClientImpl(
 //                completableDeferred = completableDeferred
 //            )
 //        )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun findIntersect(points: List<PointDetailOrOrigin>): MsgFindIntersectResponse {
+    override suspend fun findIntersect(points: List<PointDetailOrOrigin>, timeoutMs: Long): MsgFindIntersectResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgFindIntersectResponse>()
         sendQueue.send(
@@ -510,10 +624,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun requestNext(): MsgRequestNextResponse {
+    override suspend fun requestNext(timeoutMs: Long): MsgRequestNextResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgRequestNextResponse>()
         sendQueue.send(
@@ -522,10 +640,14 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
     }
 
-    override suspend fun submit(tx: String): MsgSubmitTxResponse {
+    override suspend fun submit(tx: String, timeoutMs: Long): MsgSubmitTxResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgSubmitTxResponse>()
         sendQueue.send(
@@ -535,7 +657,32 @@ internal class ClientImpl(
                 completableDeferred = completableDeferred,
             )
         )
-        return completableDeferred.await()
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override suspend fun evaluate(tx: String, timeoutMs: Long): MsgEvaluateTxResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgEvaluateTxResponse>()
+        sendQueue.send(
+            MsgEvaluateTx(
+                args = EvaluateTx(tx),
+                mirror = "MsgEvaluateTx:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred,
+            )
+        )
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override fun close() {
+        shutdown()
     }
 
     /**
@@ -551,7 +698,6 @@ internal class ClientImpl(
                 sendQueue.close()
                 sendClose.await()
                 httpClient.close()
-                job.cancelAndJoin()
             }
             _isConnected = false
         }
@@ -560,7 +706,9 @@ internal class ClientImpl(
     @Throws(IllegalStateException::class)
     private fun assertConnected() {
         if (!_isConnected) {
-            throw IllegalStateException("Kogmios client must be connected! Did you forget to call connect()?")
+            fatalException?.let {
+                throw it
+            } ?: throw IllegalStateException("Kogmios client must be connected! Did you forget to call connect()?")
         }
     }
 
