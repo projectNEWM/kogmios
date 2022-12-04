@@ -1,5 +1,10 @@
+# We may start running these on docker in the future,
+# but I wanted to put something in place in the meantime
 name: ktlint
 on:
+  push:
+    branches:
+      - master
   pull_request:
 
 jobs:
@@ -10,9 +15,9 @@ jobs:
       - uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
-          java-version: '16'
+          java-version: '17'
       - run: |
-          curl -sSLO https://github.com/pinterest/ktlint/releases/download/0.42.1/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/0.43.2/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
       - name: run ktlint
         run: |
           ktlint --reporter=checkstyle,output=build/ktlint-report.xml

@@ -1,8 +1,9 @@
 package io.newm.kogmios
 
+import io.newm.kogmios.Client.Companion.DEFAULT_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.protocols.messages.JsonWspResponse
 
-interface LocalTxMonitorClient : Client {
+interface TxMonitorClient : Client {
 //    /**
 //     * Acquire the mempool
 //     */
@@ -13,14 +14,15 @@ interface LocalTxMonitorClient : Client {
 //     */
 //    suspend fun release(): MsgReleaseResponse
 
-    suspend fun hasTx(txId: String): JsonWspResponse
+    suspend fun hasTx(txId: String, timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): JsonWspResponse
 }
 
-fun createLocalTxMonitorClient(
+fun createTxMonitorClient(
     websocketHost: String,
     websocketPort: Int,
+    secure: Boolean = false,
     ogmiosCompact: Boolean = false,
     loggerName: String? = null
-): LocalTxMonitorClient {
-    return ClientImpl(websocketHost, websocketPort, ogmiosCompact, loggerName)
+): TxMonitorClient {
+    return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

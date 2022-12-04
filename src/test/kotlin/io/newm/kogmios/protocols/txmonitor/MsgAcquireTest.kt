@@ -1,4 +1,4 @@
-package io.newm.kogmios.protocols.localtxmonitor
+package io.newm.kogmios.protocols.txmonitor
 
 import com.google.common.truth.Truth.assertThat
 import io.newm.kogmios.ClientImpl

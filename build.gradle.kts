@@ -1,14 +1,20 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import org.hibernate.build.publish.auth.maven.MavenRepoAuthPlugin
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version "0.43.0"
+    id("com.github.ben-manes.versions") version "0.44.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    kotlin("jvm") version "1.7.21"
-    kotlin("plugin.serialization") version "1.7.21"
+    kotlin("jvm") version "1.7.22"
+    kotlin("plugin.serialization") version "1.7.22"
     id("maven-publish")
     id("signing")
-    id("org.hibernate.build.maven-repo-auth") version "3.0.4"
+    id("org.hibernate.build.maven-repo-auth") version "3.0.4" apply false
+}
+
+if (!project.hasProperty("isGithubActions")) {
+    // only use this plugin if we're running locally, not on github.
+    apply<MavenRepoAuthPlugin>()
 }
 
 group = "io.newm"
@@ -22,10 +28,10 @@ object Versions {
     const val coroutines = "1.6.4"
     const val googleTruth = "1.1.3"
     const val junit = "5.9.1"
-    const val kotlin = "1.7.21"
+    const val kotlin = "1.7.22"
     const val ktor = "2.1.3"
-    const val logback = "1.4.4"
-    const val mockk = "1.13.2"
+    const val logback = "1.4.5"
+    const val mockk = "1.13.3"
     const val kotlinxDatetime = "0.4.0"
     const val kotlinxSerialization = "1.4.1"
 }
@@ -56,6 +62,10 @@ dependencies {
     testImplementation("com.google.truth:truth:${Versions.googleTruth}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
+}
+
+ktlint {
+    version.set("0.43.2")
 }
 
 tasks {

@@ -1,7 +1,7 @@
-package io.newm.kogmios.protocols.localtxmonitor
+package io.newm.kogmios.protocols.txmonitor
 
 import com.google.common.truth.Truth.assertThat
-import io.newm.kogmios.createLocalTxMonitorClient
+import io.newm.kogmios.createTxMonitorClient
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
@@ -9,7 +9,11 @@ class TxMonitorTest {
 
     @Test
     fun `test acquire origin`() = runBlocking {
-        val client = createLocalTxMonitorClient(websocketHost = "clockwork", websocketPort = 1337)
+        val client = createTxMonitorClient(
+            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketPort = 443,
+            secure = true,
+        )
         val connectResult = client.connect()
         assertThat(connectResult).isTrue()
         assertThat(client.isConnected).isTrue()
