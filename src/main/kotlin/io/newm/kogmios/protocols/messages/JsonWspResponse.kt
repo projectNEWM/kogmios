@@ -6,6 +6,9 @@ import io.newm.kogmios.protocols.Const.JSONWSP_VERSION
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Base class for all Ogmios responses.
+ */
 @Serializable
 sealed class JsonWspResponse {
     @SerialName("type")

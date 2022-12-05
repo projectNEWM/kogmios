@@ -1,29 +1,33 @@
 package io.newm.kogmios.protocols.messages
 
-import io.newm.kogmios.protocols.model.Query
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message sent to query various ledger state items.
+ * Request the Next transaction from the mempool snapshot
  */
 @Serializable
-@SerialName("Query")
-data class MsgQuery(
+@SerialName("NextTx")
+data class MsgNextTx(
     @SerialName("args")
-    val args: Query,
+    val args: Fields = Fields(),
     @SerialName("mirror")
     override val mirror: String,
     @kotlinx.serialization.Transient
-    val completableDeferred: CompletableDeferred<MsgQueryResponse> = CompletableDeferred(),
+    val completableDeferred: CompletableDeferred<MsgNextTxResponse> = CompletableDeferred(),
 ) : JsonWspRequest()
 
+@Serializable
+data class Fields(
+    @SerialName("fields")
+    val fields: String = "all"
+)
 // JSON Example
 // {
 //    "type": "jsonwsp/request",
 //    "version": "1.0",
 //    "servicename": "ogmios",
-//    "methodname": "Query",
-//    "args": { "query": "chainTip" }
+//    "methodname": "NextTx",
+//    "args": { "fields": "all" }
 // }

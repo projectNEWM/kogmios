@@ -11,7 +11,7 @@ import kotlinx.serialization.json.*
 import java.math.BigInteger
 
 /**
- * Response that comes back from Ogmios after a FindIntersect message is sent.
+ * Response that comes back from Ogmios after a SubmitTx message is sent.
  */
 @Serializable
 @SerialName("SubmitTx")

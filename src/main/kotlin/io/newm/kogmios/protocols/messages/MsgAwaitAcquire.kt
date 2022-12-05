@@ -1,22 +1,22 @@
 package io.newm.kogmios.protocols.messages
 
-import io.newm.kogmios.protocols.model.Query
+import io.newm.kogmios.protocols.model.EmptyObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Message sent to query various ledger state items.
+ * Acquire a mempool snapshot
  */
 @Serializable
-@SerialName("Query")
-data class MsgQuery(
+@SerialName("AwaitAcquire")
+data class MsgAwaitAcquire(
     @SerialName("args")
-    val args: Query,
+    val args: EmptyObject,
     @SerialName("mirror")
     override val mirror: String,
     @kotlinx.serialization.Transient
-    val completableDeferred: CompletableDeferred<MsgQueryResponse> = CompletableDeferred(),
+    val completableDeferred: CompletableDeferred<MsgAwaitAcquireMempoolResponse> = CompletableDeferred(),
 ) : JsonWspRequest()
 
 // JSON Example
@@ -24,6 +24,6 @@ data class MsgQuery(
 //    "type": "jsonwsp/request",
 //    "version": "1.0",
 //    "servicename": "ogmios",
-//    "methodname": "Query",
-//    "args": { "query": "chainTip" }
+//    "methodname": "AwaitAcquire",
+//    "args": { }
 // }

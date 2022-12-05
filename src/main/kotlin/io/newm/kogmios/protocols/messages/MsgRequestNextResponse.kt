@@ -11,7 +11,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 
 /**
- * Response that comes back from Ogmios after a FindIntersect message is sent.
+ * Response that comes back from Ogmios after a RequestNext message is sent.
  */
 @Serializable
 @SerialName("RequestNext")
