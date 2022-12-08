@@ -9,6 +9,7 @@ import io.ktor.serialization.*
 import io.ktor.util.reflect.*
 import io.ktor.utils.io.charsets.*
 import io.ktor.websocket.*
+import io.newm.kogmios.exception.KogmiosException
 import io.newm.kogmios.protocols.messages.*
 import io.newm.kogmios.protocols.model.*
 import io.newm.kogmios.serializers.BigDecimalSerializer
@@ -65,6 +66,29 @@ internal class ClientImpl(
     private val requestNextRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgRequestNextResponse>>()
     private val submitTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgSubmitTxResponse>>()
     private val evaluateTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgEvaluateTxResponse>>()
+    private val awaitAcquireResponseMap =
+        ConcurrentHashMap<String, CompletableDeferred<MsgAwaitAcquireMempoolResponse>>()
+    private val releaseMempoolResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgReleaseMempoolResponse>>()
+    private val hasTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgHasTxResponse>>()
+    private val sizeAndCapacityResponseMap =
+        ConcurrentHashMap<String, CompletableDeferred<MsgSizeAndCapacityResponse>>()
+    private val nextTxResponseMap =
+        ConcurrentHashMap<String, CompletableDeferred<MsgNextTxResponse>>()
+
+    private val requestResponseMaps = listOf(
+        acquireRequestResponseMap,
+        releaseRequestResponseMap,
+        queryRequestResponseMap,
+        findIntersectRequestResponseMap,
+        requestNextRequestResponseMap,
+        submitTxResponseMap,
+        evaluateTxResponseMap,
+        awaitAcquireResponseMap,
+        releaseMempoolResponseMap,
+        hasTxResponseMap,
+        sizeAndCapacityResponseMap,
+        nextTxResponseMap,
+    )
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
@@ -104,43 +128,27 @@ internal class ClientImpl(
                             json.decodeFromString<JsonWspResponse>(jsonString)
                         } catch (e: Throwable) {
                             handleError(jsonString, e)
+                            IgnoredJsonWspResponse()
                         }
                     }
 
-                    @kotlin.jvm.Throws(IOException::class)
+                    @kotlin.jvm.Throws(KogmiosException::class, IOException::class)
                     private fun handleError(jsonString: String, e: Throwable) {
-                        val ioException = IOException(jsonString, e)
-                        requestNextRequestResponseMap.keys.forEach { key ->
-                            if (key in jsonString) {
-                                requestNextRequestResponseMap.remove(key)
-                                    ?.completeExceptionally(ioException)
+                        val exception = try {
+                            val jsonWspFault = json.decodeFromString<JsonWspFault>(jsonString)
+                            KogmiosException(jsonWspFault.fault.string, e, jsonWspFault)
+                        } catch (parseException: Throwable) {
+                            log.error("Error parsing Fault!", parseException)
+                            IOException(jsonString, e)
+                        }
+                        requestResponseMaps.forEach outer@{ requestResponseMap ->
+                            requestResponseMap.keys.forEach inner@{ key ->
+                                if (key in jsonString) {
+                                    requestResponseMap.remove(key)?.completeExceptionally(exception)
+                                    return@outer
+                                }
                             }
                         }
-                        acquireRequestResponseMap.keys.forEach { key ->
-                            if (key in jsonString) {
-                                acquireRequestResponseMap.remove(key)
-                                    ?.completeExceptionally(ioException)
-                            }
-                        }
-                        releaseRequestResponseMap.keys.forEach { key ->
-                            if (key in jsonString) {
-                                releaseRequestResponseMap.remove(key)
-                                    ?.completeExceptionally(ioException)
-                            }
-                        }
-                        queryRequestResponseMap.keys.forEach { key ->
-                            if (key in jsonString) {
-                                queryRequestResponseMap.remove(key)
-                                    ?.completeExceptionally(ioException)
-                            }
-                        }
-                        findIntersectRequestResponseMap.keys.forEach { key ->
-                            if (key in jsonString) {
-                                findIntersectRequestResponseMap.remove(key)
-                                    ?.completeExceptionally(ioException)
-                            }
-                        }
-                        throw ioException
                     }
                 }
             }
@@ -184,6 +192,10 @@ internal class ClientImpl(
                                         log.debug("response: $response")
                                     }
                                     when (response) {
+                                        is IgnoredJsonWspResponse -> {
+                                            // A fault likely happened and is already handled. We ignore the response value.
+                                        }
+
                                         is MsgAcquireResponse -> {
                                             acquireRequestResponseMap.remove(response.reflection)?.complete(response)
                                                 ?: log.warn("No handler found for: ${response.reflection}")
@@ -218,6 +230,31 @@ internal class ClientImpl(
 
                                         is MsgEvaluateTxResponse -> {
                                             evaluateTxResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgAwaitAcquireMempoolResponse -> {
+                                            awaitAcquireResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgReleaseMempoolResponse -> {
+                                            releaseMempoolResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgHasTxResponse -> {
+                                            hasTxResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgSizeAndCapacityResponse -> {
+                                            sizeAndCapacityResponseMap.remove(response.reflection)?.complete(response)
+                                                ?: log.warn("No handler found for: ${response.reflection}")
+                                        }
+
+                                        is MsgNextTxResponse -> {
+                                            nextTxResponseMap.remove(response.reflection)?.complete(response)
                                                 ?: log.warn("No handler found for: ${response.reflection}")
                                         }
                                     }
@@ -276,6 +313,31 @@ internal class ClientImpl(
 
                                             is MsgEvaluateTx -> {
                                                 evaluateTxResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgAwaitAcquire -> {
+                                                awaitAcquireResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgReleaseMempool -> {
+                                                releaseMempoolResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgHasTx -> {
+                                                hasTxResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgSizeAndCapacity -> {
+                                                sizeAndCapacityResponseMap[request.mirror] =
+                                                    request.completableDeferred
+                                            }
+
+                                            is MsgNextTx -> {
+                                                nextTxResponseMap[request.mirror] =
                                                     request.completableDeferred
                                             }
                                         }
@@ -596,17 +658,82 @@ internal class ClientImpl(
         }
     }
 
-    override suspend fun hasTx(txId: String, timeoutMs: Long): JsonWspResponse {
+    override suspend fun awaitAcquireMempool(timeoutMs: Long): MsgAwaitAcquireMempoolResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        // FIXME: Implement
-//        sendQueue.send(
-//            MsgHasTx(
-//                args = QueryCurrentProtocolParameters(),
-//                mirror = "QueryCurrentProtocolParameters:${UUID.randomUUID()}",
-//                completableDeferred = completableDeferred
-//            )
-//        )
+        val completableDeferred = CompletableDeferred<MsgAwaitAcquireMempoolResponse>()
+        sendQueue.send(
+            MsgAwaitAcquire(
+                args = EmptyObject(),
+                mirror = "AwaitAcquireMempool:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override suspend fun releaseMempool(timeoutMs: Long): MsgReleaseMempoolResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgReleaseMempoolResponse>()
+        sendQueue.send(
+            MsgReleaseMempool(
+                args = EmptyObject(),
+                mirror = "ReleaseMempool:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override suspend fun hasTx(txId: String, timeoutMs: Long): MsgHasTxResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgHasTxResponse>()
+        sendQueue.send(
+            MsgHasTx(
+                args = HasTx(id = txId),
+                mirror = "HasTx:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override suspend fun sizeAndCapacity(timeoutMs: Long): MsgSizeAndCapacityResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgSizeAndCapacityResponse>()
+        sendQueue.send(
+            MsgSizeAndCapacity(
+                mirror = "SizeAndCapacity:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                completableDeferred.await()
+            }
+        }
+    }
+
+    override suspend fun nextTx(timeoutMs: Long): MsgNextTxResponse {
+        assertConnected()
+        val completableDeferred = CompletableDeferred<MsgNextTxResponse>()
+        sendQueue.send(
+            MsgNextTx(
+                mirror = "NextTx:${UUID.randomUUID()}",
+                completableDeferred = completableDeferred
+            )
+        )
         return coroutineScope {
             withTimeout(timeoutMs) {
                 completableDeferred.await()

@@ -295,6 +295,8 @@ class StateQueryTest {
             assertThat(response).isNotNull()
             assertThat(response.result).isInstanceOf(EraSummariesQueryResult::class.java)
             println(response.result)
+            // the endBound changes depending on the current epoch. Assume it's ok if everything else checks out.
+            val endBound = (response.result as EraSummariesQueryResult).value.last().end!!
             assertThat(response.result).isEqualTo(
                 EraSummariesQueryResult(
                     listOf(
@@ -325,7 +327,7 @@ class StateQueryTest {
                         ),
                         EraSummary(
                             start = Bound(time = 5184000, slot = 3542400, epoch = 12),
-                            end = Bound(time = 15984000, slot = 14342400, epoch = 37),
+                            end = endBound,
                             parameters = EraParameters(432000, 1, 129600),
                         )
                     )

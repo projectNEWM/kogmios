@@ -11,6 +11,9 @@ import io.newm.kogmios.protocols.model.Origin
 import io.newm.kogmios.protocols.model.PointOrOrigin
 import io.newm.kogmios.protocols.model.TxIn
 
+/**
+ * Client interface for querying the state of the node and ledger.
+ */
 interface StateQueryClient : Client {
     /**
      * Acquire a point on the chain to query. <Optional> If this method is not called,

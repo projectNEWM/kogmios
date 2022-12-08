@@ -5,6 +5,9 @@ import io.newm.kogmios.protocols.messages.MsgFindIntersectResponse
 import io.newm.kogmios.protocols.messages.MsgRequestNextResponse
 import io.newm.kogmios.protocols.model.PointDetailOrOrigin
 
+/**
+ * Client interface for syncing the blockchain.
+ */
 interface ChainSyncClient : Client {
 
     /**

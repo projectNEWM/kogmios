@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Acquire a point of intersection for syncing the blockchain
+ * Request the next block when syncing the blockchain.
  */
 @Serializable
 @SerialName("RequestNext")

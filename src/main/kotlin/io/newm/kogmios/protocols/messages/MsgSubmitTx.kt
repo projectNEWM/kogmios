@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Acquire a point of intersection for syncing the blockchain
+ * Submit a transaction to the node's mempool.
  */
 @Serializable
 @SerialName("SubmitTx")
