@@ -11,7 +11,14 @@ import io.newm.kogmios.protocols.messages.IntersectionFound
 import io.newm.kogmios.protocols.messages.IntersectionNotFound
 import io.newm.kogmios.protocols.messages.RollBackward
 import io.newm.kogmios.protocols.messages.RollForward
-import io.newm.kogmios.protocols.model.*
+import io.newm.kogmios.protocols.model.BlockAllegra
+import io.newm.kogmios.protocols.model.BlockAlonzo
+import io.newm.kogmios.protocols.model.BlockBabbage
+import io.newm.kogmios.protocols.model.BlockMary
+import io.newm.kogmios.protocols.model.BlockShelley
+import io.newm.kogmios.protocols.model.OriginString
+import io.newm.kogmios.protocols.model.PointDetail
+import io.newm.kogmios.protocols.model.TxMetadata
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import org.junit.jupiter.api.Disabled
@@ -325,8 +332,8 @@ class ChainSyncTest {
                             val tipBlockHeight = max(blockHeight, rollForward.tip.blockNo)
                             isTip = blockHeight == tipBlockHeight
                             val now = Instant.now()
-                            val tenSecondsAgo = now.minusSeconds(5L)
-                            if (isTip || tenSecondsAgo.isAfter(lastLogged)) {
+                            val fiveSecondsAgo = now.minusSeconds(5L)
+                            if (isTip || fiveSecondsAgo.isAfter(lastLogged)) {
                                 val percent = blockHeight.toDouble() / tipBlockHeight.toDouble() * 100.0
                                 log.info(
                                     "RollForward: block $blockHeight of $tipBlockHeight: %.2f%% sync'd".format(
