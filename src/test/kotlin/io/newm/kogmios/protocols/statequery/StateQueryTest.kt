@@ -475,7 +475,7 @@ class StateQueryTest {
 
             assertThat(response).isNotNull()
             assertThat(response.result).isInstanceOf(UtxoByTxInQueryResult::class.java)
-            assertThat((response.result as UtxoByTxInQueryResult).value.size).isEqualTo(5)
+            assertThat((response.result as UtxoByTxInQueryResult).value.size).isEqualTo(4)
         }
     }
 }

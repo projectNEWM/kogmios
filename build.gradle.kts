@@ -29,7 +29,7 @@ object Versions {
     const val googleTruth = "1.1.3"
     const val junit = "5.9.1"
     const val kotlin = "1.7.22"
-    const val ktor = "2.1.3"
+    const val ktor = "2.2.1"
     const val logback = "1.4.5"
     const val mockk = "1.13.3"
     const val kotlinxDatetime = "0.4.0"
