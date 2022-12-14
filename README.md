@@ -77,11 +77,85 @@ createTxSubmitClient(websocketHost = "server.domainname.io", websocketPort = 133
 
 ### TxMonitor
 
-TODO
+```kotlin
+createTxMonitorClient(
+    websocketHost = "server.domainname.io",
+    websocketPort = 443,
+    secure = true,
+).use { client ->
+    val connectResult = client.connect()
+    require(connectResult == true) { "Failed to connect!" }
+
+    val response = client.awaitAcquireMempool()
+    val response1 = client.hasTx("7f042e1a54b9f699961de8a47543d4c4cef0bc5bc5e406194d9952667e2c077d")
+    println("Has Tx: ${response1.result}")
+    val response2 = client.releaseMempool()
+}
+```
 
 ### ChainSync
 
-TODO
+```kotlin
+createChainSyncClient(
+    websocketHost = "server.domainname.io",
+    websocketPort = 443,
+    secure = true,
+    ogmiosCompact = true,
+).use { client ->
+    val connectResult = client.connect()
+    require(connectResult == true) { "Failed to connect!" }
+
+    val intersectResponse = client.findIntersect(
+        listOf(
+            // preprod - last byron block
+            PointDetail(
+                slot = 84242L,
+                hash = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af"
+            )
+        )
+    )
+    require(intersectResponse.result is IntersectionFound)
+
+    var lastLogged = Instant.EPOCH
+    var isTip = false
+    while (true) {
+        val response = client.requestNext(
+            timeoutMs = if (isTip) {
+                // if we're on tip, wait forever for next block to arrive
+                INFINITE_REQUEST_TIMEOUT_MS
+            } else {
+                DEFAULT_REQUEST_TIMEOUT_MS
+            }
+        )
+        when (response.result) {
+            is RollBackward -> {
+                log.info("RollBackward: ${(response.result as RollBackward).rollBackward.point}")
+            }
+
+            is RollForward -> {
+                (response.result as RollForward).rollForward.let { rollForward ->
+                    val blockHeight = rollForward.block.header.blockHeight
+                    val tipBlockHeight = max(blockHeight, rollForward.tip.blockNo)
+                    isTip = blockHeight == tipBlockHeight
+                    // do something with the data
+                    processBlock(rollForward.block)
+                    val now = Instant.now()
+                    val fiveSecondsAgo = now.minusSeconds(5L)
+                    if (isTip || fiveSecondsAgo.isAfter(lastLogged)) {
+                        val percent = blockHeight.toDouble() / tipBlockHeight.toDouble() * 100.0
+                        log.info(
+                            "RollForward: block $blockHeight of $tipBlockHeight: %.2f%% sync'd".format(
+                                percent
+                            )
+                        )
+                        lastLogged = now
+                    }
+                }
+            }
+        }
+    }
+}
+```
 
 ## Contributing
 
