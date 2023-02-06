@@ -1,0 +1,16 @@
+object Versions {
+    const val commonsLogging = "1.2"
+    const val coroutines = "1.6.4"
+    const val googleTruth = "1.1.3"
+    const val junit = "5.9.2"
+    const val kotlin = "1.8.10"
+    const val ktor = "2.2.3"
+    const val kotlinxDatetime = "0.4.0"
+    const val kotlinxSerialization = "1.4.1"
+    const val ktlintPlugin = "11.1.0"
+    const val ktlintVersion = "0.43.2"
+    const val logback = "1.4.5"
+    const val mavenRepoAuthPlugin = "3.0.4"
+    const val mockk = "1.13.4"
+    const val versionsPlugin = "0.45.0"
+}

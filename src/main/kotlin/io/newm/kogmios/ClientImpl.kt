@@ -263,6 +263,7 @@ internal class ClientImpl(
                                         log.warn("websocketClient.incoming was closed unexpectedly.")
                                         fatalException = e
                                         _isConnected = false
+                                        break
                                     }
                                 }
                             }
@@ -270,6 +271,10 @@ internal class ClientImpl(
                                 log.debug("websocketClient.incoming was closed.")
                             }
                             receiveClose.complete(Unit)
+                            fatalException?.let {
+                                shutdownExceptionally()
+                                throw it
+                            }
                         },
 
                         // Send Loop
@@ -348,6 +353,7 @@ internal class ClientImpl(
                                         log.warn("websocketClient.outgoing was closed unexpectedly.")
                                         fatalException = e
                                         _isConnected = false
+                                        break
                                     }
                                 }
                             }
@@ -355,6 +361,10 @@ internal class ClientImpl(
                                 log.debug("websocketClient.outgoing was closed.")
                             }
                             sendClose.complete(Unit)
+                            fatalException?.let {
+                                shutdownExceptionally()
+                                throw it
+                            }
                         }
                     )
                     log.debug("Websocket completed normally.")
@@ -827,6 +837,17 @@ internal class ClientImpl(
                 httpClient.close()
             }
             _isConnected = false
+        }
+    }
+
+    private fun shutdownExceptionally() {
+        fatalException?.let {
+            // blow up any pending requests to us
+            requestResponseMaps.forEach outer@{ requestResponseMap ->
+                requestResponseMap.keys.forEach inner@{ key ->
+                    requestResponseMap.remove(key)?.completeExceptionally(it)
+                }
+            }
         }
     }
 

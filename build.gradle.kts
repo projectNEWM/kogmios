@@ -3,13 +3,13 @@ import org.hibernate.build.publish.auth.maven.MavenRepoAuthPlugin
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version "0.44.0"
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
-    kotlin("jvm") version "1.7.22"
-    kotlin("plugin.serialization") version "1.7.22"
+    id("com.github.ben-manes.versions") version Versions.versionsPlugin
+    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlintPlugin
+    kotlin("jvm") version Versions.kotlin
+    kotlin("plugin.serialization") version Versions.kotlin
     id("maven-publish")
     id("signing")
-    id("org.hibernate.build.maven-repo-auth") version "3.0.4" apply false
+    id("org.hibernate.build.maven-repo-auth") version Versions.mavenRepoAuthPlugin apply false
 }
 
 if (!project.hasProperty("isGithubActions")) {
@@ -18,23 +18,10 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "1.0.1-SNAPSHOT"
+version = "1.0.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
-
-object Versions {
-    const val commonsLogging = "1.2"
-    const val coroutines = "1.6.4"
-    const val googleTruth = "1.1.3"
-    const val junit = "5.9.1"
-    const val kotlin = "1.7.22"
-    const val ktor = "2.2.1"
-    const val logback = "1.4.5"
-    const val mockk = "1.13.3"
-    const val kotlinxDatetime = "0.4.0"
-    const val kotlinxSerialization = "1.4.1"
-}
 
 repositories {
     mavenLocal()
@@ -65,7 +52,7 @@ dependencies {
 }
 
 ktlint {
-    version.set("0.43.2")
+    version.set(Versions.ktlintVersion)
 }
 
 tasks {
