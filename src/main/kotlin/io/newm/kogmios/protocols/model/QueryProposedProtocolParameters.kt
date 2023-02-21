@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryProposedProtocolParameters(
     @SerialName("query")
-    val query: String = "proposedProtocolParameters"
+    val query: String = "proposedProtocolParameters",
 ) : Query()

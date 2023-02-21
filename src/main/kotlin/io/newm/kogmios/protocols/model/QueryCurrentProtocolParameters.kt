@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryCurrentProtocolParameters(
     @SerialName("query")
-    val query: String = "currentProtocolParameters"
+    val query: String = "currentProtocolParameters",
 ) : Query()

@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PoolParameters(
     @SerialName("poolParameters")
-    val poolParameters: List<String>
+    val poolParameters: List<String>,
 )

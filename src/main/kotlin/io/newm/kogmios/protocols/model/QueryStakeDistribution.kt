@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryStakeDistribution(
     @SerialName("query")
-    val query: String = "stakeDistribution"
+    val query: String = "stakeDistribution",
 ) : Query()

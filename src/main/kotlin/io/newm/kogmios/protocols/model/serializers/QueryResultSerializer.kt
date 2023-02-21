@@ -1,8 +1,31 @@
 package io.newm.kogmios.protocols.model.serializers
 
-import io.newm.kogmios.protocols.model.*
+import io.newm.kogmios.protocols.model.Bound
+import io.newm.kogmios.protocols.model.CompactGenesisAlonzo
+import io.newm.kogmios.protocols.model.CompactGenesisByron
+import io.newm.kogmios.protocols.model.CompactGenesisShelley
+import io.newm.kogmios.protocols.model.EmptyQueryResult
+import io.newm.kogmios.protocols.model.EraSummariesQueryResult
+import io.newm.kogmios.protocols.model.InstantQueryResult
+import io.newm.kogmios.protocols.model.LongQueryResult
+import io.newm.kogmios.protocols.model.QueryCurrentProtocolParametersResult
+import io.newm.kogmios.protocols.model.QueryDelegationsAndRewardsResult
+import io.newm.kogmios.protocols.model.QueryFutureProtocolParametersResult
+import io.newm.kogmios.protocols.model.QueryNonMyopicMemberRewardsResult
+import io.newm.kogmios.protocols.model.QueryPointResult
+import io.newm.kogmios.protocols.model.QueryPoolParametersResult
+import io.newm.kogmios.protocols.model.QueryResult
+import io.newm.kogmios.protocols.model.QueryStakeDistributionResult
+import io.newm.kogmios.protocols.model.StringArrayQueryResult
+import io.newm.kogmios.protocols.model.UtxoByTxInQueryResult
 import kotlinx.serialization.DeserializationStrategy
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(QueryResult::class) {
 
@@ -16,8 +39,12 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     QueryPointResult.serializer()
                 } else if ("minFeeCoefficient" in element) {
                     QueryCurrentProtocolParametersResult.serializer()
+                } else if ("genesisKeyHashes" in element) {
+                    CompactGenesisByron.serializer()
+                } else if ("maxExecutionUnitsPerTransaction" in element) {
+                    CompactGenesisAlonzo.serializer()
                 } else if ("systemStart" in element) {
-                    CompactGenesis.serializer()
+                    CompactGenesisShelley.serializer()
                 } else if (("time" in element) and ("epoch" in element) and ("slot" in element)) {
                     Bound.serializer()
                 } else if (element.keys.firstOrNull()?.startsWith("pool1") == true) {
@@ -45,6 +72,7 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     throw IllegalStateException("No Serializer found to decode: $element")
                 }
             }
+
             is JsonArray -> {
                 if (element.jsonArray.size == 0) {
                     UtxoByTxInQueryResult.serializer()
@@ -56,6 +84,7 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     }
                 }
             }
+
             is JsonPrimitive -> {
                 if (element.isString) {
                     InstantQueryResult.serializer()
@@ -63,6 +92,7 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
                     LongQueryResult.serializer()
                 }
             }
+
             else -> throw IllegalStateException("No Serializer found to decode: $element")
         }
     }

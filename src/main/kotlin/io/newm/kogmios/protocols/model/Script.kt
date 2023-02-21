@@ -16,7 +16,7 @@ sealed class Script
 @Serializable
 data class ScriptNative(
     @SerialName("native")
-    val native: ScriptNativeDetail
+    val native: ScriptNativeDetail,
 ) : Script()
 
 @Serializable
@@ -58,14 +58,14 @@ object ScriptNativeDetailSignatureSerializer : KSerializer<ScriptNativeDetailSig
 data class ScriptNativeDetailExpiresAt(
     @SerialName("expiresAt")
     @Contextual
-    val expiresAt: BigDecimal
+    val expiresAt: BigDecimal,
 ) : ScriptNativeDetail()
 
 @Serializable
 data class ScriptNativeDetailStartsAt(
     @SerialName("startsAt")
     @Contextual
-    val startsAt: BigDecimal
+    val startsAt: BigDecimal,
 ) : ScriptNativeDetail()
 
 @Serializable(with = ScriptNativeDetailAllSerializer::class)
@@ -105,7 +105,7 @@ class ScriptNativeDetailAny : ScriptNativeDetail(), MutableList<ScriptNativeDeta
 @Serializable(with = ScriptNativeDetailNofKSerializer::class)
 class ScriptNativeDetailNofK(
     val nOf: Long,
-    private val delegate: MutableList<ScriptNativeDetail> = mutableListOf()
+    private val delegate: MutableList<ScriptNativeDetail> = mutableListOf(),
 ) : ScriptNativeDetail(), MutableList<ScriptNativeDetail> by delegate {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -192,9 +192,9 @@ object ScriptNativeDetailSerializer : JsonContentPolymorphicSerializer<ScriptNat
             ScriptNativeDetailExpiresAt.serializer()
         } else if ("startsAt" in element.jsonObject) {
             ScriptNativeDetailStartsAt.serializer()
-        } else if (element.jsonObject.keys.first().toLongOrNull() != null)
+        } else if (element.jsonObject.keys.first().toLongOrNull() != null) {
             ScriptNativeDetailNofK.serializer()
-        else {
+        } else {
             throw IllegalArgumentException("Unable to find serializer for $element")
         }
     }

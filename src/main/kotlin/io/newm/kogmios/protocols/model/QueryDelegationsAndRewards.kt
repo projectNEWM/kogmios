@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryDelegationsAndRewards(
     @SerialName("query")
-    val query: DelegationsAndRewards
+    val query: DelegationsAndRewards,
 ) : Query()

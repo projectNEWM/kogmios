@@ -88,7 +88,7 @@ sealed class EvaluationFailure
 @Serializable
 data class ScriptEvaluationFailure(
     @SerialName("ScriptFailures")
-    val scriptFailures: Map<String, List<ScriptFailureItem>>
+    val scriptFailures: Map<String, List<ScriptFailureItem>>,
 ) : EvaluationFailure()
 
 @Serializable

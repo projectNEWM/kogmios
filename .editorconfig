@@ -1,2 +1,4 @@
 [*.{kt,kts}]
-disabled_rules=import-ordering,no-wildcard-imports
+ktlint_disabled_rules=import-ordering,no-wildcard-imports
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true

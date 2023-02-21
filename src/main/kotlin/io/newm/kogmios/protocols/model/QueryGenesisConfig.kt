@@ -6,5 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryGenesisConfig(
     @SerialName("query")
-    val query: String = "genesisConfig"
+    val query: GenesisConfigType,
 ) : Query()
+
+@Serializable
+data class GenesisConfigType(
+    @SerialName("genesisConfig")
+    val genesisConfigEra: String, // byron, shelley, alonzo
+)

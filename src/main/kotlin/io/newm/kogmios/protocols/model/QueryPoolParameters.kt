@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryPoolParameters(
     @SerialName("query")
-    val query: PoolParameters
+    val query: PoolParameters,
 ) : Query()

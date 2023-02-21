@@ -28,7 +28,7 @@ abstract class RequestNextResult
 @Serializable
 data class RollBackward(
     @SerialName("RollBackward")
-    val rollBackward: RollBackwardData
+    val rollBackward: RollBackwardData,
 ) : RequestNextResult()
 
 @Serializable
@@ -42,7 +42,7 @@ data class RollBackwardData(
 @Serializable
 data class RollForward(
     @SerialName("RollForward")
-    val rollForward: RollForwardData
+    val rollForward: RollForwardData,
 ) : RequestNextResult()
 
 @Serializable

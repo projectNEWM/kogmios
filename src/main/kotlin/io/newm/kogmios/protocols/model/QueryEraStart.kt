@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryEraStart(
     @SerialName("query")
-    val query: String = "eraStart"
+    val query: String = "eraStart",
 ) : Query()

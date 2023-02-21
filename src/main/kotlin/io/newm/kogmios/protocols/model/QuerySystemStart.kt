@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QuerySystemStart(
     @SerialName("query")
-    val query: String = "systemStart"
+    val query: String = "systemStart",
 ) : Query()

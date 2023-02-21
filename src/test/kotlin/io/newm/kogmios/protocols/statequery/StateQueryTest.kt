@@ -5,17 +5,43 @@ import io.newm.kogmios.createStateQueryClient
 import io.newm.kogmios.protocols.messages.AcquireFailure
 import io.newm.kogmios.protocols.messages.AcquireSuccess
 import io.newm.kogmios.protocols.messages.MsgQueryResponse
-import io.newm.kogmios.protocols.model.*
-import kotlinx.coroutines.*
+import io.newm.kogmios.protocols.model.Blake2bDigestCredential
+import io.newm.kogmios.protocols.model.Bound
+import io.newm.kogmios.protocols.model.CompactGenesisAlonzo
+import io.newm.kogmios.protocols.model.CompactGenesisByron
+import io.newm.kogmios.protocols.model.CompactGenesisShelley
+import io.newm.kogmios.protocols.model.EmptyQueryResult
+import io.newm.kogmios.protocols.model.EraParameters
+import io.newm.kogmios.protocols.model.EraSummariesQueryResult
+import io.newm.kogmios.protocols.model.EraSummary
+import io.newm.kogmios.protocols.model.InstantQueryResult
+import io.newm.kogmios.protocols.model.LongQueryResult
+import io.newm.kogmios.protocols.model.LovelaceInput
+import io.newm.kogmios.protocols.model.Point
+import io.newm.kogmios.protocols.model.QueryCurrentProtocolParametersResult
+import io.newm.kogmios.protocols.model.QueryDelegationsAndRewardsResult
+import io.newm.kogmios.protocols.model.QueryNonMyopicMemberRewardsResult
+import io.newm.kogmios.protocols.model.QueryPointResult
+import io.newm.kogmios.protocols.model.QueryPoolParametersResult
+import io.newm.kogmios.protocols.model.QueryStakeDistributionResult
+import io.newm.kogmios.protocols.model.StringArrayQueryResult
+import io.newm.kogmios.protocols.model.TxIn
+import io.newm.kogmios.protocols.model.UtxoByTxInQueryResult
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class StateQueryTest {
 
     @Test
     fun `test acquire origin`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         )
@@ -33,7 +59,7 @@ class StateQueryTest {
     @Test
     fun `test acquire tip`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         )
@@ -55,9 +81,9 @@ class StateQueryTest {
     @Test
     fun `test acquire and release and acquire`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
-            secure = true
+            secure = true,
         )
         client.use {
             val connectResult = client.connect()
@@ -85,7 +111,7 @@ class StateQueryTest {
     @Test
     fun `test release without acquire failure`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         )
@@ -110,7 +136,7 @@ class StateQueryTest {
                 async {
                     delay(it * 100L)
                     val client = createStateQueryClient(
-                        websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+                        websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
                         websocketPort = 443,
                         secure = true,
                         ogmiosCompact = false,
@@ -124,7 +150,7 @@ class StateQueryTest {
                         assertThat(tipResult).isNotNull()
                     }
                     assertThat(client.isConnected).isFalse()
-                }
+                },
             )
         }
         awaitAll(*deferreds.toTypedArray())
@@ -134,7 +160,7 @@ class StateQueryTest {
     @Test
     fun `test query poolParameters for single pool not found`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -151,7 +177,7 @@ class StateQueryTest {
     @Test
     fun `test query poolParameters for single pool`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -170,7 +196,7 @@ class StateQueryTest {
     @Test
     fun `test query blockHeight`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -188,7 +214,7 @@ class StateQueryTest {
     @Test
     fun `test query currentProtocolParameters`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -205,7 +231,7 @@ class StateQueryTest {
     @Test
     fun `test query currentEpoch`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -223,7 +249,7 @@ class StateQueryTest {
     @Test
     fun `test query poolIds`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -242,7 +268,7 @@ class StateQueryTest {
     @Test
     fun `test query delegationsAndRewards`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -265,7 +291,7 @@ class StateQueryTest {
     @Test
     fun `test query eraStart`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -283,7 +309,7 @@ class StateQueryTest {
     @Test
     fun `test query eraSummaries`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -329,17 +355,17 @@ class StateQueryTest {
                             start = Bound(time = 5184000, slot = 3542400, epoch = 12),
                             end = endBound,
                             parameters = EraParameters(432000, 1, 129600),
-                        )
-                    )
-                )
+                        ),
+                    ),
+                ),
             )
         }
     }
 
     @Test
-    fun `test query genesisConfig`() = runBlocking {
+    fun `test query genesisConfig byron`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -347,17 +373,63 @@ class StateQueryTest {
             assertThat(connectResult).isTrue()
             assertThat(client.isConnected).isTrue()
 
-            val response = client.genesisConfig()
+            val response = client.genesisConfig("byron")
             assertThat(response).isNotNull()
-            assertThat(response.result).isInstanceOf(CompactGenesis::class.java)
-            assertThat((response.result as CompactGenesis).systemStart).isEqualTo(Instant.fromEpochSeconds(1654041600L))
+            assertThat(response.result).isInstanceOf(CompactGenesisByron::class.java)
+            assertThat((response.result as CompactGenesisByron).systemStart).isEqualTo(
+                Instant.fromEpochSeconds(
+                    1654041600L,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `test query genesisConfig shelley`() = runBlocking {
+        createStateQueryClient(
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
+            websocketPort = 443,
+            secure = true,
+        ).use { client ->
+            val connectResult = client.connect()
+            assertThat(connectResult).isTrue()
+            assertThat(client.isConnected).isTrue()
+
+            val response = client.genesisConfig("shelley")
+            assertThat(response).isNotNull()
+            assertThat(response.result).isInstanceOf(CompactGenesisShelley::class.java)
+            assertThat((response.result as CompactGenesisShelley).systemStart).isEqualTo(
+                Instant.fromEpochSeconds(
+                    1654041600L,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `test query genesisConfig alonzo`() = runBlocking {
+        createStateQueryClient(
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
+            websocketPort = 443,
+            secure = true,
+        ).use { client ->
+            val connectResult = client.connect()
+            assertThat(connectResult).isTrue()
+            assertThat(client.isConnected).isTrue()
+
+            val response = client.genesisConfig("alonzo")
+            assertThat(response).isNotNull()
+            assertThat(response.result).isInstanceOf(CompactGenesisAlonzo::class.java)
+            assertThat((response.result as CompactGenesisAlonzo).prices.steps).isEqualTo(
+                BigDecimal("0.0000721"),
+            )
         }
     }
 
     @Test
     fun `test query nonMyopicMemberRewards`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -368,8 +440,8 @@ class StateQueryTest {
             val response = client.nonMyopicMemberRewards(
                 listOf(
                     LovelaceInput(1000000000L.toBigInteger()),
-                    Blake2bDigestCredential("0bc846c1e00d07c6b49eb36e3236090c01e5a41faab6c2aa95c645f6")
-                )
+                    Blake2bDigestCredential("0bc846c1e00d07c6b49eb36e3236090c01e5a41faab6c2aa95c645f6"),
+                ),
             )
             assertThat(response).isNotNull()
             assertThat(response.result).isInstanceOf(QueryNonMyopicMemberRewardsResult::class.java)
@@ -380,7 +452,7 @@ class StateQueryTest {
     @Test
     fun `test query proposedProtocolParameters`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -399,7 +471,7 @@ class StateQueryTest {
     @Test
     fun `test query stakeDistribution`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -416,7 +488,7 @@ class StateQueryTest {
     @Test
     fun `test query systemStart`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -434,7 +506,7 @@ class StateQueryTest {
     @Test
     fun `test query utxoByTxIn`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketHost = "ogmios-preprod-api-kogmios-9ab819.us1.demeter.run",
             websocketPort = 443,
             secure = true,
         ).use { client ->
@@ -469,8 +541,8 @@ class StateQueryTest {
                     TxIn(
                         txId = "017ea264b9aff5660ac646243cca08b4ddf178d61fbad0ec32e5bfde289eae0d",
                         index = 0L,
-                    )
-                )
+                    ),
+                ),
             )
 
             assertThat(response).isNotNull()

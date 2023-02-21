@@ -23,7 +23,7 @@ data class Value(
     val coins: BigInteger,
     @SerialName("assets")
     @Serializable(with = AssetSerializer::class)
-    val assets: List<Asset>
+    val assets: List<Asset>,
 )
 
 @Serializable

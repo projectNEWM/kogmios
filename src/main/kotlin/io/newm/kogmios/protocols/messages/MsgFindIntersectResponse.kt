@@ -27,7 +27,7 @@ abstract class FindIntersectResult
 @Serializable
 data class IntersectionFound(
     @SerialName("IntersectionFound")
-    val intersectionFound: IntersectionFoundData
+    val intersectionFound: IntersectionFoundData,
 ) : FindIntersectResult()
 
 @Serializable
@@ -41,7 +41,7 @@ data class IntersectionFoundData(
 @Serializable
 data class IntersectionNotFound(
     @SerialName("IntersectionNotFound")
-    val intersectionNotFound: IntersectionNotFoundData
+    val intersectionNotFound: IntersectionNotFoundData,
 ) : FindIntersectResult()
 
 @Serializable

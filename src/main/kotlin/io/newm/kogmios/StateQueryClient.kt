@@ -21,7 +21,7 @@ interface StateQueryClient : Client {
      */
     suspend fun acquire(
         pointOrOrigin: PointOrOrigin = Origin(),
-        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS,
     ): MsgAcquireResponse
 
     /**
@@ -64,7 +64,7 @@ interface StateQueryClient : Client {
      */
     suspend fun delegationsAndRewards(
         stakeAddresses: List<String>,
-        timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS,
     ): MsgQueryResponse
 
     /**
@@ -78,9 +78,9 @@ interface StateQueryClient : Client {
     suspend fun eraSummaries(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
 
     /**
-     * Get the Shelley's genesis configuration.
+     * Get the genesis configuration.
      */
-    suspend fun genesisConfig(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun genesisConfig(genesisConfigEra: String = "shelley", timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
 
     /**
      * Get non-myopic member rewards from a projected delegation amount;
@@ -89,7 +89,7 @@ interface StateQueryClient : Client {
      */
     suspend fun nonMyopicMemberRewards(
         inputs: List<NonMyopicMemberRewardsInput>,
-        timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS,
     ): MsgQueryResponse
 
     /**
@@ -118,7 +118,7 @@ fun createStateQueryClient(
     websocketPort: Int,
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
-    loggerName: String? = null
+    loggerName: String? = null,
 ): StateQueryClient {
     return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

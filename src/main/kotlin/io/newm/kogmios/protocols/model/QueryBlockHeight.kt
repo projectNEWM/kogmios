@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryBlockHeight(
     @SerialName("query")
-    val query: String = "blockHeight"
+    val query: String = "blockHeight",
 ) : Query()

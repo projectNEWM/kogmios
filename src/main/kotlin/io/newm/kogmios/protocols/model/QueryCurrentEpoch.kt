@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryCurrentEpoch(
     @SerialName("query")
-    val query: String = "currentEpoch"
+    val query: String = "currentEpoch",
 ) : Query()

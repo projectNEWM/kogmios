@@ -19,7 +19,7 @@ data class MsgAwaitAcquireMempoolResponse(
 @Serializable
 data class AwaitAcquireMempoolResponse(
     @SerialName("AwaitAcquired")
-    val awaitAcquired: AwaitAcquired
+    val awaitAcquired: AwaitAcquired,
 )
 
 @Serializable

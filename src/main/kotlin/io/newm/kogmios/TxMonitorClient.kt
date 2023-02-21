@@ -39,7 +39,7 @@ fun createTxMonitorClient(
     websocketPort: Int,
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
-    loggerName: String? = null
+    loggerName: String? = null,
 ): TxMonitorClient {
     return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

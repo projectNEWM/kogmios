@@ -12,5 +12,5 @@ data class TxWitness(
     val scripts: Map<String, Script>,
 
     @SerialName("bootstrap")
-    val bootstrap: List<TxShelleyBootstrap>
+    val bootstrap: List<TxShelleyBootstrap>,
 )

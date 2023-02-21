@@ -21,7 +21,7 @@ object EraSummariesQueryResultSerializer : KSerializer<EraSummariesQueryResult> 
         return EraSummariesQueryResult(
             decoder.decodeJsonElement().jsonArray.map {
                 json.decodeFromJsonElement(EraSummary.serializer(), it)
-            }
+            },
         )
     }
 

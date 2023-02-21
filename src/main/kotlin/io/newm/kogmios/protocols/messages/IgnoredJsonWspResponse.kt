@@ -9,5 +9,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("ignore")
 class IgnoredJsonWspResponse(
-    override val reflection: String = "ignore"
+    override val reflection: String = "ignore",
 ) : JsonWspResponse()

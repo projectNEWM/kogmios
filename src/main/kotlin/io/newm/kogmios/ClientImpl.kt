@@ -113,7 +113,7 @@ internal class ClientImpl(
                                 }
 
                                 else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
-                            }
+                            },
                         )
                     }
 
@@ -139,6 +139,7 @@ internal class ClientImpl(
                             KogmiosException(jsonWspFault.fault.string, e, jsonWspFault)
                         } catch (parseException: Throwable) {
                             log.error("Error parsing Fault!", parseException)
+                            log.error("Original Exception!", e)
                             IOException(jsonString, e)
                         }
                         requestResponseMaps.forEach outer@{ requestResponseMap ->
@@ -177,7 +178,7 @@ internal class ClientImpl(
                                 append("Sec-WebSocket-Protocol", "ogmios.v1:compact")
                             }
                         }
-                    }
+                    },
                 ) {
                     session = this
                     _isConnected = true
@@ -365,7 +366,7 @@ internal class ClientImpl(
                                 shutdownExceptionally()
                                 throw it
                             }
-                        }
+                        },
                     )
                     log.debug("Websocket completed normally.")
                 }
@@ -384,8 +385,8 @@ internal class ClientImpl(
             MsgAcquire(
                 args = pointOrOrigin,
                 mirror = "Acquire:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -400,8 +401,8 @@ internal class ClientImpl(
         sendQueue.send(
             MsgRelease(
                 mirror = "Release:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -417,8 +418,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryChainTip(),
                 mirror = "QueryChainTip:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -434,8 +435,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryPoolParameters(PoolParameters(pools)),
                 mirror = "QueryPoolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -451,8 +452,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryBlockHeight(),
                 mirror = "QueryBlockHeight:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -468,8 +469,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryCurrentProtocolParameters(),
                 mirror = "QueryCurrentProtocolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -485,8 +486,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryCurrentEpoch(),
                 mirror = "QueryCurrentEpoch:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -502,8 +503,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryPoolIds(),
                 mirror = "QueryPoolIds:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -519,8 +520,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryDelegationsAndRewards(DelegationsAndRewards(stakeAddresses)),
                 mirror = "QueryDelegationsAndRewards:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -536,8 +537,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryEraStart(),
                 mirror = "QueryEraStart:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -553,8 +554,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryEraSummaries(),
                 mirror = "QueryEraSummaries:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -563,15 +564,15 @@ internal class ClientImpl(
         }
     }
 
-    override suspend fun genesisConfig(timeoutMs: Long): MsgQueryResponse {
+    override suspend fun genesisConfig(genesisConfigEra: String, timeoutMs: Long): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
         sendQueue.send(
             MsgQuery(
-                args = QueryGenesisConfig(),
+                args = QueryGenesisConfig(GenesisConfigType(genesisConfigEra)),
                 mirror = "QueryGenesisConfig:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -582,7 +583,7 @@ internal class ClientImpl(
 
     override suspend fun nonMyopicMemberRewards(
         inputs: List<NonMyopicMemberRewardsInput>,
-        timeoutMs: Long
+        timeoutMs: Long,
     ): MsgQueryResponse {
         assertConnected()
         val completableDeferred = CompletableDeferred<MsgQueryResponse>()
@@ -590,8 +591,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryNonMyopicMemberRewards(NonMyopicMemberRewardsInputs(inputs)),
                 mirror = "QueryNonMyopicMemberRewards:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -607,8 +608,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryProposedProtocolParameters(),
                 mirror = "QueryProposedProtocolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -624,8 +625,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryStakeDistribution(),
                 mirror = "QueryStakeDistribution:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -641,8 +642,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QuerySystemStart(),
                 mirror = "QuerySystemStart:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -658,8 +659,8 @@ internal class ClientImpl(
             MsgQuery(
                 args = QueryUtxoByTxIn(TxInFilters(filters)),
                 mirror = "QueryUtxoByTxIn:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -675,8 +676,8 @@ internal class ClientImpl(
             MsgAwaitAcquire(
                 args = EmptyObject(),
                 mirror = "AwaitAcquireMempool:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -692,8 +693,8 @@ internal class ClientImpl(
             MsgReleaseMempool(
                 args = EmptyObject(),
                 mirror = "ReleaseMempool:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -709,8 +710,8 @@ internal class ClientImpl(
             MsgHasTx(
                 args = HasTx(id = txId),
                 mirror = "HasTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -725,8 +726,8 @@ internal class ClientImpl(
         sendQueue.send(
             MsgSizeAndCapacity(
                 mirror = "SizeAndCapacity:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -741,8 +742,8 @@ internal class ClientImpl(
         sendQueue.send(
             MsgNextTx(
                 mirror = "NextTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -758,8 +759,8 @@ internal class ClientImpl(
             MsgFindIntersect(
                 args = FindIntersect(points),
                 mirror = "MsgFindIntersect:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -774,8 +775,8 @@ internal class ClientImpl(
         sendQueue.send(
             MsgRequestNext(
                 mirror = "MsgRequestNext:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
+                completableDeferred = completableDeferred,
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -792,7 +793,7 @@ internal class ClientImpl(
                 args = SubmitTx(tx),
                 mirror = "MsgSubmitTx:${UUID.randomUUID()}",
                 completableDeferred = completableDeferred,
-            )
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {
@@ -809,7 +810,7 @@ internal class ClientImpl(
                 args = EvaluateTx(tx),
                 mirror = "MsgEvaluateTx:${UUID.randomUUID()}",
                 completableDeferred = completableDeferred,
-            )
+            ),
         )
         return coroutineScope {
             withTimeout(timeoutMs) {

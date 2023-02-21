@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryChainTip(
     @SerialName("query")
-    val query: String = "chainTip"
+    val query: String = "chainTip",
 ) : Query()

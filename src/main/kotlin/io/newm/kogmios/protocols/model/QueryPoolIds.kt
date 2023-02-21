@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 class QueryPoolIds(
     @SerialName("query")
-    val query: String = "poolIds"
+    val query: String = "poolIds",
 ) : Query()

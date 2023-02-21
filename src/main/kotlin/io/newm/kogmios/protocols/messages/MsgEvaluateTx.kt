@@ -21,7 +21,7 @@ data class MsgEvaluateTx(
 @Serializable
 data class EvaluateTx(
     @SerialName("evaluate")
-    val evaluate: String
+    val evaluate: String,
 )
 // JSON Example
 // {

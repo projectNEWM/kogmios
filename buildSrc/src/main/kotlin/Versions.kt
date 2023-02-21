@@ -7,10 +7,10 @@ object Versions {
     const val ktor = "2.2.3"
     const val kotlinxDatetime = "0.4.0"
     const val kotlinxSerialization = "1.4.1"
-    const val ktlintPlugin = "11.1.0"
-    const val ktlintVersion = "0.43.2"
+    const val ktlintPlugin = "11.2.0"
+    const val ktlintVersion = "0.47.1"
     const val logback = "1.4.5"
     const val mavenRepoAuthPlugin = "3.0.4"
     const val mockk = "1.13.4"
-    const val versionsPlugin = "0.45.0"
+    const val versionsPlugin = "0.46.0"
 }

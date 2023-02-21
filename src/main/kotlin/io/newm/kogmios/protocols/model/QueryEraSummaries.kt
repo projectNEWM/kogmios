@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryEraSummaries(
     @SerialName("query")
-    val query: String = "eraSummaries"
+    val query: String = "eraSummaries",
 ) : Query()

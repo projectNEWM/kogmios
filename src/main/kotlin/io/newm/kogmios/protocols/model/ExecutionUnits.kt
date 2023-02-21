@@ -12,5 +12,5 @@ data class ExecutionUnits(
     val memory: BigDecimal,
     @SerialName("steps")
     @Contextual
-    val steps: BigDecimal
+    val steps: BigDecimal,
 )

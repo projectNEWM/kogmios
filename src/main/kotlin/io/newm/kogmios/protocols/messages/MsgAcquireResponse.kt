@@ -26,25 +26,25 @@ abstract class AcquireResult
 @Serializable
 data class AcquireSuccess(
     @SerialName("AcquireSuccess")
-    val acquireSuccess: AcquireSuccessData
+    val acquireSuccess: AcquireSuccessData,
 ) : AcquireResult()
 
 @Serializable
 data class AcquireSuccessData(
     @SerialName("point")
-    val point: PointDetail
+    val point: PointDetail,
 )
 
 @Serializable
 data class AcquireFailure(
     @SerialName("AcquireFailure")
-    val acquireFailure: AcquireFailureData
+    val acquireFailure: AcquireFailureData,
 ) : AcquireResult()
 
 @Serializable
 data class AcquireFailureData(
     @SerialName("failure")
-    val failure: String
+    val failure: String,
 )
 
 object AcquireSuccessOrFailureSerializer : JsonContentPolymorphicSerializer<AcquireResult>(AcquireResult::class) {

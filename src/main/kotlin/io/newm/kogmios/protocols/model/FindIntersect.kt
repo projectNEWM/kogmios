@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FindIntersect(
     @SerialName("points")
-    val points: List<PointDetailOrOrigin>
+    val points: List<PointDetailOrOrigin>,
 )

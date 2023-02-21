@@ -15,7 +15,7 @@ interface ChainSyncClient : Client {
      */
     suspend fun findIntersect(
         points: List<PointDetailOrOrigin>,
-        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS,
     ): MsgFindIntersectResponse
 
     /**
@@ -29,7 +29,7 @@ fun createChainSyncClient(
     websocketPort: Int,
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
-    loggerName: String? = null
+    loggerName: String? = null,
 ): ChainSyncClient {
     return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

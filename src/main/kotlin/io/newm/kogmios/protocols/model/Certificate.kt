@@ -16,7 +16,7 @@ sealed class Certificate
 @Serializable
 data class DelegationCertificate(
     @SerialName("stakeDelegation")
-    val stakeDelegation: StakeDelegation
+    val stakeDelegation: StakeDelegation,
 ) : Certificate()
 
 @Serializable
@@ -43,7 +43,7 @@ data class StakeKeyDeregistrationCertificate(
 @Serializable
 data class PoolRegistrationCertificate(
     @SerialName("poolRegistration")
-    val poolRegistration: PoolRegistration
+    val poolRegistration: PoolRegistration,
 ) : Certificate()
 
 @Serializable

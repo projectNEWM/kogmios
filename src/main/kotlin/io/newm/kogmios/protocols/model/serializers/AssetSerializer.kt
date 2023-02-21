@@ -23,7 +23,7 @@ object AssetSerializer : KSerializer<List<Asset>> {
             Asset(
                 policyId = policyId,
                 name = name,
-                quantity = quantity
+                quantity = quantity,
             )
         }
     }
@@ -33,7 +33,7 @@ object AssetSerializer : KSerializer<List<Asset>> {
     override fun serialize(encoder: Encoder, value: List<Asset>) {
         delegateMapSerializer.serialize(
             encoder,
-            value.associate { asset -> Pair("${asset.policyId}.${asset.name}", asset.quantity) }
+            value.associate { asset -> Pair("${asset.policyId}.${asset.name}", asset.quantity) },
         )
     }
 }

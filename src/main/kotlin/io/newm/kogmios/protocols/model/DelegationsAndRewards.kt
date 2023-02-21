@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DelegationsAndRewards(
     @SerialName("delegationsAndRewards")
-    val delegationsAndRewards: List<String>
+    val delegationsAndRewards: List<String>,
 )

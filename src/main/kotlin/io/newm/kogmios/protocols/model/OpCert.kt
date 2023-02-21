@@ -12,5 +12,5 @@ data class OpCert(
     @SerialName("kesPeriod")
     val kesPeriod: Int,
     @SerialName("sigma")
-    val sigma: String
+    val sigma: String,
 )

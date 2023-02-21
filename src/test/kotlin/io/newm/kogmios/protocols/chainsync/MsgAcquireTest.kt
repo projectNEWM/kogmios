@@ -23,10 +23,10 @@ class MsgAcquireTest {
                 args = Point(
                     point = PointDetail(
                         1234,
-                        "9e871633f7aa356ef11cdcabb6fdd6d8f4b00bc919c57aed71a91af8f86df590"
-                    )
+                        "9e871633f7aa356ef11cdcabb6fdd6d8f4b00bc919c57aed71a91af8f86df590",
+                    ),
                 ),
-                mirror = "mirror3"
+                mirror = "mirror3",
             )
         val jsonString3 = ClientImpl.json.encodeToString(target3)
         assertThat(jsonString3).isEqualTo("""{"methodname":"Acquire","type":"jsonwsp/request","version":"1.0","servicename":"ogmios","args":{"point":{"slot":1234,"hash":"9e871633f7aa356ef11cdcabb6fdd6d8f4b00bc919c57aed71a91af8f86df590"}},"mirror":"mirror3"}""")

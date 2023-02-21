@@ -18,7 +18,7 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "1.0.1"
+version = "1.1.0-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
@@ -184,7 +184,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             "-Xjsr305=strict",
             "-opt-in=kotlin.RequiresOptIn",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
         )
         jvmTarget = "17"
     }

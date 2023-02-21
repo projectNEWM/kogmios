@@ -21,7 +21,7 @@ data class MsgSubmitTx(
 @Serializable
 data class SubmitTx(
     @SerialName("submit")
-    val submit: String
+    val submit: String,
 )
 // JSON Example
 // {

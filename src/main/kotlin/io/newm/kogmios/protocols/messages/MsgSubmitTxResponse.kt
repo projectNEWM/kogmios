@@ -28,7 +28,7 @@ sealed class SubmitTxResult
 @Serializable(with = SubmitSuccessSerializer::class)
 data class SubmitSuccess(
     @SerialName("txId")
-    val txId: String
+    val txId: String,
 ) : SubmitTxResult()
 
 @Serializable(with = SubmitFailSerializer::class)
@@ -101,7 +101,7 @@ sealed class SubmitFailItem
 @Serializable
 data class EraMismatchSubmitFailItem(
     @SerialName("eraMismatch")
-    val eraMismatch: EraMismatch
+    val eraMismatch: EraMismatch,
 ) : SubmitFailItem()
 
 @Serializable
@@ -193,7 +193,7 @@ data class ExpiredUtxo(
 @Serializable
 data class OutsideOfValidityIntervalSubmitFailItem(
     @SerialName("outsideOfValidityInterval")
-    val outsideOfValidityInterval: OutsideOfValidityInterval
+    val outsideOfValidityInterval: OutsideOfValidityInterval,
 ) : SubmitFailItem()
 
 @Serializable
@@ -267,14 +267,14 @@ object ValueNotConservedSerializer : KSerializer<ValueNotConserved> {
         val element = decoder.decodeJsonElement()
         val consumed = if (element.jsonObject["consumed"] is JsonPrimitive) {
             UtxoOutputValue(
-                coins = element.jsonObject["consumed"]?.jsonPrimitive?.long?.toBigInteger() ?: BigInteger.ZERO
+                coins = element.jsonObject["consumed"]?.jsonPrimitive?.long?.toBigInteger() ?: BigInteger.ZERO,
             )
         } else {
             json.decodeFromJsonElement(element.jsonObject["consumed"]!!)
         }
         val produced = if (element.jsonObject["produced"] is JsonPrimitive) {
             UtxoOutputValue(
-                coins = element.jsonObject["produced"]?.jsonPrimitive?.long?.toBigInteger() ?: BigInteger.ZERO
+                coins = element.jsonObject["produced"]?.jsonPrimitive?.long?.toBigInteger() ?: BigInteger.ZERO,
             )
         } else {
             json.decodeFromJsonElement(element.jsonObject["produced"]!!)
@@ -298,7 +298,7 @@ data class NetworkMismatch(
     @SerialName("expectedNetwork")
     val expectedNetwork: String,
     @SerialName("invalidEntities")
-    val invalidEntities: List<InvalidEntity>
+    val invalidEntities: List<InvalidEntity>,
 )
 
 @Serializable
@@ -312,49 +312,49 @@ data class InvalidEntity(
 @Serializable
 data class OutputTooSmallSubmitFailItem(
     @SerialName("outputTooSmall")
-    val outputTooSmall: List<UtxoOutput>
+    val outputTooSmall: List<UtxoOutput>,
 ) : SubmitFailItem()
 
 @Serializable
 data class TooManyAssetsInOutputSubmitFailItem(
     @SerialName("tooManyAssetsInOutput")
-    val tooManyAssetsInOutput: List<UtxoOutput>
+    val tooManyAssetsInOutput: List<UtxoOutput>,
 ) : SubmitFailItem()
 
 @Serializable
 data class AddressAttributesTooLargeSubmitFailItem(
     @SerialName("addressAttributesTooLarge")
-    val addressAttributesTooLarge: List<String>
+    val addressAttributesTooLarge: List<String>,
 ) : SubmitFailItem()
 
 @Serializable
 data class TriesToForgeAdaSubmitFailItem(
     @SerialName("triesToForgeAda")
-    val triesToForgeAda: String?
+    val triesToForgeAda: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class DelegateNotRegisteredSubmitFailItem(
     @SerialName("delegateNotRegistered")
-    val delegateNotRegistered: String
+    val delegateNotRegistered: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class UnknownOrIncompleteWithdrawalsSubmitFailItem(
     @SerialName("unknownOrIncompleteWithdrawals")
-    val unknownOrIncompleteWithdrawals: Map<String, @Contextual BigInteger>
+    val unknownOrIncompleteWithdrawals: Map<String, @Contextual BigInteger>,
 ) : SubmitFailItem()
 
 @Serializable
 data class StakePoolNotRegisteredSubmitFailItem(
     @SerialName("stakePoolNotRegistered")
-    val stakePoolNotRegistered: String
+    val stakePoolNotRegistered: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class WrongRetirementEpochSubmitFailItem(
     @SerialName("wrongRetirementEpoch")
-    val wrongRetirementEpoch: WrongRetirementEpoch
+    val wrongRetirementEpoch: WrongRetirementEpoch,
 ) : SubmitFailItem()
 
 @Serializable
@@ -373,19 +373,19 @@ data class WrongRetirementEpoch(
 @Serializable
 data class WrongPoolCertificateSubmitFailItem(
     @SerialName("wrongPoolCertificate")
-    val wrongPoolCertificate: Int
+    val wrongPoolCertificate: Int,
 ) : SubmitFailItem()
 
 @Serializable
 data class StakeKeyAlreadyRegisteredSubmitFailItem(
     @SerialName("stakeKeyAlreadyRegistered")
-    val stakeKeyAlreadyRegistered: String
+    val stakeKeyAlreadyRegistered: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class PoolCostTooSmallSubmitFailItem(
     @SerialName("poolCostTooSmall")
-    val poolCostTooSmall: PoolCostTooSmall
+    val poolCostTooSmall: PoolCostTooSmall,
 ) : SubmitFailItem()
 
 @Serializable
@@ -398,7 +398,7 @@ data class PoolCostTooSmall(
 @Serializable
 data class PoolMetadataHashTooBigSubmitFailItem(
     @SerialName("poolMetadataHashTooBig")
-    val poolMetadataHashTooBig: PoolMetadataHashTooBig
+    val poolMetadataHashTooBig: PoolMetadataHashTooBig,
 ) : SubmitFailItem()
 
 @Serializable
@@ -413,19 +413,19 @@ data class PoolMetadataHashTooBig(
 @Serializable
 data class StakeKeyNotRegisteredSubmitFailItem(
     @SerialName("stakeKeyNotRegistered")
-    val stakeKeyNotRegistered: String
+    val stakeKeyNotRegistered: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class RewardAccountNotExistingSubmitFailItem(
     @SerialName("rewardAccountNotExisting")
-    val rewardAccountNotExisting: String?
+    val rewardAccountNotExisting: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class RewardAccountNotEmptySubmitFailItem(
     @SerialName("rewardAccountNotEmpty")
-    val rewardAccountNotEmpty: RewardAccountNotEmpty
+    val rewardAccountNotEmpty: RewardAccountNotEmpty,
 ) : SubmitFailItem()
 
 @Serializable
@@ -438,25 +438,25 @@ data class RewardAccountNotEmpty(
 @Serializable
 data class WrongCertificateTypeSubmitFailItem(
     @SerialName("wrongCertificateType")
-    val wrongCertificateType: String?
+    val wrongCertificateType: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class UnknownGenesisKeySubmitFailItem(
     @SerialName("unknownGenesisKey")
-    val unknownGenesisKey: String
+    val unknownGenesisKey: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class AlreadyDelegatingSubmitFailItem(
     @SerialName("alreadyDelegating")
-    val alreadyDelegating: String
+    val alreadyDelegating: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class InsufficientFundsForMirSubmitFailItem(
     @SerialName("insufficientFundsForMir")
-    val insufficientFundsForMir: InsufficientFundsForMir
+    val insufficientFundsForMir: InsufficientFundsForMir,
 ) : SubmitFailItem()
 
 @Serializable
@@ -474,7 +474,7 @@ data class InsufficientFundsForMir(
 @Serializable
 data class TooLateForMirSubmitFailItem(
     @SerialName("tooLateForMir")
-    val tooLateForMir: TooLateForMir
+    val tooLateForMir: TooLateForMir,
 ) : SubmitFailItem()
 
 @Serializable
@@ -490,31 +490,31 @@ data class TooLateForMir(
 @Serializable
 data class MirTransferNotCurrentlyAllowedSubmitFailItem(
     @SerialName("mirTransferNotCurrentlyAllowed")
-    val mirTransferNotCurrentlyAllowed: String?
+    val mirTransferNotCurrentlyAllowed: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class MirNegativeTransferNotCurrentlyAllowedSubmitFailItem(
     @SerialName("mirNegativeTransferNotCurrentlyAllowed")
-    val mirNegativeTransferNotCurrentlyAllowed: String?
+    val mirNegativeTransferNotCurrentlyAllowed: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class MirProducesNegativeUpdateSubmitFailItem(
     @SerialName("mirProducesNegativeUpdate")
-    val mirProducesNegativeUpdate: String?
+    val mirProducesNegativeUpdate: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class DuplicateGenesisVrfSubmitFailItem(
     @SerialName("duplicateGenesisVrf")
-    val duplicateGenesisVrf: String
+    val duplicateGenesisVrf: String,
 ) : SubmitFailItem()
 
 @Serializable
 data class NonGenesisVotersSubmitFailItem(
     @SerialName("nonGenesisVoters")
-    val nonGenesisVoters: NonGenesisVoters
+    val nonGenesisVoters: NonGenesisVoters,
 ) : SubmitFailItem()
 
 @Serializable
@@ -528,7 +528,7 @@ data class NonGenesisVoters(
 @Serializable
 data class UpdateWrongEpochSubmitFailItem(
     @SerialName("updateWrongEpoch")
-    val updateWrongEpoch: UpdateWrongEpoch
+    val updateWrongEpoch: UpdateWrongEpoch,
 ) : SubmitFailItem()
 
 @Serializable
@@ -546,19 +546,19 @@ data class UpdateWrongEpoch(
 @Serializable
 data class ProtocolVersionCannotFollowSubmitFailItem(
     @SerialName("protocolVersionCannotFollow")
-    val protocolVersionCannotFollow: ProtocolVersion
+    val protocolVersionCannotFollow: ProtocolVersion,
 ) : SubmitFailItem()
 
 @Serializable
 data class MissingRequiredRedeemersSubmitFailItem(
     @SerialName("missingRequiredRedeemers")
-    val missingRequiredRedeemers: MissingRequiredRedeemers
+    val missingRequiredRedeemers: MissingRequiredRedeemers,
 ) : SubmitFailItem()
 
 @Serializable
 data class MissingRequiredRedeemers(
     @SerialName("missing")
-    val missing: List<Map<String, Redeemer>>
+    val missing: List<Map<String, Redeemer>>,
 )
 
 @Serializable(with = RedeemerSerializer::class)
@@ -567,25 +567,25 @@ sealed class Redeemer
 @Serializable
 data class SpendRedeemer(
     @SerialName("spend")
-    val spend: UtxoInput
+    val spend: UtxoInput,
 ) : Redeemer()
 
 @Serializable
 data class MintRedeemer(
     @SerialName("mint")
-    val mint: String
+    val mint: String,
 ) : Redeemer()
 
 @Serializable
 data class CertificateRedeemer(
     @SerialName("certificate")
-    val certificate: Certificate
+    val certificate: Certificate,
 ) : Redeemer()
 
 @Serializable
 data class WithdrawalRedeemer(
     @SerialName("withdrawal")
-    val withdrawal: String
+    val withdrawal: String,
 ) : Redeemer()
 
 object RedeemerSerializer : JsonContentPolymorphicSerializer<Redeemer>(Redeemer::class) {
@@ -603,7 +603,7 @@ object RedeemerSerializer : JsonContentPolymorphicSerializer<Redeemer>(Redeemer:
 @Serializable
 data class MissingRequiredDatumsSubmitFailItem(
     @SerialName("missingRequiredDatums")
-    val missingRequiredDatums: MissingRequiredDatums
+    val missingRequiredDatums: MissingRequiredDatums,
 ) : SubmitFailItem()
 
 @Serializable
@@ -617,7 +617,7 @@ data class MissingRequiredDatums(
 @Serializable
 data class UnspendableDatumsSubmitFailItem(
     @SerialName("unspendableDatums")
-    val unspendableDatums: UnspendableDatums
+    val unspendableDatums: UnspendableDatums,
 ) : SubmitFailItem()
 
 @Serializable
@@ -631,7 +631,7 @@ data class UnspendableDatums(
 @Serializable
 data class ExtraDataMismatchSubmitFailItem(
     @SerialName("extraDataMismatch")
-    val extraDataMismatch: ExtraDataMismatch
+    val extraDataMismatch: ExtraDataMismatch,
 ) : SubmitFailItem()
 
 @Serializable
@@ -645,37 +645,37 @@ data class ExtraDataMismatch(
 @Serializable
 data class MissingRequiredSignaturesSubmitFailItem(
     @SerialName("MissingRequiredSignatures")
-    val missingRequiredSignatures: List<String>
+    val missingRequiredSignatures: List<String>,
 ) : SubmitFailItem()
 
 @Serializable
 data class UnspendableScriptInputsSubmitFailItem(
     @SerialName("unspendableScriptInputs")
-    val unspendableScriptInputs: List<UtxoInput>
+    val unspendableScriptInputs: List<UtxoInput>,
 ) : SubmitFailItem()
 
 @Serializable
 data class ExtraRedeemersSubmitFailItem(
     @SerialName("extraRedeemers")
-    val extraRedeemers: List<String>
+    val extraRedeemers: List<String>,
 ) : SubmitFailItem()
 
 @Serializable
 data class MissingDatumHashesForInputsSubmitFailItem(
     @SerialName("missingDatumHashesForInputs")
-    val missingDatumHashesForInputs: List<UtxoInput>
+    val missingDatumHashesForInputs: List<UtxoInput>,
 ) : SubmitFailItem()
 
 @Serializable
 data class MissingCollateralInputsSubmitFailItem(
     @SerialName("missingCollateralInputs")
-    val missingCollateralInputs: String?
+    val missingCollateralInputs: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class CollateralTooSmallSubmitFailItem(
     @SerialName("collateralTooSmall")
-    val collateralTooSmall: CollateralTooSmall
+    val collateralTooSmall: CollateralTooSmall,
 ) : SubmitFailItem()
 
 @Serializable
@@ -691,19 +691,19 @@ data class CollateralTooSmall(
 @Serializable
 data class CollateralIsScriptSubmitFailItem(
     @SerialName("collateralIsScript")
-    val collateralIsScript: List<Pair<UtxoInput, UtxoOutput>>
+    val collateralIsScript: List<Pair<UtxoInput, UtxoOutput>>,
 ) : SubmitFailItem()
 
 @Serializable
 data class CollateralHasNonAdaAssetsSubmitFailItem(
     @SerialName("collateralHasNonAdaAssets")
-    val collateralHasNonAdaAssets: UtxoOutputValue
+    val collateralHasNonAdaAssets: UtxoOutputValue,
 ) : SubmitFailItem()
 
 @Serializable
 data class TooManyCollateralInputsSubmitFailItem(
     @SerialName("tooManyCollateralInputs")
-    val tooManyCollateralInputs: TooManyCollateralInputs
+    val tooManyCollateralInputs: TooManyCollateralInputs,
 ) : SubmitFailItem()
 
 @Serializable
@@ -719,7 +719,7 @@ data class TooManyCollateralInputs(
 @Serializable
 data class ExecutionUnitsTooLargeSubmitFailItem(
     @SerialName("executionUnitsTooLarge")
-    val executionUnitsTooLarge: ExecutionUnitsTooLarge
+    val executionUnitsTooLarge: ExecutionUnitsTooLarge,
 ) : SubmitFailItem()
 
 @Serializable
@@ -734,19 +734,19 @@ data class ExecutionUnitsTooLarge(
 data class OutsideForecastSubmitFailItem(
     @SerialName("outsideForecast")
     @Contextual
-    val outsideForecast: BigInteger
+    val outsideForecast: BigInteger,
 ) : SubmitFailItem()
 
 @Serializable
 data class ValidationTagMismatchSubmitFailItem(
     @SerialName("validationTagMismatch")
-    val validationTagMismatch: String?
+    val validationTagMismatch: String?,
 ) : SubmitFailItem()
 
 @Serializable
 data class CollectErrorsSubmitFailItem(
     @SerialName("collectErrors")
-    val collectErrors: List<CollectError>
+    val collectErrors: List<CollectError>,
 ) : SubmitFailItem()
 
 @Serializable(with = CollectErrorSerializer::class)
@@ -755,25 +755,25 @@ sealed class CollectError
 @Serializable
 data class NoRedeemerCollectError(
     @SerialName("noRedeemer")
-    val noRedeemer: Redeemer
+    val noRedeemer: Redeemer,
 ) : CollectError()
 
 @Serializable
 data class NoWitnessCollectError(
     @SerialName("noWitness")
-    val noWitness: String
+    val noWitness: String,
 ) : CollectError()
 
 @Serializable
 data class NoCostModelCollectError(
     @SerialName("noCostModel")
-    val noCostModel: String
+    val noCostModel: String,
 ) : CollectError()
 
 @Serializable
 data class BadTranslationCollectError(
     @SerialName("badTranslation")
-    val badTranslation: String
+    val badTranslation: String,
 ) : CollectError()
 
 object CollectErrorSerializer : JsonContentPolymorphicSerializer<CollectError>(CollectError::class) {
@@ -795,13 +795,13 @@ object CollectErrorSerializer : JsonContentPolymorphicSerializer<CollectError>(C
 @Serializable
 data class ExtraScriptWitnessesSubmitFailItem(
     @SerialName("extraScriptWitnesses")
-    val extraScriptWitnesses: List<String>
+    val extraScriptWitnesses: List<String>,
 ) : SubmitFailItem()
 
 @Serializable
 data class MirNegativeTransferSubmitFailItem(
     @SerialName("MirNegativeTransfer")
-    val mirNegativeTransfer: MirNegativeTransfer
+    val mirNegativeTransfer: MirNegativeTransfer,
 ) : SubmitFailItem()
 
 @Serializable
@@ -816,7 +816,7 @@ data class MirNegativeTransfer(
 @Serializable
 data class TotalCollateralMismatchSubmitFailItem(
     @SerialName("totalCollateralMismatch")
-    val totalCollateralMismatch: TotalCollateralMismatch
+    val totalCollateralMismatch: TotalCollateralMismatch,
 ) : SubmitFailItem()
 
 @Serializable
@@ -832,13 +832,13 @@ data class TotalCollateralMismatch(
 @Serializable
 data class MalformedReferenceScriptsSubmitFailItem(
     @SerialName("malformedReferenceScripts")
-    val malformedReferenceScripts: List<String>
+    val malformedReferenceScripts: List<String>,
 ) : SubmitFailItem()
 
 @Serializable
 data class MalformedScriptWitnessesSubmitFailItem(
     @SerialName("malformedScriptWitnesses")
-    val malformedScriptWitnesses: List<String>
+    val malformedScriptWitnesses: List<String>,
 ) : SubmitFailItem()
 
 object SubmitFailItemSerializer : JsonContentPolymorphicSerializer<SubmitFailItem>(SubmitFailItem::class) {

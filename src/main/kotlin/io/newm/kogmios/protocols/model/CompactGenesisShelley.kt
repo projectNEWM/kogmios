@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
 @Serializable
-data class CompactGenesis(
+data class CompactGenesisShelley(
     @SerialName("systemStart")
     val systemStart: Instant,
     @SerialName("networkMagic")
@@ -32,5 +32,5 @@ data class CompactGenesis(
     @SerialName("maxLovelaceSupply")
     val maxLovelaceSupply: Long,
     @SerialName("protocolParameters")
-    val protocolParameters: ProtocolParameters
+    val protocolParameters: ProtocolParameters,
 ) : QueryResult

@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryNonMyopicMemberRewards(
     @SerialName("query")
-    val query: NonMyopicMemberRewardsInputs
+    val query: NonMyopicMemberRewardsInputs,
 ) : Query()
 
 @Serializable
 data class NonMyopicMemberRewardsInputs(
     @SerialName("nonMyopicMemberRewards")
-    val nonMyopicMemberRewards: List<NonMyopicMemberRewardsInput>
+    val nonMyopicMemberRewards: List<NonMyopicMemberRewardsInput>,
 )

@@ -44,5 +44,5 @@ data class ProtocolParameters(
     @SerialName("minUtxoValue")
     val minUtxoValue: Long,
     @SerialName("minPoolCost")
-    val minPoolCost: Long
+    val minPoolCost: Long,
 )

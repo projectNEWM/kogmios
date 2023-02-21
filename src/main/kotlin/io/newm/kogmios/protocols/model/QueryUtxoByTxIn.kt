@@ -6,11 +6,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class QueryUtxoByTxIn(
     @SerialName("query")
-    val query: TxInFilters
+    val query: TxInFilters,
 ) : Query()
 
 @Serializable
 data class TxInFilters(
     @SerialName("utxo")
-    val filters: List<TxIn>
+    val filters: List<TxIn>,
 )

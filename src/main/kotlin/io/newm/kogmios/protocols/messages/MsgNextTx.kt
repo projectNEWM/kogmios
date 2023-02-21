@@ -21,7 +21,7 @@ data class MsgNextTx(
 @Serializable
 data class Fields(
     @SerialName("fields")
-    val fields: String = "all"
+    val fields: String = "all",
 )
 // JSON Example
 // {

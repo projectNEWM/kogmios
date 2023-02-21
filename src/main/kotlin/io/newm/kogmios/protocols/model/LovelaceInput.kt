@@ -8,5 +8,5 @@ import java.math.BigInteger
 @Serializable(with = LovelaceInputSerializer::class)
 class LovelaceInput(
     @Contextual
-    val amount: BigInteger
+    val amount: BigInteger,
 ) : NonMyopicMemberRewardsInput()
