@@ -55,7 +55,7 @@ data class RollForwardData(
 
 object RequestNextResultSerializer :
     JsonContentPolymorphicSerializer<RequestNextResult>(RequestNextResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out RequestNextResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<RequestNextResult> {
         return if ("RollForward" in element.jsonObject) {
             RollForward.serializer()
         } else {

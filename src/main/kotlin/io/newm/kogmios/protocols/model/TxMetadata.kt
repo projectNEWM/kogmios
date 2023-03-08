@@ -109,7 +109,7 @@ object MetadataListSerializer : KSerializer<MetadataList> {
 }
 
 object MetadataValueSerializer : JsonContentPolymorphicSerializer<MetadataValue>(MetadataValue::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out MetadataValue> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MetadataValue> {
         return if ("map" in element.jsonObject) {
             MetadataMap.serializer()
         } else if ("list" in element.jsonObject) {

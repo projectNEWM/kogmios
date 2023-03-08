@@ -26,7 +26,7 @@ data class ScriptPlutusV1(@SerialName("plutus:v1") val plutusV1: String) : Scrip
 data class ScriptPlutusV2(@SerialName("plutus:v2") val plutusV2: String) : Script()
 
 object ScriptSerializer : JsonContentPolymorphicSerializer<Script>(Script::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out Script> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Script> {
         return when (val key = element.jsonObject.keys.first()) {
             "native" -> ScriptNative.serializer()
             "plutus:v1" -> ScriptPlutusV1.serializer()
@@ -181,7 +181,7 @@ object ScriptNativeDetailNofKSerializer : KSerializer<ScriptNativeDetailNofK> {
 }
 
 object ScriptNativeDetailSerializer : JsonContentPolymorphicSerializer<ScriptNativeDetail>(ScriptNativeDetail::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out ScriptNativeDetail> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ScriptNativeDetail> {
         return if (element is JsonPrimitive) {
             ScriptNativeDetailSignature.serializer()
         } else if ("all" in element.jsonObject) {

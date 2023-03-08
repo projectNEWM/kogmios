@@ -10,7 +10,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 
 object UpdateProposalSerializer : JsonContentPolymorphicSerializer<UpdateProposal>(UpdateProposal::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out UpdateProposal> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<UpdateProposal> {
         return if ("coinsPerUtxoByte" in element.jsonObject) {
             UpdateProposalBabbage.serializer()
         } else if ("coinsPerUtxoWord" in element.jsonObject) {

@@ -52,7 +52,7 @@ data class IntersectionNotFoundData(
 
 object IntersectionFoundOrIntersectionNotFoundSerializer :
     JsonContentPolymorphicSerializer<FindIntersectResult>(FindIntersectResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out FindIntersectResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<FindIntersectResult> {
         return if ("IntersectionFound" in element.jsonObject) {
             IntersectionFound.serializer()
         } else {
