@@ -49,7 +49,7 @@ class SubmitFail : SubmitTxResult(), MutableList<SubmitFailItem> by mutableListO
 }
 
 object SubmitTxResultSerializer : JsonContentPolymorphicSerializer<SubmitTxResult>(SubmitTxResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out SubmitTxResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<SubmitTxResult> {
         return if ("SubmitFail" in element.jsonObject) {
             SubmitFail.serializer()
         } else if ("SubmitSuccess" in element.jsonObject) {
@@ -589,7 +589,7 @@ data class WithdrawalRedeemer(
 ) : Redeemer()
 
 object RedeemerSerializer : JsonContentPolymorphicSerializer<Redeemer>(Redeemer::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out Redeemer> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Redeemer> {
         return if ("spend" in element.jsonObject) {
             SpendRedeemer.serializer()
         } else if ("mint" in element.jsonObject) {
@@ -777,7 +777,7 @@ data class BadTranslationCollectError(
 ) : CollectError()
 
 object CollectErrorSerializer : JsonContentPolymorphicSerializer<CollectError>(CollectError::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out CollectError> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<CollectError> {
         return if ("noRedeemer" in element.jsonObject) {
             NoRedeemerCollectError.serializer()
         } else if ("noWitness" in element.jsonObject) {
@@ -842,7 +842,7 @@ data class MalformedScriptWitnessesSubmitFailItem(
 ) : SubmitFailItem()
 
 object SubmitFailItemSerializer : JsonContentPolymorphicSerializer<SubmitFailItem>(SubmitFailItem::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out SubmitFailItem> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<SubmitFailItem> {
         return if ("addressAttributesTooLarge" in element.jsonObject) {
             AddressAttributesTooLargeSubmitFailItem.serializer()
         } else if ("alreadyDelegating" in element.jsonObject) {

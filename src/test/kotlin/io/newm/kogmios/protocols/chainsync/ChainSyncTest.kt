@@ -269,6 +269,69 @@ class ChainSyncTest {
         }
     }
 
+    @Test
+    fun `test RequestNext babbage block`() = runBlocking {
+        createChainSyncClient(
+            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
+            websocketPort = 443,
+            secure = true,
+        ).use { client ->
+            val connectResult = client.connect()
+            assertThat(connectResult).isTrue()
+            assertThat(client.isConnected).isTrue()
+
+            val response = client.findIntersect(
+                listOf(
+                    PointDetail(
+                        slot = 17801390L,
+                        hash = "5334d8f43d03acb9dc0a41af97ba7eb84700773c778012af32493c3300bcf0c3",
+                    )
+                )
+            )
+            assertThat(response).isNotNull()
+            assertThat(response.result).isInstanceOf(IntersectionFound::class.java)
+            assertThat(((response.result as IntersectionFound).intersectionFound.point as PointDetail).slot).isEqualTo(
+                17801390L
+            )
+
+            val response1 = client.requestNext()
+            assertThat(response1).isNotNull()
+            assertThat(response1.result).isInstanceOf(RollBackward::class.java)
+            assertThat(((response1.result as RollBackward).rollBackward.point as PointDetail).slot).isEqualTo(
+                17801390L
+            )
+
+            val response2 = client.requestNext()
+            assertThat(response2).isNotNull()
+            assertThat(response2.result).isInstanceOf(RollForward::class.java)
+            assertThat(((response2.result as RollForward).rollForward.block as BlockBabbage).babbage.header.slot).isEqualTo(
+                17801422L
+            )
+
+            val block = (response2.result as RollForward).rollForward.block as BlockBabbage
+            val transaction =
+                block.babbage.body.firstOrNull { it.id == "13211d06ab3c63ee1d493fbd35608df4f3bfdf20b70ee0b1552d5aecfdfcce2b" }
+            assertThat(transaction).isNotNull()
+            transaction?.witness?.datums?.let { datums ->
+                println("datums: $datums")
+            }
+
+            transaction?.witness?.redeemers?.let { redeemers ->
+                println(
+                    "redeemers: ${
+                    redeemers.entries.associate { (key, txRedeemer) ->
+                        Pair(
+                            key,
+                            "redeemer: ${txRedeemer.redeemer}, executionUnits: { memory: ${txRedeemer.executionUnits.memory.toLong()}, steps: ${txRedeemer.executionUnits.steps.toLong()} }"
+                        )
+                    }
+                    }"
+                )
+            }
+        }
+        Unit
+    }
+
     @Disabled
     @Test
     fun `test blockchain sync`() = runBlocking {

@@ -12,5 +12,11 @@ data class TxWitness(
     val scripts: Map<String, Script>,
 
     @SerialName("bootstrap")
-    val bootstrap: List<TxShelleyBootstrap>
+    val bootstrap: List<TxShelleyBootstrap>,
+
+    @SerialName("datums")
+    val datums: Map<String, String>? = null,
+
+    @SerialName("redeemers")
+    val redeemers: Map<String, TxRedeemer>? = null,
 )

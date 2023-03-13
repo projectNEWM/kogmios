@@ -127,7 +127,7 @@ data class MoveInstantaneousRewards(
 )
 
 object CertificateSerializer : JsonContentPolymorphicSerializer<Certificate>(Certificate::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out Certificate> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Certificate> {
         return if ("stakeDelegation" in element.jsonObject) {
             DelegationCertificate.serializer()
         } else if ("stakeKeyRegistration" in element.jsonObject) {

@@ -151,7 +151,7 @@ data class QueryCurrentProtocolBabbageParametersResult(
 
 object QueryCurrentProtocolParametersResultSerializer :
     JsonContentPolymorphicSerializer<QueryCurrentProtocolParametersResult>(QueryCurrentProtocolParametersResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out QueryCurrentProtocolParametersResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<QueryCurrentProtocolParametersResult> {
         require(element is JsonObject)
         return if ("decentralizationParameter" in element.jsonObject) {
             QueryCurrentProtocolAlonzoParametersResult.serializer()

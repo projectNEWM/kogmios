@@ -46,7 +46,7 @@ class EvaluationResult : EvaluateTxResult(), MutableMap<String, ExecutionUnits> 
 }
 
 object EvaluateTxResultSerializer : JsonContentPolymorphicSerializer<EvaluateTxResult>(EvaluateTxResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out EvaluateTxResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<EvaluateTxResult> {
         return with(element.jsonObject) {
             when {
                 contains("EvaluationResult") -> EvaluationResult.serializer()
@@ -116,7 +116,7 @@ data class CannotCreateEvaluationContextEvaluationFailure(
 ) : EvaluationFailure()
 
 object EvaluationFailureSerializer : JsonContentPolymorphicSerializer<EvaluationFailure>(EvaluationFailure::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out EvaluationFailure> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<EvaluationFailure> {
         return with(element.jsonObject) {
             when {
                 contains("ScriptFailures") -> ScriptEvaluationFailure.serializer()
@@ -212,7 +212,7 @@ data class NoCostModelForLanguageFailureItem(
 ) : ScriptFailureItem()
 
 object ScriptFailureItemSerializer : JsonContentPolymorphicSerializer<ScriptFailureItem>(ScriptFailureItem::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out ScriptFailureItem> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<ScriptFailureItem> {
         return with(element.jsonObject) {
             when {
                 contains("extraRedeemers") -> ExtraRedeemersScriptFailureItem.serializer()

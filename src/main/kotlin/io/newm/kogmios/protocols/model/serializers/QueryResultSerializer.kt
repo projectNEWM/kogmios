@@ -9,7 +9,7 @@ object QueryResultSerializer : JsonContentPolymorphicSerializer<QueryResult>(Que
     private val twentyEightByteHex = Regex("[a-f\\d]{56}")
     private val digitString = Regex("\\d+")
 
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out QueryResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<QueryResult> {
         return when (element) {
             is JsonObject -> {
                 if (("hash" in element) and ("slot" in element)) {

@@ -48,7 +48,7 @@ data class AcquireFailureData(
 )
 
 object AcquireSuccessOrFailureSerializer : JsonContentPolymorphicSerializer<AcquireResult>(AcquireResult::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out AcquireResult> {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<AcquireResult> {
         return if ("AcquireSuccess" in element.jsonObject) {
             AcquireSuccess.serializer()
         } else {
