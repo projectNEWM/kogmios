@@ -19,6 +19,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -179,199 +181,232 @@ internal class ClientImpl(
                         }
                     }
                 ) {
-                    session = this
-                    _isConnected = true
-                    result.complete(true)
-                    awaitAll(
-                        // Receive Loop
-                        async {
-                            while (!session.incoming.isClosedForReceive) {
-                                try {
-                                    val response = session.receiveDeserialized<JsonWspResponse>()
-                                    if (log.isDebugEnabled) {
-                                        log.debug("response: $response")
-                                    }
-                                    when (response) {
-                                        is IgnoredJsonWspResponse -> {
-                                            // A fault likely happened and is already handled. We ignore the response value.
+                    delay(1000) // wait a bit in case server disconnects us immediately.
+                    if (!coroutineContext.job.isActive) {
+                        result.complete(false)
+                    } else {
+                        session = this
+                        _isConnected = true
+                        val startupMutex = Mutex()
+                        var receivingReady = false
+                        var sendingReady = false
+                        awaitAll(
+                            // Receive Loop
+                            async {
+                                while (!session.incoming.isClosedForReceive) {
+                                    try {
+                                        startupMutex.withLock {
+                                            if (!receivingReady) {
+                                                receivingReady = true
+                                                if (sendingReady) {
+                                                    result.complete(true)
+                                                }
+                                            }
                                         }
-
-                                        is MsgAcquireResponse -> {
-                                            acquireRequestResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgReleaseResponse -> {
-                                            releaseRequestResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgQueryResponse -> {
-                                            queryRequestResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgFindIntersectResponse -> {
-                                            findIntersectRequestResponseMap.remove(response.reflection)
-                                                ?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgRequestNextResponse -> {
-                                            requestNextRequestResponseMap.remove(response.reflection)
-                                                ?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgSubmitTxResponse -> {
-                                            submitTxResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgEvaluateTxResponse -> {
-                                            evaluateTxResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgAwaitAcquireMempoolResponse -> {
-                                            awaitAcquireResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgReleaseMempoolResponse -> {
-                                            releaseMempoolResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgHasTxResponse -> {
-                                            hasTxResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgSizeAndCapacityResponse -> {
-                                            sizeAndCapacityResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-
-                                        is MsgNextTxResponse -> {
-                                            nextTxResponseMap.remove(response.reflection)?.complete(response)
-                                                ?: log.warn("No handler found for: ${response.reflection}")
-                                        }
-                                    }
-                                } catch (e: ClosedReceiveChannelException) {
-                                    if (!isClosing) {
-                                        log.warn("websocketClient.incoming was closed unexpectedly.")
-                                        fatalException = e
-                                        _isConnected = false
-                                        break
-                                    }
-                                }
-                            }
-                            if (isClosing) {
-                                log.debug("websocketClient.incoming was closed.")
-                            }
-                            receiveClose.complete(Unit)
-                            fatalException?.let {
-                                shutdownExceptionally()
-                                throw it
-                            }
-                        },
-
-                        // Send Loop
-                        async {
-                            while (!session.outgoing.isClosedForSend) {
-                                try {
-                                    sendQueue.consumeEach { request ->
+                                        val response = session.receiveDeserialized<JsonWspResponse>()
                                         if (log.isDebugEnabled) {
-                                            log.debug("request: $request")
+                                            log.debug("response: $response")
                                         }
-                                        when (request) {
-                                            is MsgAcquire -> {
-                                                acquireRequestResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                        when (response) {
+                                            is IgnoredJsonWspResponse -> {
+                                                // A fault likely happened and is already handled. We ignore the response value.
                                             }
 
-                                            is MsgRelease -> {
-                                                releaseRequestResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgAcquireResponse -> {
+                                                acquireRequestResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgQuery -> {
-                                                queryRequestResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgReleaseResponse -> {
+                                                releaseRequestResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgFindIntersect -> {
-                                                findIntersectRequestResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgQueryResponse -> {
+                                                queryRequestResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgRequestNext -> {
-                                                requestNextRequestResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgFindIntersectResponse -> {
+                                                findIntersectRequestResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgSubmitTx -> {
-                                                submitTxResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgRequestNextResponse -> {
+                                                requestNextRequestResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgEvaluateTx -> {
-                                                evaluateTxResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgSubmitTxResponse -> {
+                                                submitTxResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgAwaitAcquire -> {
-                                                awaitAcquireResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgEvaluateTxResponse -> {
+                                                evaluateTxResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgReleaseMempool -> {
-                                                releaseMempoolResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgAwaitAcquireMempoolResponse -> {
+                                                awaitAcquireResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgHasTx -> {
-                                                hasTxResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgReleaseMempoolResponse -> {
+                                                releaseMempoolResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgSizeAndCapacity -> {
-                                                sizeAndCapacityResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgHasTxResponse -> {
+                                                hasTxResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
 
-                                            is MsgNextTx -> {
-                                                nextTxResponseMap[request.mirror] =
-                                                    request.completableDeferred
+                                            is MsgSizeAndCapacityResponse -> {
+                                                sizeAndCapacityResponseMap.remove(response.reflection)
+                                                    ?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
+                                            }
+
+                                            is MsgNextTxResponse -> {
+                                                nextTxResponseMap.remove(response.reflection)?.complete(response)
+                                                    ?: log.warn("No handler found for: ${response.reflection}")
                                             }
                                         }
-                                        session.sendSerialized(request)
-                                    }
-                                } catch (e: ClosedSendChannelException) {
-                                    if (!isClosing) {
-                                        log.warn("websocketClient.outgoing was closed unexpectedly.")
-                                        fatalException = e
-                                        _isConnected = false
-                                        break
+                                    } catch (e: ClosedReceiveChannelException) {
+                                        if (!isClosing) {
+                                            log.warn("websocketClient.incoming was closed unexpectedly.")
+                                            fatalException = e
+                                            _isConnected = false
+                                            break
+                                        }
                                     }
                                 }
+                                if (isClosing) {
+                                    log.debug("websocketClient.incoming was closed.")
+                                }
+                                receiveClose.complete(Unit)
+                                fatalException?.let {
+                                    shutdownExceptionally()
+                                    throw it
+                                }
+                            },
+
+                            // Send Loop
+                            async {
+                                while (!session.outgoing.isClosedForSend) {
+                                    try {
+                                        startupMutex.withLock {
+                                            if (!sendingReady) {
+                                                sendingReady = true
+                                                if (receivingReady) {
+                                                    result.complete(true)
+                                                }
+                                            }
+                                        }
+                                        sendQueue.consumeEach { request ->
+                                            if (log.isDebugEnabled) {
+                                                log.debug("request: $request")
+                                            }
+                                            when (request) {
+                                                is MsgAcquire -> {
+                                                    acquireRequestResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgRelease -> {
+                                                    releaseRequestResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgQuery -> {
+                                                    queryRequestResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgFindIntersect -> {
+                                                    findIntersectRequestResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgRequestNext -> {
+                                                    requestNextRequestResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgSubmitTx -> {
+                                                    submitTxResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgEvaluateTx -> {
+                                                    evaluateTxResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgAwaitAcquire -> {
+                                                    awaitAcquireResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgReleaseMempool -> {
+                                                    releaseMempoolResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgHasTx -> {
+                                                    hasTxResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgSizeAndCapacity -> {
+                                                    sizeAndCapacityResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+
+                                                is MsgNextTx -> {
+                                                    nextTxResponseMap[request.mirror] =
+                                                        request.completableDeferred
+                                                }
+                                            }
+                                            session.sendSerialized(request)
+                                        }
+                                    } catch (e: ClosedSendChannelException) {
+                                        if (!isClosing) {
+                                            log.warn("websocketClient.outgoing was closed unexpectedly.")
+                                            fatalException = e
+                                            _isConnected = false
+                                            break
+                                        }
+                                    }
+                                }
+                                if (isClosing) {
+                                    log.debug("websocketClient.outgoing was closed.")
+                                }
+                                sendClose.complete(Unit)
+                                fatalException?.let {
+                                    shutdownExceptionally()
+                                    throw it
+                                }
                             }
-                            if (isClosing) {
-                                log.debug("websocketClient.outgoing was closed.")
-                            }
-                            sendClose.complete(Unit)
-                            fatalException?.let {
-                                shutdownExceptionally()
-                                throw it
-                            }
-                        }
-                    )
+                        )
+                    }
                     log.debug("Websocket completed normally.")
+                    if (result.isActive) {
+                        result.complete(false)
+                    }
                 }
             } catch (e: Throwable) {
                 log.error("Connection Error!", e)
-                result.complete(false)
+                e.printStackTrace()
+                if (result.isActive) {
+                    result.complete(false)
+                }
             }
         }
         return result
