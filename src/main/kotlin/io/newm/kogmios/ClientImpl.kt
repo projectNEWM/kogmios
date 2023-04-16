@@ -50,9 +50,8 @@ internal class ClientImpl(
         }
     }
 
-    private var _isConnected = false
-    override val isConnected: Boolean
-        get() = _isConnected
+    override var isConnected: Boolean = false
+        private set
     private var isClosing = false
     private var fatalException: Throwable? = null
     private val sendClose = CompletableDeferred<Unit>()
@@ -186,7 +185,7 @@ internal class ClientImpl(
                         result.complete(false)
                     } else {
                         session = this
-                        _isConnected = true
+                        isConnected = true
                         val startupMutex = Mutex()
                         var receivingReady = false
                         var sendingReady = false
@@ -282,7 +281,7 @@ internal class ClientImpl(
                                         if (!isClosing) {
                                             log.warn("websocketClient.incoming was closed unexpectedly.")
                                             fatalException = e
-                                            _isConnected = false
+                                            isConnected = false
                                             break
                                         }
                                     }
@@ -380,7 +379,7 @@ internal class ClientImpl(
                                         if (!isClosing) {
                                             log.warn("websocketClient.outgoing was closed unexpectedly.")
                                             fatalException = e
-                                            _isConnected = false
+                                            isConnected = false
                                             break
                                         }
                                     }
@@ -861,7 +860,7 @@ internal class ClientImpl(
      * Disconnect from the Ogmios server
      */
     override fun shutdown() {
-        if (_isConnected) {
+        if (isConnected) {
             runBlocking {
                 isClosing = true
                 log.debug("Closing WebSocket...")
@@ -871,7 +870,7 @@ internal class ClientImpl(
                 sendClose.await()
                 httpClient.close()
             }
-            _isConnected = false
+            isConnected = false
         }
     }
 
@@ -888,7 +887,7 @@ internal class ClientImpl(
 
     @Throws(IllegalStateException::class)
     private fun assertConnected() {
-        if (!_isConnected) {
+        if (!isConnected) {
             fatalException?.let {
                 throw it
             } ?: throw IllegalStateException("Kogmios client must be connected! Did you forget to call connect()?")
