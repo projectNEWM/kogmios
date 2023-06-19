@@ -5,19 +5,54 @@ import io.newm.kogmios.createStateQueryClient
 import io.newm.kogmios.protocols.messages.AcquireFailure
 import io.newm.kogmios.protocols.messages.AcquireSuccess
 import io.newm.kogmios.protocols.messages.MsgQueryResponse
-import io.newm.kogmios.protocols.model.*
-import kotlinx.coroutines.*
+import io.newm.kogmios.protocols.model.Blake2bDigestCredential
+import io.newm.kogmios.protocols.model.Bound
+import io.newm.kogmios.protocols.model.CompactGenesis
+import io.newm.kogmios.protocols.model.EmptyQueryResult
+import io.newm.kogmios.protocols.model.EraParameters
+import io.newm.kogmios.protocols.model.EraSummariesQueryResult
+import io.newm.kogmios.protocols.model.EraSummary
+import io.newm.kogmios.protocols.model.InstantQueryResult
+import io.newm.kogmios.protocols.model.LongQueryResult
+import io.newm.kogmios.protocols.model.LovelaceInput
+import io.newm.kogmios.protocols.model.Point
+import io.newm.kogmios.protocols.model.QueryCurrentProtocolParametersResult
+import io.newm.kogmios.protocols.model.QueryDelegationsAndRewardsResult
+import io.newm.kogmios.protocols.model.QueryNonMyopicMemberRewardsResult
+import io.newm.kogmios.protocols.model.QueryPointResult
+import io.newm.kogmios.protocols.model.QueryPoolParametersResult
+import io.newm.kogmios.protocols.model.QueryStakeDistributionResult
+import io.newm.kogmios.protocols.model.StringArrayQueryResult
+import io.newm.kogmios.protocols.model.TxIn
+import io.newm.kogmios.protocols.model.UtxoByTxInQueryResult
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 
 class StateQueryTest {
 
+    companion object {
+        // local testing
+//        private const val TEST_HOST = "localhost"
+//        private const val TEST_PORT = 1337
+//        private const val TEST_SECURE = false
+
+        // remote testing
+        private const val TEST_HOST = "ogmios-kogmios-9ab819.us1.demeter.run"
+        private const val TEST_PORT = 443
+        private const val TEST_SECURE = true
+    }
+
     @Test
     fun `test acquire origin`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         )
         client.use {
             val connectResult = client.connect()
@@ -33,9 +68,9 @@ class StateQueryTest {
     @Test
     fun `test acquire tip`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         )
         client.use {
             val connectResult = client.connect()
@@ -55,9 +90,9 @@ class StateQueryTest {
     @Test
     fun `test acquire and release and acquire`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         )
         client.use {
             val connectResult = client.connect()
@@ -85,9 +120,9 @@ class StateQueryTest {
     @Test
     fun `test release without acquire failure`() = runBlocking {
         val client = createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         )
         client.use {
             val connectResult = client.connect()
@@ -110,9 +145,9 @@ class StateQueryTest {
                 async {
                     delay(it * 100L)
                     val client = createStateQueryClient(
-                        websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-                        websocketPort = 443,
-                        secure = true,
+                        websocketHost = TEST_HOST,
+                        websocketPort = TEST_PORT,
+                        secure = TEST_SECURE,
                         ogmiosCompact = false,
                         loggerName = "client$it",
                     )
@@ -134,9 +169,9 @@ class StateQueryTest {
     @Test
     fun `test query poolParameters for single pool not found`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -151,9 +186,9 @@ class StateQueryTest {
     @Test
     fun `test query poolParameters for single pool`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -170,9 +205,9 @@ class StateQueryTest {
     @Test
     fun `test query blockHeight`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -188,9 +223,9 @@ class StateQueryTest {
     @Test
     fun `test query currentProtocolParameters`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -205,9 +240,9 @@ class StateQueryTest {
     @Test
     fun `test query currentEpoch`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -223,9 +258,9 @@ class StateQueryTest {
     @Test
     fun `test query poolIds`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -242,9 +277,9 @@ class StateQueryTest {
     @Test
     fun `test query delegationsAndRewards`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -265,9 +300,9 @@ class StateQueryTest {
     @Test
     fun `test query eraStart`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -283,9 +318,9 @@ class StateQueryTest {
     @Test
     fun `test query eraSummaries`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -339,9 +374,9 @@ class StateQueryTest {
     @Test
     fun `test query genesisConfig`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -357,9 +392,9 @@ class StateQueryTest {
     @Test
     fun `test query nonMyopicMemberRewards`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -380,9 +415,9 @@ class StateQueryTest {
     @Test
     fun `test query proposedProtocolParameters`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -399,9 +434,9 @@ class StateQueryTest {
     @Test
     fun `test query stakeDistribution`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -416,9 +451,9 @@ class StateQueryTest {
     @Test
     fun `test query systemStart`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
@@ -434,9 +469,9 @@ class StateQueryTest {
     @Test
     fun `test query utxoByTxIn`() = runBlocking {
         createStateQueryClient(
-            websocketHost = "ogmios-kogmios-9ab819.us1.demeter.run",
-            websocketPort = 443,
-            secure = true,
+            websocketHost = TEST_HOST,
+            websocketPort = TEST_PORT,
+            secure = TEST_SECURE,
         ).use { client ->
             val connectResult = client.connect()
             assertThat(connectResult).isTrue()
