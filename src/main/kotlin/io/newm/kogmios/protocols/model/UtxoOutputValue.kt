@@ -1,16 +1,13 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
+import io.newm.kogmios.protocols.model.serializers.UtxoOutputValueSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.math.BigInteger
 
-@Serializable
+@Serializable(with = UtxoOutputValueSerializer::class)
 data class UtxoOutputValue(
-    @SerialName("coins")
-    @Contextual
-    val coins: BigInteger,
-
+    @SerialName("ada")
+    val ada: Ada,
     @SerialName("assets")
-    val assets: Map<String, @Contextual BigInteger>? = null,
+    val assets: List<Asset>? = null,
 )

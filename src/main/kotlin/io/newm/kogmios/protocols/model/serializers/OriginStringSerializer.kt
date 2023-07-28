@@ -16,7 +16,10 @@ object OriginStringSerializer : KSerializer<OriginString> {
         return OriginString(decoder.decodeString())
     }
 
-    override fun serialize(encoder: Encoder, value: OriginString) {
+    override fun serialize(
+        encoder: Encoder,
+        value: OriginString
+    ) {
         encoder.encodeString(value.origin)
     }
 }

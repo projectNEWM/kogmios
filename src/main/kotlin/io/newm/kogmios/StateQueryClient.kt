@@ -4,12 +4,26 @@ import io.newm.kogmios.Client.Companion.DEFAULT_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.Client.Companion.INSANE_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.Client.Companion.LONG_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.protocols.messages.MsgAcquireResponse
-import io.newm.kogmios.protocols.messages.MsgQueryResponse
+import io.newm.kogmios.protocols.messages.MsgQueryBlockHeightResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEpochResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEraStartResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEraSummariesResponse
+import io.newm.kogmios.protocols.messages.MsgQueryGenesisConfigResponse
+import io.newm.kogmios.protocols.messages.MsgQueryLiveStakeDistributionResponse
+import io.newm.kogmios.protocols.messages.MsgQueryNetworkStartTimeResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProjectedRewardsResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProposedProtocolParametersResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProtocolParametersResponse
+import io.newm.kogmios.protocols.messages.MsgQueryRewardAccountSummariesResponse
+import io.newm.kogmios.protocols.messages.MsgQueryStakePoolsResponse
+import io.newm.kogmios.protocols.messages.MsgQueryTipResponse
+import io.newm.kogmios.protocols.messages.MsgQueryUtxoResponse
 import io.newm.kogmios.protocols.messages.MsgReleaseResponse
-import io.newm.kogmios.protocols.model.NonMyopicMemberRewardsInput
+import io.newm.kogmios.protocols.model.GenesisEra
 import io.newm.kogmios.protocols.model.Origin
+import io.newm.kogmios.protocols.model.ParamsProjectedRewards
+import io.newm.kogmios.protocols.model.ParamsUtxo
 import io.newm.kogmios.protocols.model.PointOrOrigin
-import io.newm.kogmios.protocols.model.TxIn
 
 /**
  * Client interface for querying the state of the node and ledger.
@@ -21,7 +35,7 @@ interface StateQueryClient : Client {
      */
     suspend fun acquire(
         pointOrOrigin: PointOrOrigin = Origin(),
-        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS,
     ): MsgAcquireResponse
 
     /**
@@ -32,85 +46,88 @@ interface StateQueryClient : Client {
     /**
      * Get the most recent information about the chain's tip.
      */
-    suspend fun chainTip(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun chainTip(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryTipResponse
 
     /**
-     * Get the parameters for a given pool(s)
+     * Get the information for a given pool(s)
      */
-    suspend fun poolParameters(pools: List<String>, timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun stakePools(
+        pools: List<String>,
+        timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
+    ): MsgQueryStakePoolsResponse
 
     /**
      * Get the current block number of the network
      */
-    suspend fun blockHeight(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun blockHeight(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryBlockHeightResponse
 
     /**
      * Get the current network protocol parameters
      */
-    suspend fun currentProtocolParameters(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun protocolParameters(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryProtocolParametersResponse
 
     /**
      * Get the current network epoch
      */
-    suspend fun currentEpoch(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
-
-    /**
-     * Get the list of pool ids
-     */
-    suspend fun poolIds(timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun epoch(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryEpochResponse
 
     /**
      * Get the rewards and delegation information for the given stake addresses.
      */
-    suspend fun delegationsAndRewards(
+    suspend fun rewardAccountSummaries(
         stakeAddresses: List<String>,
         timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
-    ): MsgQueryResponse
+    ): MsgQueryRewardAccountSummariesResponse
 
     /**
      * Get the beginning of this era.
      */
-    suspend fun eraStart(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun eraStart(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryEraStartResponse
 
     /**
      * Get summaries of all Cardano eras, necessary to do proper slotting arithmetic.
      */
-    suspend fun eraSummaries(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun eraSummaries(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryEraSummariesResponse
 
     /**
-     * Get the Shelley's genesis configuration.
+     * Get the genesis configuration for any era: "byron", "shelley", "alonzo", "conway"
      */
-    suspend fun genesisConfig(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun genesisConfig(
+        era: GenesisEra,
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+    ): MsgQueryGenesisConfigResponse
 
     /**
-     * Get non-myopic member rewards from a projected delegation amount;
-     * this is used to rank pools such that the system converges towards
-     * a fixed number of pools at equilibrium.
+     * Query the projected rewards of an account in a context where the top stake pools are fully saturated.
+     * This projection gives, in principle, a ranking of stake pools that maximizes delegator rewards.
      */
-    suspend fun nonMyopicMemberRewards(
-        inputs: List<NonMyopicMemberRewardsInput>,
+    suspend fun projectedRewards(
+        params: ParamsProjectedRewards,
         timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
-    ): MsgQueryResponse
+    ): MsgQueryProjectedRewardsResponse
 
     /**
      * Get proposed protocol parameters for update, if any.
      */
-    suspend fun proposedProtocolParameters(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun proposedProtocolParameters(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryProposedProtocolParametersResponse
 
     /**
      * Get the current stake pool distribution. This request may be quite long, use with care.
      */
-    suspend fun stakeDistribution(timeoutMs: Long = INSANE_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun liveStakeDistribution(timeoutMs: Long = INSANE_REQUEST_TIMEOUT_MS): MsgQueryLiveStakeDistributionResponse
 
     /**
      * Get the start date of the network.
      */
-    suspend fun systemStart(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun networkStartTime(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryNetworkStartTimeResponse
 
     /**
      * Queries the Utxo details associated with some TxIn value(s)
      */
-    suspend fun utxoByTxIn(filters: List<TxIn>, timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryResponse
+    suspend fun utxo(
+        params: ParamsUtxo,
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+    ): MsgQueryUtxoResponse
 }
 
 fun createStateQueryClient(
@@ -118,7 +135,7 @@ fun createStateQueryClient(
     websocketPort: Int,
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
-    loggerName: String? = null
+    loggerName: String? = null,
 ): StateQueryClient {
     return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

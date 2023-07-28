@@ -7,7 +7,6 @@ import kotlinx.serialization.Serializable
 data class ProtocolUpdate(
     @SerialName("epoch")
     val epoch: Long,
-
     @SerialName("proposal")
     val proposal: Map<String, UpdateProposal>,
 )

@@ -18,7 +18,10 @@ object Blake2bDigestCredentialSerializer : KSerializer<Blake2bDigestCredential> 
         return Blake2bDigestCredential(element.jsonPrimitive.content)
     }
 
-    override fun serialize(encoder: Encoder, value: Blake2bDigestCredential) {
+    override fun serialize(
+        encoder: Encoder,
+        value: Blake2bDigestCredential
+    ) {
         encoder.encodeString(value.digest)
     }
 }

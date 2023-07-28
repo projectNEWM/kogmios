@@ -1,6 +1,9 @@
 package io.newm.kogmios.exception
 
-import io.newm.kogmios.protocols.messages.JsonWspFault
+import io.newm.kogmios.protocols.messages.JsonRpcErrorResponse
 import java.io.IOException
 
-class KogmiosException(message: String, cause: Throwable, val jsonWspFault: JsonWspFault) : IOException(message, cause)
+/**
+ * Exception thrown when an error occurs while communicating with the Ogmios server.
+ */
+class KogmiosException(message: String, cause: Throwable, val jsonRpcErrorResponse: JsonRpcErrorResponse) : IOException(message, cause)

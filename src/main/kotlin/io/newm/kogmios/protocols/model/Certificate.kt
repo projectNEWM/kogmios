@@ -1,103 +1,107 @@
 package io.newm.kogmios.protocols.model
 
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonContentPolymorphicSerializer
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.jsonObject
-import java.math.BigDecimal
-import java.math.BigInteger
-
-@Serializable(with = CertificateSerializer::class)
-sealed class Certificate
+import kotlinx.serialization.json.JsonClassDiscriminator
+import org.apache.commons.numbers.fraction.BigFraction
 
 @Serializable
-data class DelegationCertificate(
-    @SerialName("stakeDelegation")
-    val stakeDelegation: StakeDelegation
-) : Certificate()
+@JsonClassDiscriminator("type")
+sealed interface Certificate
 
 @Serializable
-data class StakeDelegation(
-    @SerialName("delegator")
-    val delegator: String,
-
-    @SerialName("delegatee")
-    val delegatee: String,
-)
-
-@Serializable
-data class StakeKeyRegistrationCertificate(
-    @SerialName("stakeKeyRegistration")
-    val stakeKeyRegistration: String,
-) : Certificate()
+@SerialName("stakeDelegation")
+data class StakeDelegationCertificate(
+    @SerialName("credential")
+    val credential: String,
+    @SerialName("stakePool")
+    val stakePool: StakePool? = null,
+    @SerialName("delegateRepresentative")
+    val delegateRepresentative: DelegateRepresentative? = null,
+) : Certificate
 
 @Serializable
-data class StakeKeyDeregistrationCertificate(
-    @SerialName("stakeKeyDeregistration")
-    val stakeKeyDeregistration: String,
-) : Certificate()
+@SerialName("stakeCredentialRegistration")
+data class StakeCredentialRegistrationCertificate(
+    @SerialName("credential")
+    val credential: String,
+    @SerialName("deposit")
+    val deposit: Ada? = null,
+) : Certificate
 
 @Serializable
-data class PoolRegistrationCertificate(
-    @SerialName("poolRegistration")
-    val poolRegistration: PoolRegistration
-) : Certificate()
+@SerialName("stakeCredentialDeregistration")
+data class StakeCredentialDeregistrationCertificate(
+    @SerialName("credential")
+    val credential: String,
+    @SerialName("deposit")
+    val deposit: Ada? = null,
+) : Certificate
 
 @Serializable
-data class PoolRegistration(
+@SerialName("stakePoolRegistration")
+data class StakePoolRegistrationCertificate(
+    @SerialName("stakePool")
+    val stakePool: StakePoolRegistration,
+) : Certificate
+
+@Serializable
+data class StakePoolRegistration(
+    // bech32 encoding of a pool's verification key
     @SerialName("id")
     val id: String,
-    @SerialName("vrf")
-    val vrf: String,
-    @SerialName("pledge")
-    @Contextual
-    val pledge: BigInteger,
-    @SerialName("cost")
-    @Contextual
-    val cost: BigInteger,
-    @SerialName("margin")
-    @Contextual
-    val margin: BigDecimal,
-    @SerialName("rewardAccount")
-    val rewardAccount: String,
+    // base16 encoding of a pool's verification key
+    @SerialName("vrfVerificationKeyHash")
+    val vrfVerificationKeyHash: String,
     @SerialName("owners")
     val owners: List<String>,
+    @SerialName("cost")
+    val cost: Ada,
+    @SerialName("margin")
+    @Contextual
+    val margin: BigFraction,
+    @SerialName("pledge")
+    val pledge: Ada,
+    @SerialName("rewardAccount")
+    val rewardAccount: String,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata? = null,
     @SerialName("relays")
     val relays: List<RelayResult>,
-    @SerialName("metadata")
-    val metadata: PoolRegistrationMetadata?,
 )
 
 @Serializable
-data class PoolRegistrationMetadata(
-    @SerialName("url")
-    val url: String,
+data class AnchorMetadata(
     @SerialName("hash")
     val hash: String,
+    @SerialName("url")
+    val url: String,
 )
 
 @Serializable
-data class PoolRetirementCertificate(
-    @SerialName("poolRetirement")
-    val poolRetirement: PoolRetirement,
-) : Certificate()
+@SerialName("stakePoolRetirement")
+data class StakePoolRetirementCertificate(
+    @SerialName("stakePool")
+    val stakePool: PoolRetirement,
+) : Certificate
 
 @Serializable
 data class PoolRetirement(
-    @SerialName("poolId")
-    val poolId: String,
+    @SerialName("id")
+    val id: String,
     @SerialName("retirementEpoch")
     val retirementEpoch: Long,
 )
 
 @Serializable
+@SerialName("genesisDelegation")
 data class GenesisDelegationCertificate(
-    @SerialName("genesisDelegation")
-    val genesisDelegation: GenesisDelegation,
-) : Certificate()
+    @SerialName("delegate")
+    val delegate: IdHashWithVrf,
+    @SerialName("issuer")
+    val issuer: IdHash,
+) : Certificate
 
 @Serializable
 data class GenesisDelegation(
@@ -110,40 +114,46 @@ data class GenesisDelegation(
 )
 
 @Serializable
-data class MoveInstantaneousRewardsCertificate(
-    @SerialName("moveInstantaneousRewards")
-    val moveInstantaneousRewards: MoveInstantaneousRewards,
-) : Certificate()
+@SerialName("constitutionalCommitteeHotKeyRegistration")
+data class ConstitutionalCommitteeHotKeyRegistrationCertificate(
+    @SerialName("member")
+    val member: IdHash,
+    @SerialName("hotKey")
+    val hotKey: String,
+) : Certificate
 
 @Serializable
-data class MoveInstantaneousRewards(
-    @SerialName("rewards")
-    val rewards: Map<String, @Contextual BigInteger>? = null,
-    @SerialName("value")
-    @Contextual
-    val value: BigInteger? = null,
-    @SerialName("pot")
-    val pot: String, // reserves or treasury
-)
+@SerialName("constitutionalCommitteeRetirement")
+data class ConstitutionalCommitteeRetirementCertificate(
+    @SerialName("member")
+    val member: IdHash,
+) : Certificate
 
-object CertificateSerializer : JsonContentPolymorphicSerializer<Certificate>(Certificate::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Certificate> {
-        return if ("stakeDelegation" in element.jsonObject) {
-            DelegationCertificate.serializer()
-        } else if ("stakeKeyRegistration" in element.jsonObject) {
-            StakeKeyRegistrationCertificate.serializer()
-        } else if ("stakeKeyDeregistration" in element.jsonObject) {
-            StakeKeyDeregistrationCertificate.serializer()
-        } else if ("poolRegistration" in element.jsonObject) {
-            PoolRegistrationCertificate.serializer()
-        } else if ("poolRetirement" in element.jsonObject) {
-            PoolRetirementCertificate.serializer()
-        } else if ("genesisDelegation" in element.jsonObject) {
-            GenesisDelegationCertificate.serializer()
-        } else if ("moveInstantaneousRewards" in element.jsonObject) {
-            MoveInstantaneousRewardsCertificate.serializer()
-        } else {
-            throw IllegalStateException("No serializer found!: $element")
-        }
-    }
-}
+@Serializable
+@SerialName("delegateRepresentativeRegistration")
+data class DelegateRepresentativeRegistrationCertificate(
+    @SerialName("delegateRepresentative")
+    val delegateRepresentative: DelegateRepresentative,
+    @SerialName("deposit")
+    val deposit: Ada,
+    @SerialName("anchor")
+    val anchor: AnchorMetadata? = null,
+) : Certificate
+
+@Serializable
+@SerialName("delegateRepresentativeUpdate")
+data class DelegateRepresentativeUpdateCertificate(
+    @SerialName("delegateRepresentative")
+    val delegateRepresentative: DelegateRepresentative,
+    @SerialName("anchor")
+    val anchor: AnchorMetadata? = null,
+) : Certificate
+
+@Serializable
+@SerialName("delegateRepresentativeRetirement")
+data class DelegateRepresentativeRetirementCertificate(
+    @SerialName("delegateRepresentative")
+    val delegateRepresentative: DelegateRepresentative,
+    @SerialName("deposit")
+    val deposit: Ada,
+) : Certificate

@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class PointDetail(
     @SerialName("slot")
     val slot: Long,
-    @SerialName("hash")
-    val hash: String,
+    @SerialName("id")
+    val id: String,
 ) : PointDetailOrOrigin()

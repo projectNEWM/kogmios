@@ -12,7 +12,9 @@ import io.ktor.websocket.*
 import io.newm.kogmios.exception.KogmiosException
 import io.newm.kogmios.protocols.messages.*
 import io.newm.kogmios.protocols.model.*
-import io.newm.kogmios.serializers.BigDecimalSerializer
+import io.newm.kogmios.protocols.model.fault.InternalErrorFault
+import io.newm.kogmios.protocols.model.fault.StringFaultData
+import io.newm.kogmios.serializers.BigFractionSerializer
 import io.newm.kogmios.serializers.BigIntegerSerializer
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -21,13 +23,12 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import org.apache.commons.numbers.fraction.BigFraction
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -41,7 +42,6 @@ internal class ClientImpl(
     private val ogmiosCompact: Boolean = false,
     loggerName: String? = null,
 ) : CoroutineScope, StateQueryClient, TxMonitorClient, ChainSyncClient, TxSubmitClient {
-
     private val log by lazy {
         if (loggerName == null) {
             LoggerFactory.getLogger(ClientImpl::class.java)
@@ -57,39 +57,8 @@ internal class ClientImpl(
     private val sendClose = CompletableDeferred<Unit>()
     private val receiveClose = CompletableDeferred<Unit>()
 
-    private val sendQueue = Channel<JsonWspRequest>(Channel.BUFFERED)
-
-    private val acquireRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgAcquireResponse>>()
-    private val releaseRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgReleaseResponse>>()
-    private val queryRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgQueryResponse>>()
-    private val findIntersectRequestResponseMap =
-        ConcurrentHashMap<String, CompletableDeferred<MsgFindIntersectResponse>>()
-    private val requestNextRequestResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgRequestNextResponse>>()
-    private val submitTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgSubmitTxResponse>>()
-    private val evaluateTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgEvaluateTxResponse>>()
-    private val awaitAcquireResponseMap =
-        ConcurrentHashMap<String, CompletableDeferred<MsgAwaitAcquireMempoolResponse>>()
-    private val releaseMempoolResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgReleaseMempoolResponse>>()
-    private val hasTxResponseMap = ConcurrentHashMap<String, CompletableDeferred<MsgHasTxResponse>>()
-    private val sizeAndCapacityResponseMap =
-        ConcurrentHashMap<String, CompletableDeferred<MsgSizeAndCapacityResponse>>()
-    private val nextTxResponseMap =
-        ConcurrentHashMap<String, CompletableDeferred<MsgNextTxResponse>>()
-
-    private val requestResponseMaps = listOf(
-        acquireRequestResponseMap,
-        releaseRequestResponseMap,
-        queryRequestResponseMap,
-        findIntersectRequestResponseMap,
-        requestNextRequestResponseMap,
-        submitTxResponseMap,
-        evaluateTxResponseMap,
-        awaitAcquireResponseMap,
-        releaseMempoolResponseMap,
-        hasTxResponseMap,
-        sizeAndCapacityResponseMap,
-        nextTxResponseMap,
-    )
+    private val sendQueue = Channel<JsonRpcRequest>(Channel.BUFFERED)
+    private val requestResponseMap = ConcurrentHashMap<String, CompletableDeferred<JsonRpcSuccessResponse>>()
 
     private lateinit var session: DefaultClientWebSocketSession
     private val httpClient by lazy {
@@ -99,59 +68,56 @@ internal class ClientImpl(
                 requestTimeout = 0L
             }
             install(WebSockets) {
-                contentConverter = object : WebsocketContentConverter {
-                    override fun isApplicable(frame: Frame): Boolean = frame.frameType == FrameType.TEXT
+                contentConverter =
+                    object : WebsocketContentConverter {
+                        override fun isApplicable(frame: Frame): Boolean = frame.frameType == FrameType.TEXT
 
-                    override suspend fun serialize(charset: Charset, typeInfo: TypeInfo, value: Any): Frame {
-                        if (log.isTraceEnabled) {
-                            log.trace("serialize() - charset: $charset, typeInfo: $typeInfo, value: $value")
-                        }
-                        return Frame.Text(
-                            when (value) {
-                                is JsonWspRequest -> json.encodeToString(value).also {
-                                    // temporary while we need to figure out how all the requests look
-                                    log.debug(it)
-                                }
+                        override suspend fun serialize(
+                            charset: Charset,
+                            typeInfo: TypeInfo,
+                            value: Any
+                        ): Frame {
+                            log.trace("serialize() - charset: {}, typeInfo: {}, value: {}", charset, typeInfo, value)
+                            return Frame.Text(
+                                when (value) {
+                                    is JsonRpcRequest ->
+                                        json.encodeToString(value).also {
+                                            // temporary while we need to figure out how all the requests look
+                                            log.debug("sending: {}", it)
+                                        }
 
-                                else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
-                            }
-                        )
-                    }
+                                    else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
+                                },
+                            )
+                        }
 
-                    override suspend fun deserialize(charset: Charset, typeInfo: TypeInfo, content: Frame): Any {
-                        if (log.isTraceEnabled) {
-                            log.trace("deserialize() - charset: $charset, typeInfo: $typeInfo, content: $content")
-                        }
-                        val jsonString = (content as Frame.Text).readText()
-                        // temporary while we need to figure out how all the responses look
-                        log.debug(jsonString)
-                        return try {
-                            json.decodeFromString<JsonWspResponse>(jsonString)
-                        } catch (e: Throwable) {
-                            handleError(jsonString, e)
-                            IgnoredJsonWspResponse()
-                        }
-                    }
-
-                    @kotlin.jvm.Throws(KogmiosException::class, IOException::class)
-                    private fun handleError(jsonString: String, e: Throwable) {
-                        val exception = try {
-                            val jsonWspFault = json.decodeFromString<JsonWspFault>(jsonString)
-                            KogmiosException(jsonWspFault.fault.string, e, jsonWspFault)
-                        } catch (parseException: Throwable) {
-                            log.error("Error parsing Fault!", parseException)
-                            IOException(jsonString, e)
-                        }
-                        requestResponseMaps.forEach outer@{ requestResponseMap ->
-                            requestResponseMap.keys.forEach inner@{ key ->
-                                if (key in jsonString) {
-                                    requestResponseMap.remove(key)?.completeExceptionally(exception)
-                                    return@outer
-                                }
+                        override suspend fun deserialize(
+                            charset: Charset,
+                            typeInfo: TypeInfo,
+                            content: Frame
+                        ): Any {
+                            log.trace("deserialize() - charset: {}, typeInfo: {}, content: {}", charset, typeInfo, content)
+                            val jsonString = (content as Frame.Text).readText()
+                            log.debug("received: {}", jsonString)
+                            return try {
+                                json.decodeFromString<JsonRpcResponse>(jsonString)
+                            } catch (e: Throwable) {
+                                // This should never happen unless WE have made an error in our parsers somewhere.
+                                val idRegex = """"id":"([^:{},]*: [a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})"""".toRegex()
+                                val id = idRegex.find(jsonString)?.let { it.groupValues[1] } ?: "-1"
+                                JsonRpcErrorResponse(
+                                    error =
+                                        InternalErrorFault(
+                                            code = -1,
+                                            message = "Error parsing JsonRpcResponse!",
+                                            data = StringFaultData(jsonString),
+                                        ),
+                                    id = id,
+                                    cause = e,
+                                )
                             }
                         }
                     }
-                }
             }
         }
     }
@@ -160,6 +126,7 @@ internal class ClientImpl(
         return connectInternal().await()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun connectInternal(): CompletableDeferred<Boolean> {
         val result = CompletableDeferred<Boolean>()
 
@@ -178,7 +145,7 @@ internal class ClientImpl(
                                 append("Sec-WebSocket-Protocol", "ogmios.v1:compact")
                             }
                         }
-                    }
+                    },
                 ) {
                     delay(1000) // wait a bit in case server disconnects us immediately.
                     if (!coroutineContext.job.isActive) {
@@ -202,79 +169,27 @@ internal class ClientImpl(
                                                 }
                                             }
                                         }
-                                        val response = session.receiveDeserialized<JsonWspResponse>()
-                                        if (log.isDebugEnabled) {
-                                            log.debug("response: $response")
-                                        }
-                                        when (response) {
-                                            is IgnoredJsonWspResponse -> {
-                                                // A fault likely happened and is already handled. We ignore the response value.
+                                        when (val response = session.receiveDeserialized<JsonRpcResponse>()) {
+                                            is JsonRpcErrorResponse -> {
+                                                log.error("response: {}", response)
+                                                if (!requestResponseMap.containsKey(response.id)) {
+                                                    log.error("No handler found for: {}", response.id)
+                                                    log.error("requestResponseMap: {}", requestResponseMap)
+                                                }
+                                                requestResponseMap.remove(response.id)!!.completeExceptionally(
+                                                    KogmiosException(
+                                                        message = response.error.message,
+                                                        cause = response.cause ?: IOException(),
+                                                        jsonRpcErrorResponse = response,
+                                                    ),
+                                                )
                                             }
 
-                                            is MsgAcquireResponse -> {
-                                                acquireRequestResponseMap.remove(response.reflection)
+                                            is JsonRpcSuccessResponse -> {
+                                                log.debug("response: {}", response)
+                                                requestResponseMap.remove(response.id)
                                                     ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgReleaseResponse -> {
-                                                releaseRequestResponseMap.remove(response.reflection)
-                                                    ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgQueryResponse -> {
-                                                queryRequestResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgFindIntersectResponse -> {
-                                                findIntersectRequestResponseMap.remove(response.reflection)
-                                                    ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgRequestNextResponse -> {
-                                                requestNextRequestResponseMap.remove(response.reflection)
-                                                    ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgSubmitTxResponse -> {
-                                                submitTxResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgEvaluateTxResponse -> {
-                                                evaluateTxResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgAwaitAcquireMempoolResponse -> {
-                                                awaitAcquireResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgReleaseMempoolResponse -> {
-                                                releaseMempoolResponseMap.remove(response.reflection)
-                                                    ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgHasTxResponse -> {
-                                                hasTxResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgSizeAndCapacityResponse -> {
-                                                sizeAndCapacityResponseMap.remove(response.reflection)
-                                                    ?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
-                                            }
-
-                                            is MsgNextTxResponse -> {
-                                                nextTxResponseMap.remove(response.reflection)?.complete(response)
-                                                    ?: log.warn("No handler found for: ${response.reflection}")
+                                                    ?: log.warn("No handler found for: {}", response.id)
                                             }
                                         }
                                     } catch (e: ClosedReceiveChannelException) {
@@ -295,7 +210,6 @@ internal class ClientImpl(
                                     throw it
                                 }
                             },
-
                             // Send Loop
                             async {
                                 while (!session.outgoing.isClosedForSend) {
@@ -309,70 +223,8 @@ internal class ClientImpl(
                                             }
                                         }
                                         sendQueue.consumeEach { request ->
-                                            if (log.isDebugEnabled) {
-                                                log.debug("request: $request")
-                                            }
-                                            when (request) {
-                                                is MsgAcquire -> {
-                                                    acquireRequestResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgRelease -> {
-                                                    releaseRequestResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgQuery -> {
-                                                    queryRequestResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgFindIntersect -> {
-                                                    findIntersectRequestResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgRequestNext -> {
-                                                    requestNextRequestResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgSubmitTx -> {
-                                                    submitTxResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgEvaluateTx -> {
-                                                    evaluateTxResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgAwaitAcquire -> {
-                                                    awaitAcquireResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgReleaseMempool -> {
-                                                    releaseMempoolResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgHasTx -> {
-                                                    hasTxResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgSizeAndCapacity -> {
-                                                    sizeAndCapacityResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-
-                                                is MsgNextTx -> {
-                                                    nextTxResponseMap[request.mirror] =
-                                                        request.completableDeferred
-                                                }
-                                            }
+                                            log.debug("request: {}", request)
+                                            requestResponseMap[request.id] = request.completableDeferred
                                             session.sendSerialized(request)
                                         }
                                     } catch (e: ClosedSendChannelException) {
@@ -392,7 +244,7 @@ internal class ClientImpl(
                                     shutdownExceptionally()
                                     throw it
                                 }
-                            }
+                            },
                         )
                     }
                     log.debug("Websocket completed normally.")
@@ -411,443 +263,365 @@ internal class ClientImpl(
         return result
     }
 
-    override suspend fun acquire(pointOrOrigin: PointOrOrigin, timeoutMs: Long): MsgAcquireResponse {
+    override suspend fun acquire(
+        pointOrOrigin: PointOrOrigin,
+        timeoutMs: Long
+    ): MsgAcquireResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgAcquireResponse>()
-        sendQueue.send(
+
+        val message =
             MsgAcquire(
-                args = pointOrOrigin,
-                mirror = "Acquire:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                params = pointOrOrigin,
             )
-        )
+
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgAcquireResponse
             }
         }
     }
 
     override suspend fun release(timeoutMs: Long): MsgReleaseResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgReleaseResponse>()
-        sendQueue.send(
-            MsgRelease(
-                mirror = "Release:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgRelease()
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgReleaseResponse
             }
         }
     }
 
-    override suspend fun chainTip(timeoutMs: Long): MsgQueryResponse {
+    override suspend fun chainTip(timeoutMs: Long): MsgQueryTipResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QueryChainTip(),
-                mirror = "QueryChainTip:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_NETWORK_TIP,
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryTipResponse
             }
         }
     }
 
-    override suspend fun poolParameters(pools: List<String>, timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryPoolParameters(PoolParameters(pools)),
-                mirror = "QueryPoolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun blockHeight(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryBlockHeight(),
-                mirror = "QueryBlockHeight:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun currentProtocolParameters(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryCurrentProtocolParameters(),
-                mirror = "QueryCurrentProtocolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun currentEpoch(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryCurrentEpoch(),
-                mirror = "QueryCurrentEpoch:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun poolIds(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryPoolIds(),
-                mirror = "QueryPoolIds:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun delegationsAndRewards(stakeAddresses: List<String>, timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryDelegationsAndRewards(DelegationsAndRewards(stakeAddresses)),
-                mirror = "QueryDelegationsAndRewards:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun eraStart(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryEraStart(),
-                mirror = "QueryEraStart:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun eraSummaries(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryEraSummaries(),
-                mirror = "QueryEraSummaries:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun genesisConfig(timeoutMs: Long): MsgQueryResponse {
-        assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
-            MsgQuery(
-                args = QueryGenesisConfig(),
-                mirror = "QueryGenesisConfig:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                completableDeferred.await()
-            }
-        }
-    }
-
-    override suspend fun nonMyopicMemberRewards(
-        inputs: List<NonMyopicMemberRewardsInput>,
+    override suspend fun stakePools(
+        pools: List<String>,
         timeoutMs: Long
-    ): MsgQueryResponse {
+    ): MsgQueryStakePoolsResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QueryNonMyopicMemberRewards(NonMyopicMemberRewardsInputs(inputs)),
-                mirror = "QueryNonMyopicMemberRewards:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_STAKE_POOLS,
+                params = ParamsPoolParameters(pools.map { StakePool(it) }),
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryStakePoolsResponse
             }
         }
     }
 
-    override suspend fun proposedProtocolParameters(timeoutMs: Long): MsgQueryResponse {
+    override suspend fun blockHeight(timeoutMs: Long): MsgQueryBlockHeightResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QueryProposedProtocolParameters(),
-                mirror = "QueryProposedProtocolParameters:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_NETWORK_BLOCK_HEIGHT,
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryBlockHeightResponse
             }
         }
     }
 
-    override suspend fun stakeDistribution(timeoutMs: Long): MsgQueryResponse {
+    override suspend fun protocolParameters(timeoutMs: Long): MsgQueryProtocolParametersResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QueryStakeDistribution(),
-                mirror = "QueryStakeDistribution:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_PROTOCOL_PARAMETERS,
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryProtocolParametersResponse
             }
         }
     }
 
-    override suspend fun systemStart(timeoutMs: Long): MsgQueryResponse {
+    override suspend fun epoch(timeoutMs: Long): MsgQueryEpochResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QuerySystemStart(),
-                mirror = "QuerySystemStart:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_EPOCH,
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryEpochResponse
             }
         }
     }
 
-    override suspend fun utxoByTxIn(filters: List<TxIn>, timeoutMs: Long): MsgQueryResponse {
+    override suspend fun rewardAccountSummaries(
+        stakeAddresses: List<String>,
+        timeoutMs: Long
+    ): MsgQueryRewardAccountSummariesResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgQueryResponse>()
-        sendQueue.send(
+        val message =
             MsgQuery(
-                args = QueryUtxoByTxIn(TxInFilters(filters)),
-                mirror = "QueryUtxoByTxIn:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_REWARD_ACCOUNT_SUMMARIES,
+                params = ParamsRewardAccountSummaries(stakeAddresses)
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryRewardAccountSummariesResponse
             }
         }
     }
 
-    override suspend fun awaitAcquireMempool(timeoutMs: Long): MsgAwaitAcquireMempoolResponse {
+    override suspend fun eraStart(timeoutMs: Long): MsgQueryEraStartResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgAwaitAcquireMempoolResponse>()
-        sendQueue.send(
-            MsgAwaitAcquire(
-                args = EmptyObject(),
-                mirror = "AwaitAcquireMempool:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_ERA_START,
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgQueryEraStartResponse
+            }
+        }
+    }
+
+    override suspend fun eraSummaries(timeoutMs: Long): MsgQueryEraSummariesResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_ERA_SUMMARIES,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryEraSummariesResponse
+            }
+        }
+    }
+
+    override suspend fun genesisConfig(
+        era: GenesisEra,
+        timeoutMs: Long
+    ): MsgQueryGenesisConfigResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_NETWORK_GENESIS_CONFIGURATION,
+                params = ParamsGenesisConfig(era.name.lowercase()),
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryGenesisConfigResponse
+            }
+        }
+    }
+
+    override suspend fun projectedRewards(
+        params: ParamsProjectedRewards,
+        timeoutMs: Long
+    ): MsgQueryProjectedRewardsResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_PROJECTED_REWARDS,
+                params = params,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryProjectedRewardsResponse
+            }
+        }
+    }
+
+    override suspend fun proposedProtocolParameters(timeoutMs: Long): MsgQueryProposedProtocolParametersResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_PROPOSED_PROTOCOL_PARAMETERS,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryProposedProtocolParametersResponse
+            }
+        }
+    }
+
+    override suspend fun liveStakeDistribution(timeoutMs: Long): MsgQueryLiveStakeDistributionResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_LIVE_STAKE_DISTRIBUTION,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryLiveStakeDistributionResponse
+            }
+        }
+    }
+
+    override suspend fun networkStartTime(timeoutMs: Long): MsgQueryNetworkStartTimeResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_NETWORK_START_TIME,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryNetworkStartTimeResponse
+            }
+        }
+    }
+
+    override suspend fun utxo(
+        params: ParamsUtxo,
+        timeoutMs: Long
+    ): MsgQueryUtxoResponse {
+        assertConnected()
+        val message =
+            MsgQuery(
+                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_UTXO,
+                params = params,
+            )
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgQueryUtxoResponse
+            }
+        }
+    }
+
+    override suspend fun acquireMempool(timeoutMs: Long): MsgAcquireMempoolResponse {
+        assertConnected()
+        val message = MsgAcquireMempool()
+        sendQueue.send(message)
+        return coroutineScope {
+            withTimeout(timeoutMs) {
+                message.completableDeferred.await() as MsgAcquireMempoolResponse
             }
         }
     }
 
     override suspend fun releaseMempool(timeoutMs: Long): MsgReleaseMempoolResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgReleaseMempoolResponse>()
-        sendQueue.send(
-            MsgReleaseMempool(
-                args = EmptyObject(),
-                mirror = "ReleaseMempool:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgReleaseMempool()
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgReleaseMempoolResponse
             }
         }
     }
 
-    override suspend fun hasTx(txId: String, timeoutMs: Long): MsgHasTxResponse {
+    override suspend fun hasTransaction(
+        txId: String,
+        timeoutMs: Long
+    ): MsgHasTransactionResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgHasTxResponse>()
-        sendQueue.send(
-            MsgHasTx(
-                args = HasTx(id = txId),
-                mirror = "HasTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgHasTransaction(params = HasTransaction(id = txId))
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgHasTransactionResponse
             }
         }
     }
 
-    override suspend fun sizeAndCapacity(timeoutMs: Long): MsgSizeAndCapacityResponse {
+    override suspend fun sizeOfMempool(timeoutMs: Long): MsgSizeOfMempoolResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgSizeAndCapacityResponse>()
-        sendQueue.send(
-            MsgSizeAndCapacity(
-                mirror = "SizeAndCapacity:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgSizeOfMempool()
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgSizeOfMempoolResponse
             }
         }
     }
 
-    override suspend fun nextTx(timeoutMs: Long): MsgNextTxResponse {
+    override suspend fun nextTransaction(timeoutMs: Long): MsgNextTransactionResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgNextTxResponse>()
-        sendQueue.send(
-            MsgNextTx(
-                mirror = "NextTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgNextTransaction()
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgNextTransactionResponse
             }
         }
     }
 
-    override suspend fun findIntersect(points: List<PointDetailOrOrigin>, timeoutMs: Long): MsgFindIntersectResponse {
+    override suspend fun findIntersect(
+        points: List<PointDetailOrOrigin>,
+        timeoutMs: Long
+    ): MsgFindIntersectResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgFindIntersectResponse>()
-        sendQueue.send(
-            MsgFindIntersect(
-                args = FindIntersect(points),
-                mirror = "MsgFindIntersect:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgFindIntersect(params = FindIntersect(points))
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgFindIntersectResponse
             }
         }
     }
 
-    override suspend fun requestNext(timeoutMs: Long): MsgRequestNextResponse {
+    override suspend fun nextBlock(timeoutMs: Long): MsgNextBlockResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgRequestNextResponse>()
-        sendQueue.send(
-            MsgRequestNext(
-                mirror = "MsgRequestNext:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred
-            )
-        )
+        val message = MsgNextBlock()
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgNextBlockResponse
             }
         }
     }
 
-    override suspend fun submit(tx: String, timeoutMs: Long): MsgSubmitTxResponse {
+    override suspend fun submit(
+        tx: String,
+        timeoutMs: Long
+    ): MsgSubmitTxResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgSubmitTxResponse>()
-        sendQueue.send(
+        val message =
             MsgSubmitTx(
-                args = SubmitTx(tx),
-                mirror = "MsgSubmitTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred,
+                params = SubmitOrEvalTx(Cbor(tx)),
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgSubmitTxResponse
             }
         }
     }
 
-    override suspend fun evaluate(tx: String, timeoutMs: Long): MsgEvaluateTxResponse {
+    override suspend fun evaluate(
+        tx: String,
+        timeoutMs: Long
+    ): MsgEvaluateTxResponse {
         assertConnected()
-        val completableDeferred = CompletableDeferred<MsgEvaluateTxResponse>()
-        sendQueue.send(
+        val message =
             MsgEvaluateTx(
-                args = EvaluateTx(tx),
-                mirror = "MsgEvaluateTx:${UUID.randomUUID()}",
-                completableDeferred = completableDeferred,
+                params = SubmitOrEvalTx(Cbor(tx)),
             )
-        )
+        sendQueue.send(message)
         return coroutineScope {
             withTimeout(timeoutMs) {
-                completableDeferred.await()
+                message.completableDeferred.await() as MsgEvaluateTxResponse
             }
         }
     }
@@ -877,10 +651,8 @@ internal class ClientImpl(
     private fun shutdownExceptionally() {
         fatalException?.let {
             // blow up any pending requests to us
-            requestResponseMaps.forEach outer@{ requestResponseMap ->
-                requestResponseMap.keys.forEach inner@{ key ->
-                    requestResponseMap.remove(key)?.completeExceptionally(it)
-                }
+            requestResponseMap.keys.forEach { key ->
+                requestResponseMap.remove(key)?.completeExceptionally(it)
             }
         }
     }
@@ -900,16 +672,18 @@ internal class ClientImpl(
     }
 
     companion object {
-        internal val json = Json {
-            classDiscriminator = "methodname"
-            encodeDefaults = true
-            explicitNulls = true
-            ignoreUnknownKeys = true
-            isLenient = true
-            serializersModule = SerializersModule {
-                contextual(BigInteger::class, BigIntegerSerializer)
-                contextual(BigDecimal::class, BigDecimalSerializer)
+        internal val json =
+            Json {
+                // classDiscriminator = "type"
+                encodeDefaults = true
+                explicitNulls = true
+                ignoreUnknownKeys = true
+                isLenient = true
+                serializersModule =
+                    SerializersModule {
+                        contextual(BigInteger::class, BigIntegerSerializer)
+                        contextual(BigFraction::class, BigFractionSerializer)
+                    }
             }
-        }
     }
 }

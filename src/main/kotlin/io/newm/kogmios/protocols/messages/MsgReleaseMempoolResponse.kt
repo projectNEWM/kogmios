@@ -1,5 +1,6 @@
 package io.newm.kogmios.protocols.messages
 
+import io.newm.kogmios.protocols.model.result.ReleaseMempoolResult
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -7,20 +8,10 @@ import kotlinx.serialization.Serializable
  * Response that comes back from Ogmios after a release mempool message is sent.
  */
 @Serializable
-@SerialName("ReleaseMempool")
+@SerialName(MsgReleaseMempool.METHOD_NAME)
 data class MsgReleaseMempoolResponse(
     @SerialName("result")
-    val result: String,
-    @SerialName("reflection")
-    override val reflection: String,
-) : JsonWspResponse()
-
-// JSON Example
-// {
-//    "type": "jsonwsp/response",
-//    "version": "1.0",
-//    "servicename": "ogmios",
-//    "methodname": "Release",
-//    "result": "Released",
-//    "reflection": null
-// }
+    override val result: ReleaseMempoolResult,
+    @SerialName("id")
+    override val id: String,
+) : JsonRpcSuccessResponse()

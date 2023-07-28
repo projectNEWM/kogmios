@@ -4,4 +4,4 @@ import io.newm.kogmios.protocols.model.serializers.NonMyopicMemberRewardsResultS
 import kotlinx.serialization.Serializable
 
 @Serializable(with = NonMyopicMemberRewardsResultSerializer::class)
-class NonMyopicMemberRewardsResult : LinkedHashMap<String, Long>()
+class NonMyopicMemberRewardsResult : LinkedHashMap<String, Ada>()

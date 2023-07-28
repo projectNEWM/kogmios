@@ -8,5 +8,5 @@ data class CertifiedVrf(
     @SerialName("output")
     val output: String,
     @SerialName("proof")
-    val proof: String
+    val proof: String,
 )

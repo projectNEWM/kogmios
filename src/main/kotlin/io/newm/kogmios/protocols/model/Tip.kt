@@ -7,8 +7,8 @@ import kotlinx.serialization.Serializable
 data class Tip(
     @SerialName("slot")
     val slot: Long,
-    @SerialName("hash")
-    val hash: String,
-    @SerialName("blockNo")
-    val blockNo: Long,
+    @SerialName("id")
+    val id: String,
+    @SerialName("height")
+    val height: Long,
 )

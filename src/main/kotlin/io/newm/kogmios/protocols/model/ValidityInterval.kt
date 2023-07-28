@@ -9,9 +9,8 @@ import java.math.BigInteger
 data class ValidityInterval(
     @SerialName("invalidBefore")
     @Contextual
-    val invalidBefore: BigInteger?,
-
-    @SerialName("invalidHereafter")
+    val invalidBefore: BigInteger? = null,
+    @SerialName("invalidAfter")
     @Contextual
-    val invalidHereafter: BigInteger?,
+    val invalidAfter: BigInteger? = null,
 )

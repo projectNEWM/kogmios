@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable(with = OriginStringSerializer::class)
 data class OriginString(
-    val origin: String = Const.ORIGIN
+    val origin: String = Const.ORIGIN,
 ) : PointDetailOrOrigin()

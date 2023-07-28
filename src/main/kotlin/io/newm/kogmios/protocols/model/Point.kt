@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Point(
     @SerialName("point")
-    val point: PointDetail
+    val point: PointDetail,
 ) : PointOrOrigin()

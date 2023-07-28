@@ -7,7 +7,8 @@ import kotlinx.serialization.Serializable
 data class TxRedeemer(
     @SerialName("executionUnits")
     val executionUnits: ExecutionUnits,
-
     @SerialName("redeemer")
     val redeemer: String,
+    @SerialName("validator")
+    val validator: Validator,
 )

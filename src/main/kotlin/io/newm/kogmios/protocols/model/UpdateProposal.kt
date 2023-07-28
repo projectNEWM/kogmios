@@ -1,7 +1,16 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.serializers.UpdateProposalSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable(with = UpdateProposalSerializer::class)
-sealed class UpdateProposal
+@Serializable
+data class UpdateProposal(
+    @SerialName("version")
+    val version: Version,
+    @SerialName("software")
+    val software: Software,
+    @SerialName("parameters")
+    val parameters: UpdatableParametersProposal,
+    @SerialName("metadata")
+    val metadata: Map<String, String>,
+)

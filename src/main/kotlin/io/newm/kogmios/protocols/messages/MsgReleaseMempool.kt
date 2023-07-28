@@ -1,29 +1,20 @@
 package io.newm.kogmios.protocols.messages
 
-import io.newm.kogmios.protocols.model.EmptyObject
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 /**
  * Release mempool snapshot
  */
 @Serializable
-@SerialName("ReleaseMempool")
 data class MsgReleaseMempool(
-    @SerialName("args")
-    val args: EmptyObject,
-    @SerialName("mirror")
-    override val mirror: String,
-    @kotlinx.serialization.Transient
-    val completableDeferred: CompletableDeferred<MsgReleaseMempoolResponse> = CompletableDeferred(),
-) : JsonWspRequest()
-
-// JSON Example
-// {
-//    "type": "jsonwsp/request",
-//    "version": "1.0",
-//    "servicename": "ogmios",
-//    "methodname": "ReleaseMempool",
-//    "args": {}
-// }
+    @SerialName("method")
+    override val method: String = METHOD_NAME,
+    @SerialName("id")
+    override val id: String = "$method: ${UUID.randomUUID()}",
+) : JsonRpcRequest() {
+    companion object {
+        const val METHOD_NAME = "releaseMempool"
+    }
+}
