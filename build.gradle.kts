@@ -3,13 +3,13 @@ import org.hibernate.build.publish.auth.maven.MavenRepoAuthPlugin
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version Versions.versionsPlugin
-    id("org.jlleitschuh.gradle.ktlint") version Versions.ktlintPlugin
-    kotlin("jvm") version Versions.kotlin
-    kotlin("plugin.serialization") version Versions.kotlin
+    id("com.github.ben-manes.versions") version Versions.VERSIONS_PLUGIN
+    id("org.jlleitschuh.gradle.ktlint") version Versions.KTLINT_PLUGIN
+    kotlin("jvm") version Versions.KOTLIN
+    kotlin("plugin.serialization") version Versions.KOTLIN
     id("maven-publish")
     id("signing")
-    id("org.hibernate.build.maven-repo-auth") version Versions.mavenRepoAuthPlugin apply false
+    id("org.hibernate.build.maven-repo-auth") version Versions.MAVEN_REPO_AUTH_PLUGIN apply false
 }
 
 if (!project.hasProperty("isGithubActions")) {
@@ -18,7 +18,7 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "1.0.3"
+version = "2.0.0-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
@@ -33,26 +33,28 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-    implementation("io.ktor:ktor-client-websockets:${Versions.ktor}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.KOTLIN}")
+    implementation("io.ktor:ktor-client-websockets:${Versions.KTOR}")
 
-    implementation("io.ktor:ktor-client-cio-jvm:${Versions.ktor}")
+    implementation("io.ktor:ktor-client-cio-jvm:${Versions.KTOR}")
 
-    implementation("commons-logging:commons-logging:${Versions.commonsLogging}")
-    implementation("ch.qos.logback:logback-classic:${Versions.logback}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.coroutines}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinxSerialization}")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.kotlinxDatetime}")
+    implementation("commons-logging:commons-logging:${Versions.COMMONS_LOGGING}")
+    implementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.COROUTINES}")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.KOTLINX_DATETIME}")
 
-    testImplementation("io.mockk:mockk:${Versions.mockk}")
-    testImplementation("com.google.truth:truth:${Versions.googleTruth}")
-    testImplementation("org.junit.jupiter:junit-jupiter:${Versions.junit}")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}")
+    implementation("org.apache.commons:commons-numbers-fraction:${Versions.COMMONS_NUMBERS}")
+
+    testImplementation("io.mockk:mockk:${Versions.MOCKK}")
+    testImplementation("com.google.truth:truth:${Versions.GOOGLE_TRUTH}")
+    testImplementation("org.junit.jupiter:junit-jupiter:${Versions.JUNIT}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
 }
 
 ktlint {
-    version.set(Versions.ktlintVersion)
+    version.set(Versions.KTLINT)
 }
 
 tasks {
@@ -66,7 +68,7 @@ tasks {
     val javadocJar by registering(Jar::class) {
         archiveClassifier.set("javadoc")
         dependsOn("javadoc")
-        from("$buildDir/javadoc")
+        from("${layout.buildDirectory}/javadoc")
     }
 
     artifacts {
@@ -136,7 +138,7 @@ signing {
 }
 
 fun isNonStable(version: String): Boolean {
-    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.toUpperCase().contains(it) }
+    val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
     val regex = "^[0-9,.v-]+(-r)?$".toRegex()
     val isStable = stableKeyword || regex.matches(version)
     return isStable.not()
@@ -171,21 +173,23 @@ tasks.withType<DependencyUpdatesTask> {
 
 project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain>().configureEach {
     val service = project.extensions.getByType<JavaToolchainService>()
-    val customLauncher = service.launcherFor {
-        this.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.majorVersion))
-    }
+    val customLauncher =
+        service.launcherFor {
+            this.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.majorVersion))
+        }
 
     this.kotlinJavaToolchain.toolchain.use(customLauncher)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs = listOf(
-            "-Xjsr305=strict",
-            "-opt-in=kotlin.RequiresOptIn",
-            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        )
+        freeCompilerArgs =
+            listOf(
+                "-Xjsr305=strict",
+                "-opt-in=kotlin.RequiresOptIn",
+                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            )
         jvmTarget = "17"
     }
 }

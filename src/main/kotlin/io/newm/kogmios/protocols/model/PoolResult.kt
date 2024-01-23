@@ -3,24 +3,21 @@ package io.newm.kogmios.protocols.model
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import java.math.BigDecimal
-import java.math.BigInteger
+import org.apache.commons.numbers.fraction.BigFraction
 
 @Serializable
 data class PoolResult(
     @SerialName("id")
     val id: String,
-    @SerialName("vrf")
-    val vrf: String,
+    @SerialName("vrfVerificationKeyHash")
+    val vrfVerificationKeyHash: String,
     @SerialName("pledge")
-    @Contextual
-    val pledge: BigInteger,
+    val pledge: Ada,
     @SerialName("cost")
+    val cost: Ada,
     @Contextual
-    val cost: BigInteger,
     @SerialName("margin")
-    @Contextual
-    val margin: BigDecimal,
+    val margin: BigFraction,
     @SerialName("rewardAccount")
     val rewardAccount: String,
     @SerialName("owners")

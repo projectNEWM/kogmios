@@ -7,13 +7,10 @@ import kotlinx.serialization.Serializable
 data class TxShelleyBootstrap(
     @SerialName("signature")
     val signature: String,
-
     @SerialName("key")
     val key: String,
-
     @SerialName("chainCode")
     val chainCode: String?,
-
     @SerialName("addressAttributes")
     val addressAttributes: String?,
 )

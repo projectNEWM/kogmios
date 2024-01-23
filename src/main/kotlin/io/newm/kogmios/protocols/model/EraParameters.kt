@@ -8,7 +8,7 @@ data class EraParameters(
     @SerialName("epochLength")
     val epochLength: Long,
     @SerialName("slotLength")
-    val slotLength: Long,
+    val slotLength: Milliseconds,
     @SerialName("safeZone")
-    val safeZone: Long,
+    val safeZone: Long? = null,
 )

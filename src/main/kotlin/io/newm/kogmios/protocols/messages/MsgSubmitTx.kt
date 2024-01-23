@@ -1,35 +1,34 @@
 package io.newm.kogmios.protocols.messages
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 /**
  * Submit a transaction to the node's mempool.
  */
 @Serializable
-@SerialName("SubmitTx")
 data class MsgSubmitTx(
-    @SerialName("mirror")
-    override val mirror: String,
-    @SerialName("args")
-    val args: SubmitTx,
-    @kotlinx.serialization.Transient
-    val completableDeferred: CompletableDeferred<MsgSubmitTxResponse> = CompletableDeferred(),
-) : JsonWspRequest()
+    @SerialName("method")
+    override val method: String = METHOD_SUBMIT_TX,
+    @SerialName("params")
+    val params: SubmitOrEvalTx,
+    @SerialName("id")
+    override val id: String = "$method: ${UUID.randomUUID()}",
+) : JsonRpcRequest() {
+    companion object {
+        const val METHOD_SUBMIT_TX = "submitTransaction"
+    }
+}
 
 @Serializable
-data class SubmitTx(
-    @SerialName("submit")
-    val submit: String
+data class SubmitOrEvalTx(
+    @SerialName("transaction")
+    val transaction: Cbor,
 )
-// JSON Example
-// {
-//    "type": "jsonwsp/request",
-//    "version": "1.0",
-//    "servicename": "ogmios",
-//    "methodname": "SubmitTx",
-//    "args": {
-//      "submit": "1092304a09875d008..."
-//    }
-// }
+
+@Serializable
+data class Cbor(
+    @SerialName("cbor")
+    val cbor: String,
+)

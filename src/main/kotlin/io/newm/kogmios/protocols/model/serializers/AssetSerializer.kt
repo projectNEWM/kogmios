@@ -11,29 +11,34 @@ import kotlinx.serialization.encoding.Encoder
 
 object AssetSerializer : KSerializer<List<Asset>> {
     private val delegateMapSerializer = MapSerializer(String.serializer(), BigIntegerSerializer)
+
     override fun deserialize(decoder: Decoder): List<Asset> {
         return delegateMapSerializer.deserialize(decoder).map { (policyAndName, quantity) ->
             val policyAndNameParts = policyAndName.split('.')
             val policyId = policyAndNameParts[0]
-            val name = if (policyAndNameParts.size == 2) {
-                policyAndNameParts[1]
-            } else {
-                ""
-            }
+            val name =
+                if (policyAndNameParts.size == 2) {
+                    policyAndNameParts[1]
+                } else {
+                    ""
+                }
             Asset(
                 policyId = policyId,
                 name = name,
-                quantity = quantity
+                quantity = quantity,
             )
         }
     }
 
     override val descriptor: SerialDescriptor = SerialDescriptor("List<Asset>", delegateMapSerializer.descriptor)
 
-    override fun serialize(encoder: Encoder, value: List<Asset>) {
+    override fun serialize(
+        encoder: Encoder,
+        value: List<Asset>
+    ) {
         delegateMapSerializer.serialize(
             encoder,
-            value.associate { asset -> Pair("${asset.policyId}.${asset.name}", asset.quantity) }
+            value.associate { asset -> Pair("${asset.policyId}.${asset.name}", asset.quantity) },
         )
     }
 }

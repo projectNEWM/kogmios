@@ -1,16 +1,21 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.serializers.BlockSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonClassDiscriminator
 
-@Serializable(with = BlockSerializer::class)
-sealed class Block {
-    val header: BlockHeader
-        get() = when (this) {
-            is BlockAllegra -> this.allegra.header
-            is BlockAlonzo -> this.alonzo.header
-            is BlockBabbage -> this.babbage.header
-            is BlockMary -> this.mary.header
-            is BlockShelley -> this.shelley.header
-        }
+@Serializable
+@JsonClassDiscriminator("type")
+sealed interface Block {
+    @SerialName("era")
+    val era: String
+
+    @SerialName("id")
+    val id: String
+
+    @SerialName("ancestor")
+    val ancestor: String
+
+    @SerialName("height")
+    val height: Long
 }

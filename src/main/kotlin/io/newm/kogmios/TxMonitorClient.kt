@@ -11,7 +11,7 @@ interface TxMonitorClient : Client {
     /**
      * Acquire the mempool snapshot
      */
-    suspend fun awaitAcquireMempool(timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS): MsgAwaitAcquireMempoolResponse
+    suspend fun acquireMempool(timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS): MsgAcquireMempoolResponse
 
     /**
      * Release the mempool snapshot
@@ -21,17 +21,20 @@ interface TxMonitorClient : Client {
     /**
      * Check whether the mempool (acquired snapshot) has a given transaction in it.
      */
-    suspend fun hasTx(txId: String, timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgHasTxResponse
+    suspend fun hasTransaction(
+        txId: String,
+        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+    ): MsgHasTransactionResponse
 
     /**
      * Get size and capacities of the mempool (acquired snapshot).
      */
-    suspend fun sizeAndCapacity(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgSizeAndCapacityResponse
+    suspend fun sizeOfMempool(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgSizeOfMempoolResponse
 
     /**
      * Request the next mempool transaction from an acquired snapshot.
      */
-    suspend fun nextTx(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgNextTxResponse
+    suspend fun nextTransaction(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgNextTransactionResponse
 }
 
 fun createTxMonitorClient(
@@ -39,7 +42,7 @@ fun createTxMonitorClient(
     websocketPort: Int,
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
-    loggerName: String? = null
+    loggerName: String? = null,
 ): TxMonitorClient {
     return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
 }

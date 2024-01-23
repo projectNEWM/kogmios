@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable(with = Blake2bDigestCredentialSerializer::class)
 class Blake2bDigestCredential(
-    val digest: String
-) : NonMyopicMemberRewardsInput()
+    val digest: String,
+) : ProjectedRewardsInput

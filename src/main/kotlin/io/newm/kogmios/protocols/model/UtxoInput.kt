@@ -5,9 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UtxoInput(
-    @SerialName("txId")
-    val txId: String,
-
+    @SerialName("transaction")
+    val transaction: Transaction,
     @SerialName("index")
     val index: Long,
 )
