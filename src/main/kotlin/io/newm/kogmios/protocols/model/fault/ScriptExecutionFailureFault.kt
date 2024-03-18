@@ -19,9 +19,8 @@ data class ScriptExecutionFailureFault(
     override val data: ScriptExecutionFailureFaultData,
 ) : Fault
 
-
 @Serializable(with = ScriptExecutionFailureFaultDataSerializer::class)
-class ScriptExecutionFailureFaultData: ArrayList<ScriptExecutionFailureFaultDataItem>(), FaultData {
+class ScriptExecutionFailureFaultData : ArrayList<ScriptExecutionFailureFaultDataItem>(), FaultData {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScriptExecutionFailureFaultData) return false

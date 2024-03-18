@@ -18,10 +18,10 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "2.0.1-SNAPSHOT"
+version = "2.1.0-SNAPSHOT"
 
-java.sourceCompatibility = JavaVersion.VERSION_17
-java.targetCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
+java.targetCompatibility = JavaVersion.VERSION_21
 
 repositories {
     mavenLocal()
@@ -190,7 +190,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
                 "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             )
-        jvmTarget = "17"
+        jvmTarget = "21"
     }
 }
 

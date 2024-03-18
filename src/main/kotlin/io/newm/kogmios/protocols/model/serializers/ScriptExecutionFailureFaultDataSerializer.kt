@@ -20,7 +20,10 @@ object ScriptExecutionFailureFaultDataSerializer : KSerializer<ScriptExecutionFa
     override val descriptor: SerialDescriptor =
         SerialDescriptor("EraSummariesResult", delegateListSerializer.descriptor)
 
-    override fun serialize(encoder: Encoder, value: ScriptExecutionFailureFaultData) {
+    override fun serialize(
+        encoder: Encoder,
+        value: ScriptExecutionFailureFaultData
+    ) {
         delegateListSerializer.serialize(encoder, value)
     }
 }
