@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConwayConstitution(
-    @SerialName("hash")
-    val hash: String? = null,
-    @SerialName("anchor")
-    val anchor: AnchorMetadata,
+    @SerialName("guardrails")
+    val guardrails: String? = null,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata,
 )
