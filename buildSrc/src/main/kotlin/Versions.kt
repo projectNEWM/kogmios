@@ -1,5 +1,5 @@
 object Versions {
-    const val COMMONS_LOGGING = "1.3.0"
+    const val COMMONS_LOGGING = "1.3.1"
     const val COMMONS_NUMBERS = "1.1"
     const val COROUTINES = "1.8.0"
     const val GOOGLE_TRUTH = "1.4.2"

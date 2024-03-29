@@ -26,12 +26,15 @@ object UtxoOutputValueSerializer : KSerializer<UtxoOutputValue> {
         val adaMap = elements["ada"] ?: throw IllegalStateException("ada value not found in UtxoOutputValue")
         val lovelace = adaMap["lovelace"] ?: throw IllegalStateException("lovelace value not found in UtxoOutputValue")
         val assets =
-            elements.entries.filterNot { it.key == "ada" }.map {
-                Asset(
-                    policyId = it.key,
-                    name = it.value.keys.first(),
-                    quantity = it.value.values.first()
-                )
+            elements.entries.filterNot { it.key == "ada" }.flatMap { policy ->
+                val policyId = policy.key
+                policy.value.map {
+                    Asset(
+                        policyId = policyId,
+                        name = it.key,
+                        quantity = it.value
+                    )
+                }
             }
         return UtxoOutputValue(
             ada = Ada(Lovelace(lovelace)),
