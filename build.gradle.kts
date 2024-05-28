@@ -1,5 +1,6 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.hibernate.build.publish.auth.maven.MavenRepoAuthPlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
@@ -18,7 +19,7 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "2.2.0-SNAPSHOT"
+version = "2.2.1-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -182,7 +183,7 @@ project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.UsesKotlinJavaToolchain
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs =
             listOf(
                 "-Xjsr305=strict",
@@ -190,7 +191,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
                 "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             )
-        jvmTarget = "21"
+        jvmTarget.set(JvmTarget.JVM_21)
     }
 }
 
