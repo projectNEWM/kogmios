@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.serialization.*
 import io.ktor.util.reflect.*
@@ -14,8 +15,15 @@ import io.newm.kogmios.protocols.messages.*
 import io.newm.kogmios.protocols.model.*
 import io.newm.kogmios.protocols.model.fault.InternalErrorFault
 import io.newm.kogmios.protocols.model.fault.StringFaultData
+import io.newm.kogmios.protocols.model.result.HealthResult
 import io.newm.kogmios.serializers.BigFractionSerializer
 import io.newm.kogmios.serializers.BigIntegerSerializer
+import java.io.IOException
+import java.math.BigInteger
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.collections.set
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
@@ -28,12 +36,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.apache.commons.numbers.fraction.BigFraction
 import org.slf4j.LoggerFactory
-import java.io.IOException
-import java.math.BigInteger
-import java.util.*
-import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
-import kotlin.coroutines.CoroutineContext
 
 internal class ClientImpl(
     private val websocketHost: String,
@@ -507,6 +509,12 @@ internal class ClientImpl(
                 message.completableDeferred.await() as MsgQueryUtxoResponse
             }
         }
+    }
+
+    override suspend fun health(): HealthResult {
+        val response = httpClient.get("http://$websocketHost:$websocketPort/health")
+        val jsonBody = response.bodyAsText()
+        return json.decodeFromString(jsonBody)
     }
 
     override suspend fun acquireMempool(timeoutMs: Long): MsgAcquireMempoolResponse {

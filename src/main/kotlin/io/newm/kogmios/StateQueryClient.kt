@@ -24,6 +24,7 @@ import io.newm.kogmios.protocols.model.Origin
 import io.newm.kogmios.protocols.model.ParamsProjectedRewards
 import io.newm.kogmios.protocols.model.ParamsUtxo
 import io.newm.kogmios.protocols.model.PointOrOrigin
+import io.newm.kogmios.protocols.model.result.HealthResult
 
 /**
  * Client interface for querying the state of the node and ledger.
@@ -128,6 +129,11 @@ interface StateQueryClient : Client {
         params: ParamsUtxo,
         timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
     ): MsgQueryUtxoResponse
+
+    /**
+     * Get the health of the node.
+     */
+    suspend fun health(): HealthResult
 }
 
 fun createStateQueryClient(
