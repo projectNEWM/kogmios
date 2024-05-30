@@ -25,6 +25,8 @@ import io.newm.kogmios.protocols.model.result.ProjectedRewardsResult
 import io.newm.kogmios.protocols.model.result.RewardAccountSummariesResult
 import io.newm.kogmios.protocols.model.result.StakePoolsResult
 import io.newm.kogmios.protocols.model.result.UtxoResult
+import java.io.IOException
+import java.math.BigInteger
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -33,8 +35,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.io.IOException
-import java.math.BigInteger
 
 class StateQueryTest {
     companion object {
@@ -48,6 +48,25 @@ class StateQueryTest {
 //        private const val TEST_PORT = 443
 //        private const val TEST_SECURE = true
     }
+
+    @Test
+    fun `test health`() =
+        runBlocking {
+            createStateQueryClient(
+                websocketHost = TEST_HOST,
+                websocketPort = TEST_PORT,
+                secure = TEST_SECURE,
+            ).use { client ->
+                val connectResult = client.connect()
+                assertThat(connectResult).isTrue()
+                assertThat(client.isConnected).isTrue()
+
+                val response = client.health()
+                assertThat(response).isNotNull()
+                assertThat(response.connectionStatus).isEqualTo("connected")
+                println(response)
+            }
+        }
 
     @Test
     fun `test acquire origin`() =
