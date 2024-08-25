@@ -15,4 +15,6 @@ data class StakePoolVotingThresholds(
     @SerialName("hardForkInitiation")
     @Contextual
     val hardForkInitiation: BigFraction,
+    @SerialName("protocolParametersUpdate")
+    val protocolParametersUpdate: StakePoolProtocolParametersUpdateThresholds,
 )

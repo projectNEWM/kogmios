@@ -5,6 +5,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ConwayConstitutionalCommitteeMember(
+    @SerialName("from")
+    val from: String,
     @SerialName("id")
     val id: String,
     @SerialName("mandate")
