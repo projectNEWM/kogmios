@@ -10,7 +10,8 @@ import org.apache.commons.numbers.fraction.BigFraction
 import java.math.BigDecimal
 
 object BigFractionSerializer : KSerializer<BigFraction> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("io.newm.kogmios.serializers.BigFractionSerializer", PrimitiveKind.STRING)
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("io.newm.kogmios.serializers.BigFractionSerializer", PrimitiveKind.STRING)
 
     override fun serialize(
         encoder: Encoder,

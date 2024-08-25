@@ -12,11 +12,10 @@ import kotlinx.serialization.encoding.Encoder
 object NonMyopicMemberRewardsResultSerializer : KSerializer<NonMyopicMemberRewardsResult> {
     private val delegateMapSerializer = MapSerializer(String.serializer(), Ada.serializer())
 
-    override fun deserialize(decoder: Decoder): NonMyopicMemberRewardsResult {
-        return NonMyopicMemberRewardsResult().also {
+    override fun deserialize(decoder: Decoder): NonMyopicMemberRewardsResult =
+        NonMyopicMemberRewardsResult().also {
             it.putAll(delegateMapSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("NonMyopicMemberRewardsResult", delegateMapSerializer.descriptor)

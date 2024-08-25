@@ -8,7 +8,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable(with = UtxoResultSerializer::class)
-class UtxoResult : ArrayList<UtxoResultItem>(), OgmiosResult {
+class UtxoResult :
+    ArrayList<UtxoResultItem>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is UtxoResult) return false
@@ -16,9 +18,7 @@ class UtxoResult : ArrayList<UtxoResultItem>(), OgmiosResult {
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }
 
 @Serializable

@@ -11,7 +11,5 @@ data class TipResult(
     @SerialName("id")
     val id: String,
 ) : OgmiosResult {
-    fun toPointDetail(): PointDetail {
-        return PointDetail(slot, id)
-    }
+    fun toPointDetail(): PointDetail = PointDetail(slot, id)
 }

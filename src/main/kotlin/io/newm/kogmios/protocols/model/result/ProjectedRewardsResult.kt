@@ -5,7 +5,9 @@ import io.newm.kogmios.protocols.model.serializers.ProjectedRewardsResultSeriali
 import kotlinx.serialization.Serializable
 
 @Serializable(with = ProjectedRewardsResultSerializer::class)
-class ProjectedRewardsResult : LinkedHashMap<String, NonMyopicMemberRewardsResult>(), OgmiosResult {
+class ProjectedRewardsResult :
+    LinkedHashMap<String, NonMyopicMemberRewardsResult>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ProjectedRewardsResult) return false
@@ -13,7 +15,5 @@ class ProjectedRewardsResult : LinkedHashMap<String, NonMyopicMemberRewardsResul
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }

@@ -11,11 +11,10 @@ import kotlinx.serialization.encoding.Encoder
 object EvaluateTxResultSerializer : KSerializer<EvaluateTxResult> {
     private val delegateListSerializer = ListSerializer(EvaluateTx.serializer())
 
-    override fun deserialize(decoder: Decoder): EvaluateTxResult {
-        return EvaluateTxResult().also {
+    override fun deserialize(decoder: Decoder): EvaluateTxResult =
+        EvaluateTxResult().also {
             it.addAll(delegateListSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("EvaluateTxResult", delegateListSerializer.descriptor)

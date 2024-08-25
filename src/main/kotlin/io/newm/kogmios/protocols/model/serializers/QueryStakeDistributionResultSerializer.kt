@@ -12,11 +12,10 @@ import kotlinx.serialization.encoding.Encoder
 object QueryStakeDistributionResultSerializer : KSerializer<LiveStakeDistributionResult> {
     private val delegateMapSerializer = MapSerializer(String.serializer(), PoolDistribution.serializer())
 
-    override fun deserialize(decoder: Decoder): LiveStakeDistributionResult {
-        return LiveStakeDistributionResult().also {
+    override fun deserialize(decoder: Decoder): LiveStakeDistributionResult =
+        LiveStakeDistributionResult().also {
             it.putAll(delegateMapSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("QueryStakeDistributionResult", delegateMapSerializer.descriptor)

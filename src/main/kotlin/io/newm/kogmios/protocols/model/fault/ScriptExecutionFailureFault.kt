@@ -20,7 +20,9 @@ data class ScriptExecutionFailureFault(
 ) : Fault
 
 @Serializable(with = ScriptExecutionFailureFaultDataSerializer::class)
-class ScriptExecutionFailureFaultData : ArrayList<ScriptExecutionFailureFaultDataItem>(), FaultData {
+class ScriptExecutionFailureFaultData :
+    ArrayList<ScriptExecutionFailureFaultDataItem>(),
+    FaultData {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ScriptExecutionFailureFaultData) return false
@@ -28,9 +30,7 @@ class ScriptExecutionFailureFaultData : ArrayList<ScriptExecutionFailureFaultDat
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }
 
 @Serializable

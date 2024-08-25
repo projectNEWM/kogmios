@@ -5,7 +5,9 @@ import io.newm.kogmios.protocols.model.serializers.ProposedProtocolParametersRes
 import kotlinx.serialization.Serializable
 
 @Serializable(with = ProposedProtocolParametersResultSerializer::class)
-class ProposedProtocolParametersResult : ArrayList<ProposedProtocolParameters>(), OgmiosResult {
+class ProposedProtocolParametersResult :
+    ArrayList<ProposedProtocolParameters>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ProposedProtocolParametersResult) return false
@@ -13,7 +15,5 @@ class ProposedProtocolParametersResult : ArrayList<ProposedProtocolParameters>()
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }

@@ -9,11 +9,10 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 
 object JsonRpcResponseSerializer : JsonContentPolymorphicSerializer<JsonRpcResponse>(JsonRpcResponse::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<JsonRpcResponse> {
-        return if ("error" in element.jsonObject) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<JsonRpcResponse> =
+        if ("error" in element.jsonObject) {
             JsonRpcErrorResponse.serializer()
         } else {
             JsonRpcSuccessResponse.serializer()
         }
-    }
 }

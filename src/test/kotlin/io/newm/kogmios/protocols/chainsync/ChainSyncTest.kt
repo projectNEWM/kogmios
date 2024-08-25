@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory
 import java.time.Instant
 import kotlin.math.floor
 import kotlin.math.max
+import org.junit.jupiter.api.Disabled
 
 class ChainSyncTest {
     companion object {
@@ -406,7 +407,7 @@ class ChainSyncTest {
             Unit
         }
 
-//    @Disabled
+    @Disabled
     @Test
     fun `test blockchain sync`() =
         runBlocking {

@@ -29,6 +29,4 @@ fun createChainSyncClient(
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-): ChainSyncClient {
-    return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
-}
+): ChainSyncClient = ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)

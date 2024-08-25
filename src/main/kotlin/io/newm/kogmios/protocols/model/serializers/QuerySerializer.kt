@@ -11,8 +11,8 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 
 object QuerySerializer : JsonContentPolymorphicSerializer<Params>(Params::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Params> {
-        return when ((element.jsonObject["query"] as? JsonPrimitive)?.contentOrNull) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Params> =
+        when ((element.jsonObject["query"] as? JsonPrimitive)?.contentOrNull) {
             "chainTip" -> ParamsChainTip.serializer()
             else -> {
                 if (element.jsonObject["query"]?.jsonObject?.let { "poolParameters" in it } == true) {
@@ -22,5 +22,4 @@ object QuerySerializer : JsonContentPolymorphicSerializer<Params>(Params::class)
                 }
             }
         }
-    }
 }

@@ -90,7 +90,9 @@ class TxMonitorTest {
                 assertThat(exception.jsonRpcErrorResponse).isNotNull()
                 assertThat(exception.jsonRpcErrorResponse.error).isInstanceOf(MustAcquireMempoolFirstFault::class.java)
                 assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(4000)
-                assertThat(exception.jsonRpcErrorResponse.error.message).isEqualTo("You must acquire a mempool snapshot prior to accessing it.")
+                assertThat(
+                    exception.jsonRpcErrorResponse.error.message
+                ).isEqualTo("You must acquire a mempool snapshot prior to accessing it.")
                 assertThat(exception.jsonRpcErrorResponse.error.data).isNull()
             }
         }

@@ -11,11 +11,10 @@ import kotlinx.serialization.encoding.Encoder
 object ProposedProtocolParametersResultSerializer : KSerializer<ProposedProtocolParametersResult> {
     private val delegateListSerializer = ListSerializer(ProposedProtocolParameters.serializer())
 
-    override fun deserialize(decoder: Decoder): ProposedProtocolParametersResult {
-        return ProposedProtocolParametersResult().also {
+    override fun deserialize(decoder: Decoder): ProposedProtocolParametersResult =
+        ProposedProtocolParametersResult().also {
             it.addAll(delegateListSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("ProposedProtocolParametersResult", delegateListSerializer.descriptor)

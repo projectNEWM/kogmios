@@ -5,4 +5,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable(with = InstantResultSerializer::class)
-data class InstantResult(val value: Instant) : OgmiosResult
+data class InstantResult(
+    val value: Instant
+) : OgmiosResult

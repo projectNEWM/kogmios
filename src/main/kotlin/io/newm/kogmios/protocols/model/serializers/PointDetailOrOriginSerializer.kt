@@ -9,10 +9,9 @@ import kotlinx.serialization.json.JsonObject
 
 object PointDetailOrOriginSerializer :
     JsonContentPolymorphicSerializer<PointDetailOrOrigin>(PointDetailOrOrigin::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<PointDetailOrOrigin> {
-        return when (element) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<PointDetailOrOrigin> =
+        when (element) {
             is JsonObject -> PointDetail.serializer()
             else -> OriginStringSerializer
         }
-    }
 }

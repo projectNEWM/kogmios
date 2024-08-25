@@ -42,7 +42,11 @@ class TxSubmitTest {
                         )
                     }
                 assertThat(exception).isInstanceOf(KogmiosException::class.java)
-                assertThat(exception.message).isEqualTo("The transaction contains unknown UTxO references as inputs. This can happen if the inputs you're trying to spend have already been spent, or if you've simply referred to non-existing UTxO altogether. The field 'data.unknownOutputReferences' indicates all unknown inputs.")
+                assertThat(
+                    exception.message
+                ).isEqualTo(
+                    "The transaction contains unknown UTxO references as inputs. This can happen if the inputs you're trying to spend have already been spent, or if you've simply referred to non-existing UTxO altogether. The field 'data.unknownOutputReferences' indicates all unknown inputs."
+                )
                 assertThat(exception.jsonRpcErrorResponse).isNotNull()
                 assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3117L)
             }
@@ -133,7 +137,11 @@ class TxSubmitTest {
                 assertThat(exception.jsonRpcErrorResponse).isNotNull()
                 assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3004L)
                 assertThat(exception.jsonRpcErrorResponse.error.data).isInstanceOf(CannotCreateEvaluationContextFaultData::class.java)
-                assertThat((exception.jsonRpcErrorResponse.error.data as CannotCreateEvaluationContextFaultData).reason).isEqualTo("Unknown transaction input (missing from UTxO set): 334958f7971903143be0672aa1818a1d96babe6cddbf445405ba488c8f70d10c#2")
+                assertThat(
+                    (exception.jsonRpcErrorResponse.error.data as CannotCreateEvaluationContextFaultData).reason
+                ).isEqualTo(
+                    "Unknown transaction input (missing from UTxO set): 334958f7971903143be0672aa1818a1d96babe6cddbf445405ba488c8f70d10c#2"
+                )
             }
         }
 }

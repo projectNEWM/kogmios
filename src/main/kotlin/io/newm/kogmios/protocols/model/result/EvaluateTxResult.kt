@@ -7,7 +7,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable(with = EvaluateTxResultSerializer::class)
-class EvaluateTxResult : ArrayList<EvaluateTx>(), OgmiosResult {
+class EvaluateTxResult :
+    ArrayList<EvaluateTx>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is EvaluateTxResult) return false
@@ -15,9 +17,7 @@ class EvaluateTxResult : ArrayList<EvaluateTx>(), OgmiosResult {
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }
 
 @Serializable

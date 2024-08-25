@@ -43,7 +43,11 @@ internal class ClientImpl(
     private val secure: Boolean = false,
     private val ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-) : CoroutineScope, StateQueryClient, TxMonitorClient, ChainSyncClient, TxSubmitClient {
+) : CoroutineScope,
+    StateQueryClient,
+    TxMonitorClient,
+    ChainSyncClient,
+    TxSubmitClient {
     private val log by lazy {
         if (loggerName == null) {
             LoggerFactory.getLogger(ClientImpl::class.java)
@@ -105,7 +109,8 @@ internal class ClientImpl(
                                 json.decodeFromString<JsonRpcResponse>(jsonString)
                             } catch (e: Throwable) {
                                 // This should never happen unless WE have made an error in our parsers somewhere.
-                                val idRegex = """"id":"([^:{},]*: [a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})"""".toRegex()
+                                val idRegex = """"id":"([^:{},]*: [a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})""""
+                                    .toRegex()
                                 val id = idRegex.find(jsonString)?.let { it.groupValues[1] } ?: "-1"
                                 JsonRpcErrorResponse(
                                     error =
@@ -124,9 +129,7 @@ internal class ClientImpl(
         }
     }
 
-    override suspend fun connect(): Boolean {
-        return connectInternal().await()
-    }
+    override suspend fun connect(): Boolean = connectInternal().await()
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun connectInternal(): CompletableDeferred<Boolean> {
@@ -189,7 +192,8 @@ internal class ClientImpl(
 
                                             is JsonRpcSuccessResponse -> {
                                                 log.debug("response: {}", response)
-                                                requestResponseMap.remove(response.id)
+                                                requestResponseMap
+                                                    .remove(response.id)
                                                     ?.complete(response)
                                                     ?: log.warn("No handler found for: {}", response.id)
                                             }
