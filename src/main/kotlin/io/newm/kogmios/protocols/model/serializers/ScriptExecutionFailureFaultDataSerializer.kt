@@ -11,11 +11,10 @@ import kotlinx.serialization.encoding.Encoder
 object ScriptExecutionFailureFaultDataSerializer : KSerializer<ScriptExecutionFailureFaultData> {
     private val delegateListSerializer = ListSerializer(ScriptExecutionFailureFaultDataItem.serializer())
 
-    override fun deserialize(decoder: Decoder): ScriptExecutionFailureFaultData {
-        return ScriptExecutionFailureFaultData().also {
+    override fun deserialize(decoder: Decoder): ScriptExecutionFailureFaultData =
+        ScriptExecutionFailureFaultData().also {
             it.addAll(delegateListSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("EraSummariesResult", delegateListSerializer.descriptor)

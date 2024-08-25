@@ -12,11 +12,10 @@ import kotlinx.serialization.encoding.Encoder
 object RewardAccountSummariesResultSerializer : KSerializer<RewardAccountSummariesResult> {
     private val delegateMapSerializer = MapSerializer(String.serializer(), RewardAccountSummary.serializer())
 
-    override fun deserialize(decoder: Decoder): RewardAccountSummariesResult {
-        return RewardAccountSummariesResult().also {
+    override fun deserialize(decoder: Decoder): RewardAccountSummariesResult =
+        RewardAccountSummariesResult().also {
             it.putAll(delegateMapSerializer.deserialize(decoder))
         }
-    }
 
     override val descriptor: SerialDescriptor =
         SerialDescriptor("RewardAccountSummariesResult", delegateMapSerializer.descriptor)

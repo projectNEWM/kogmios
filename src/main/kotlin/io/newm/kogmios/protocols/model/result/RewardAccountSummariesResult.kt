@@ -5,7 +5,9 @@ import io.newm.kogmios.protocols.model.serializers.RewardAccountSummariesResultS
 import kotlinx.serialization.Serializable
 
 @Serializable(with = RewardAccountSummariesResultSerializer::class)
-class RewardAccountSummariesResult : LinkedHashMap<String, RewardAccountSummary>(), OgmiosResult {
+class RewardAccountSummariesResult :
+    LinkedHashMap<String, RewardAccountSummary>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is RewardAccountSummariesResult) return false
@@ -13,7 +15,5 @@ class RewardAccountSummariesResult : LinkedHashMap<String, RewardAccountSummary>
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }

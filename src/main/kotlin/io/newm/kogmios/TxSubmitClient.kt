@@ -28,6 +28,4 @@ fun createTxSubmitClient(
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-): TxSubmitClient {
-    return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
-}
+): TxSubmitClient = ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)

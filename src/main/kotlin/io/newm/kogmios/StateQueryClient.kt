@@ -142,6 +142,4 @@ fun createStateQueryClient(
     secure: Boolean = false,
     ogmiosCompact: Boolean = false,
     loggerName: String? = null,
-): StateQueryClient {
-    return ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)
-}
+): StateQueryClient = ClientImpl(websocketHost, websocketPort, secure, ogmiosCompact, loggerName)

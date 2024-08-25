@@ -32,6 +32,12 @@ data class ScriptPlutusV2(
 ) : Script
 
 @Serializable
+@SerialName("plutus:v3")
+data class ScriptPlutusV3(
+    @SerialName("cbor") val cbor: String
+) : Script
+
+@Serializable
 @JsonClassDiscriminator("clause")
 sealed interface ScriptNativeDetail
 

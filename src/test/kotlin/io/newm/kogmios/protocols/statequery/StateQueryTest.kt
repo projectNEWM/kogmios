@@ -323,7 +323,10 @@ class StateQueryTest {
                 assertThat(response.result).isInstanceOf(RewardAccountSummariesResult::class.java)
                 assertThat(response.result.size).isEqualTo(1)
                 assertThat(response.result[stakeHash]!!.delegate.id).isEqualTo("pool1lgd9u8nshsh60asqszepfaalt2c5c5w6fvc85xne9st3g3fwtvm")
-                assertThat(response.result[stakeHash]!!.rewards.ada.lovelace).isEqualTo(BigInteger.ZERO)
+                assertThat(
+                    response.result[stakeHash]!!
+                        .rewards.ada.lovelace
+                ).isEqualTo(BigInteger.ZERO)
             }
         }
 
@@ -344,9 +347,9 @@ class StateQueryTest {
                 assertThat(response.result).isInstanceOf(Bound::class.java)
                 assertThat(response.result).isEqualTo(
                     Bound(
-                        time = Seconds(5184000.toBigInteger()),
-                        slot = 3542400,
-                        epoch = 12
+                        time = Seconds(70416000.toBigInteger()),
+                        slot = 68774400,
+                        epoch = 163
                     )
                 )
             }
@@ -370,38 +373,44 @@ class StateQueryTest {
                 println(response.result)
                 // the endBound changes depending on the current epoch. Assume it's ok if everything else checks out.
                 val endBound = response.result.last().end!!
-                assertThat(response.result).containsExactly(
-                    EraSummary(
-                        start = Bound(time = Seconds(0.toBigInteger()), slot = 0, epoch = 0),
-                        end = Bound(time = Seconds(1728000.toBigInteger()), slot = 86400, epoch = 4),
-                        parameters = EraParameters(21600, Milliseconds(20000.toBigInteger()), 4320),
-                    ),
-                    EraSummary(
-                        start = Bound(time = Seconds(1728000.toBigInteger()), slot = 86400, epoch = 4),
-                        end = Bound(time = Seconds(2160000.toBigInteger()), slot = 518400, epoch = 5),
-                        parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
-                    ),
-                    EraSummary(
-                        start = Bound(time = Seconds(2160000.toBigInteger()), slot = 518400, epoch = 5),
-                        end = Bound(time = Seconds(2592000.toBigInteger()), slot = 950400, epoch = 6),
-                        parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
-                    ),
-                    EraSummary(
-                        start = Bound(time = Seconds(2592000.toBigInteger()), slot = 950400, epoch = 6),
-                        end = Bound(time = Seconds(3024000.toBigInteger()), slot = 1382400, epoch = 7),
-                        parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
-                    ),
-                    EraSummary(
-                        start = Bound(time = Seconds(3024000.toBigInteger()), slot = 1382400, epoch = 7),
-                        end = Bound(time = Seconds(5184000.toBigInteger()), slot = 3542400, epoch = 12),
-                        parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
-                    ),
-                    EraSummary(
-                        start = Bound(time = Seconds(5184000.toBigInteger()), slot = 3542400, epoch = 12),
-                        end = endBound,
-                        parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
-                    )
-                ).inOrder()
+                assertThat(response.result)
+                    .containsExactly(
+                        EraSummary(
+                            start = Bound(time = Seconds(0.toBigInteger()), slot = 0, epoch = 0),
+                            end = Bound(time = Seconds(1728000.toBigInteger()), slot = 86400, epoch = 4),
+                            parameters = EraParameters(21600, Milliseconds(20000.toBigInteger()), 4320),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(1728000.toBigInteger()), slot = 86400, epoch = 4),
+                            end = Bound(time = Seconds(2160000.toBigInteger()), slot = 518400, epoch = 5),
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(2160000.toBigInteger()), slot = 518400, epoch = 5),
+                            end = Bound(time = Seconds(2592000.toBigInteger()), slot = 950400, epoch = 6),
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(2592000.toBigInteger()), slot = 950400, epoch = 6),
+                            end = Bound(time = Seconds(3024000.toBigInteger()), slot = 1382400, epoch = 7),
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(3024000.toBigInteger()), slot = 1382400, epoch = 7),
+                            end = Bound(time = Seconds(5184000.toBigInteger()), slot = 3542400, epoch = 12),
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(5184000.toBigInteger()), slot = 3542400, epoch = 12),
+                            end = Bound(time = Seconds(70416000.toBigInteger()), slot = 68774400, epoch = 163),
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                        EraSummary(
+                            start = Bound(time = Seconds(70416000.toBigInteger()), slot = 68774400, epoch = 163),
+                            end = endBound,
+                            parameters = EraParameters(432000, Milliseconds(1000.toBigInteger()), 129600),
+                        ),
+                    ).inOrder()
             }
         }
 
@@ -466,7 +475,13 @@ class StateQueryTest {
                 val response = client.genesisConfig(GenesisEra.ALONZO)
                 assertThat(response).isNotNull()
                 assertThat(response.result).isInstanceOf(io.newm.kogmios.protocols.model.result.AlonzoGenesisConfigResult::class.java)
-                assertThat((response.result as io.newm.kogmios.protocols.model.result.AlonzoGenesisConfigResult).updatableParameters.plutusCostModels.plutusV1?.get(4)).isEqualTo(
+                assertThat(
+                    (response.result as io.newm.kogmios.protocols.model.result.AlonzoGenesisConfigResult)
+                        .updatableParameters.plutusCostModels.plutusV1
+                        ?.get(
+                            4
+                        )
+                ).isEqualTo(
                     396231.toBigInteger()
                 )
             }
@@ -487,7 +502,10 @@ class StateQueryTest {
                 val response = client.genesisConfig(GenesisEra.CONWAY)
                 assertThat(response).isNotNull()
                 assertThat(response.result).isInstanceOf(io.newm.kogmios.protocols.model.result.ConwayGenesisConfigResult::class.java)
-                assertThat((response.result as io.newm.kogmios.protocols.model.result.ConwayGenesisConfigResult).updatableParameters.governanceActionDeposit.ada.lovelace).isEqualTo(1000000000L.toBigInteger())
+                assertThat(
+                    (response.result as io.newm.kogmios.protocols.model.result.ConwayGenesisConfigResult)
+                        .updatableParameters.governanceActionDeposit.ada.lovelace
+                ).isEqualTo(100000000000L.toBigInteger())
             }
         }
 
@@ -531,7 +549,9 @@ class StateQueryTest {
 
                 val response = client.proposedProtocolParameters()
                 assertThat(response).isNotNull()
-                assertThat(response.result).isInstanceOf(io.newm.kogmios.protocols.model.result.ProposedProtocolParametersResult::class.java)
+                assertThat(
+                    response.result
+                ).isInstanceOf(io.newm.kogmios.protocols.model.result.ProposedProtocolParametersResult::class.java)
                 // FIXME: We don't currently have a way to test until they change a param on preprod. Then we'll
                 // have to implement the correct response object.
             }

@@ -5,7 +5,9 @@ import io.newm.kogmios.protocols.model.serializers.EraSummariesResultSerializer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = EraSummariesResultSerializer::class)
-class EraSummariesResult : ArrayList<EraSummary>(), OgmiosResult {
+class EraSummariesResult :
+    ArrayList<EraSummary>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is EraSummariesResult) return false
@@ -13,7 +15,5 @@ class EraSummariesResult : ArrayList<EraSummary>(), OgmiosResult {
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }

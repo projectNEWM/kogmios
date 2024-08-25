@@ -8,7 +8,8 @@ import kotlin.coroutines.CoroutineContext
 
 class DefaultCoroutineExceptionHandler(
     private val log: Logger,
-) : AbstractCoroutineContextElement(CoroutineExceptionHandler), CoroutineExceptionHandler {
+) : AbstractCoroutineContextElement(CoroutineExceptionHandler),
+    CoroutineExceptionHandler {
     override fun handleException(
         context: CoroutineContext,
         exception: Throwable

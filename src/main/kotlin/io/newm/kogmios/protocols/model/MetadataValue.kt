@@ -21,41 +21,39 @@ import java.math.BigInteger
 sealed interface MetadataValue
 
 @Serializable(with = MetadataMapSerializer::class)
-class MetadataMap : MetadataValue, MutableMap<MetadataValue, MetadataValue> by mutableMapOf() {
+class MetadataMap :
+    MetadataValue,
+    MutableMap<MetadataValue, MetadataValue> by mutableMapOf() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MetadataMap) return false
         return true
     }
 
-    override fun hashCode(): Int {
-        return javaClass.hashCode()
-    }
+    override fun hashCode(): Int = javaClass.hashCode()
 
-    override fun toString(): String {
-        return "MetadataMap(${this.entries.joinToString { entry -> "{${entry.key}:${entry.value}}" }})"
-    }
+    override fun toString(): String = "MetadataMap(${this.entries.joinToString { entry -> "{${entry.key}:${entry.value}}" }})"
 }
 
 @Serializable(with = MetadataListSerializer::class)
-class MetadataList : MetadataValue, MutableList<MetadataValue> by mutableListOf() {
+class MetadataList :
+    MetadataValue,
+    MutableList<MetadataValue> by mutableListOf() {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is MetadataList) return false
         return true
     }
 
-    override fun hashCode(): Int {
-        return javaClass.hashCode()
-    }
+    override fun hashCode(): Int = javaClass.hashCode()
 
-    override fun toString(): String {
-        return "MetadataList([${this.joinToString { metadataValue -> metadataValue.toString() }}])"
-    }
+    override fun toString(): String = "MetadataList([${this.joinToString { metadataValue -> metadataValue.toString() }}])"
 }
 
 @Serializable
-data class MetadataString(val string: String) : MetadataValue
+data class MetadataString(
+    val string: String
+) : MetadataValue
 
 @Serializable
 data class MetadataInteger(
@@ -63,7 +61,9 @@ data class MetadataInteger(
 ) : MetadataValue
 
 @Serializable
-data class MetadataBytes(val bytes: String) : MetadataValue
+data class MetadataBytes(
+    val bytes: String
+) : MetadataValue
 
 object MetadataMapSerializer : KSerializer<MetadataMap> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("MetadataMap")
@@ -109,8 +109,8 @@ object MetadataListSerializer : KSerializer<MetadataList> {
 }
 
 object MetadataValueSerializer : JsonContentPolymorphicSerializer<MetadataValue>(MetadataValue::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MetadataValue> {
-        return if ("map" in element.jsonObject) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<MetadataValue> =
+        if ("map" in element.jsonObject) {
             MetadataMap.serializer()
         } else if ("list" in element.jsonObject) {
             MetadataList.serializer()
@@ -123,5 +123,4 @@ object MetadataValueSerializer : JsonContentPolymorphicSerializer<MetadataValue>
         } else {
             throw IllegalStateException("No serializer found!: $element")
         }
-    }
 }

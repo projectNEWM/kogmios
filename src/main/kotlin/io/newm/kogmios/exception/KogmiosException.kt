@@ -6,4 +6,8 @@ import java.io.IOException
 /**
  * Exception thrown when an error occurs while communicating with the Ogmios server.
  */
-class KogmiosException(message: String, cause: Throwable, val jsonRpcErrorResponse: JsonRpcErrorResponse) : IOException(message, cause)
+class KogmiosException(
+    message: String,
+    cause: Throwable,
+    val jsonRpcErrorResponse: JsonRpcErrorResponse
+) : IOException(message, cause)

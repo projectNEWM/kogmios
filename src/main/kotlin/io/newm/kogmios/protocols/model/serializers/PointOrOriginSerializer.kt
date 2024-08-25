@@ -9,11 +9,10 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
 
 object PointOrOriginSerializer : JsonContentPolymorphicSerializer<PointOrOrigin>(PointOrOrigin::class) {
-    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<PointOrOrigin> {
-        return if (element.jsonObject["point"]?.jsonObject?.let { "slot" in it } == true) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<PointOrOrigin> =
+        if (element.jsonObject["point"]?.jsonObject?.let { "slot" in it } == true) {
             Point.serializer()
         } else {
             Origin.serializer()
         }
-    }
 }

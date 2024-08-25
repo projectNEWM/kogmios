@@ -18,13 +18,13 @@ import io.newm.kogmios.protocols.model.result.RollForward
 import io.newm.kogmios.protocols.model.TransactionMetadata
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import java.time.Instant
 import kotlin.math.floor
 import kotlin.math.max
+import org.junit.jupiter.api.Disabled
 
 class ChainSyncTest {
     companion object {
@@ -119,7 +119,9 @@ class ChainSyncTest {
                     }
                 assertThat(exception.message).isEqualTo("No intersection found.")
                 assertThat(exception.jsonRpcErrorResponse.error).isInstanceOf(IntersectionNotFoundFault::class.java)
-                assertThat((exception.jsonRpcErrorResponse.error as IntersectionNotFoundFault).data.tip.slot).isGreaterThan(14155704L)
+                assertThat((exception.jsonRpcErrorResponse.error as IntersectionNotFoundFault).data.tip.slot).isGreaterThan(
+                    14155704L
+                )
             }
         }
 
@@ -337,7 +339,10 @@ class ChainSyncTest {
                 )
 
                 val block = (response2.result as RollForward).block as BlockPraos
-                val transaction = block.transactions.firstOrNull { it.id == "13211d06ab3c63ee1d493fbd35608df4f3bfdf20b70ee0b1552d5aecfdfcce2b" }
+                val transaction = block.transactions.firstOrNull {
+                    it.id ==
+                        "13211d06ab3c63ee1d493fbd35608df4f3bfdf20b70ee0b1552d5aecfdfcce2b"
+                }
                 assertThat(transaction).isNotNull()
                 transaction?.datums?.let { datums ->
                     println("datums: $datums")
@@ -346,6 +351,58 @@ class ChainSyncTest {
                 transaction?.redeemers?.let { redeemers ->
                     println("redeemers: $redeemers")
                 }
+            }
+            Unit
+        }
+
+    @Test
+    fun `test RequestNext conway block`() =
+        runBlocking {
+            createChainSyncClient(
+                websocketHost = TEST_HOST,
+                websocketPort = TEST_PORT,
+                secure = TEST_SECURE,
+            ).use { client ->
+                val connectResult = client.connect()
+                assertThat(connectResult).isTrue()
+                assertThat(client.isConnected).isTrue()
+
+                val response =
+                    client.findIntersect(
+                        listOf(
+                            PointDetail(
+                                slot = 68862095L,
+                                id = "4494b8ce692720052b1630c57ad0dc113ab161d87702b6398754e70299ead8a2",
+                            ),
+                        ),
+                    )
+                assertThat(response).isNotNull()
+                assertThat(response.result).isInstanceOf(IntersectionFoundResult::class.java)
+                assertThat((response.result.intersection as PointDetail).slot).isEqualTo(
+                    68862095L,
+                )
+
+                val response1 = client.nextBlock()
+                assertThat(response1).isNotNull()
+                assertThat(response1.result).isInstanceOf(RollBackward::class.java)
+                assertThat(((response1.result as RollBackward).point as PointDetail).slot).isEqualTo(
+                    68862095L,
+                )
+
+                val response2 = client.nextBlock()
+                assertThat(response2).isNotNull()
+                assertThat(response2.result).isInstanceOf(RollForward::class.java)
+                assertThat(((response2.result as RollForward).block as BlockPraos).slot).isEqualTo(
+                    68862139L,
+                )
+
+                val block = (response2.result as RollForward).block as BlockPraos
+                val transaction = block.transactions.firstOrNull {
+                    it.id ==
+                        "fba6f45218d1797a3eeafd98d5105fc86f335d01dc405634d9918ab002ba8026"
+                }
+                assertThat(transaction).isNotNull()
+                assertThat(block.era).isEqualTo("conway")
             }
             Unit
         }
@@ -416,7 +473,8 @@ class ChainSyncTest {
                             val now = Instant.now()
                             val fiveSecondsAgo = now.minusSeconds(5L)
                             if (isTip || fiveSecondsAgo.isAfter(lastLogged)) {
-                                val percent = floor(blockHeight.toDouble() / tipBlockHeight.toDouble() * 10000.0) / 100.0
+                                val percent =
+                                    floor(blockHeight.toDouble() / tipBlockHeight.toDouble() * 10000.0) / 100.0
                                 log.info(
                                     "RollForward: block $blockHeight of $tipBlockHeight: %.2f%% sync'd".format(
                                         percent,

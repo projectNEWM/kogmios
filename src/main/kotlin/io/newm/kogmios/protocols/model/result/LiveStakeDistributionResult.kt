@@ -5,7 +5,9 @@ import io.newm.kogmios.protocols.model.serializers.LiveStakeDistributionResultSe
 import kotlinx.serialization.Serializable
 
 @Serializable(with = LiveStakeDistributionResultSerializer::class)
-class LiveStakeDistributionResult : LinkedHashMap<String, PoolDistribution>(), OgmiosResult {
+class LiveStakeDistributionResult :
+    LinkedHashMap<String, PoolDistribution>(),
+    OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is LiveStakeDistributionResult) return false
@@ -13,7 +15,5 @@ class LiveStakeDistributionResult : LinkedHashMap<String, PoolDistribution>(), O
         return true
     }
 
-    override fun hashCode(): Int {
-        return super.hashCode()
-    }
+    override fun hashCode(): Int = super.hashCode()
 }
