@@ -19,7 +19,7 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "2.3.0-SNAPSHOT"
+version = "2.3.1-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

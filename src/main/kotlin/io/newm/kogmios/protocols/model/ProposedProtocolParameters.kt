@@ -1,10 +1,10 @@
 package io.newm.kogmios.protocols.model
 
+import java.math.BigInteger
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.apache.commons.numbers.fraction.BigFraction
-import java.math.BigInteger
 
 @Serializable
 data class ProposedProtocolParameters(
@@ -13,6 +13,8 @@ data class ProposedProtocolParameters(
     val minFeeCoefficient: BigInteger? = null,
     @SerialName("minFeeConstant")
     val minFeeConstant: Ada? = null,
+    @SerialName("minFeeReferenceScripts")
+    val minFeeReferenceScripts: MinFeeReferenceScripts? = null,
     @Contextual
     @SerialName("minUtxoDepositCoefficient")
     val minUtxoDepositCoefficient: BigInteger? = null,
@@ -24,6 +26,8 @@ data class ProposedProtocolParameters(
     val maxBlockHeaderSize: BytesSize? = null,
     @SerialName("maxTransactionSize")
     val maxTransactionSize: BytesSize? = null,
+    @SerialName("maxReferenceScriptsSize")
+    val maxReferenceScriptsSize: BytesSize? = null,
     @SerialName("maxValueSize")
     val maxValueSize: BytesSize? = null,
     @SerialName("extraEntropy")

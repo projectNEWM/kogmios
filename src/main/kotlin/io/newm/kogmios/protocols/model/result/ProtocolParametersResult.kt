@@ -4,12 +4,13 @@ import io.newm.kogmios.protocols.model.Ada
 import io.newm.kogmios.protocols.model.BytesSize
 import io.newm.kogmios.protocols.model.ExecutionPrices
 import io.newm.kogmios.protocols.model.ExecutionUnits
+import io.newm.kogmios.protocols.model.MinFeeReferenceScripts
 import io.newm.kogmios.protocols.model.PlutusCostModels
+import java.math.BigInteger
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.apache.commons.numbers.fraction.BigFraction
-import java.math.BigInteger
 
 @Serializable
 data class ProtocolParametersResult(
@@ -18,6 +19,8 @@ data class ProtocolParametersResult(
     val minFeeCoefficient: BigInteger,
     @SerialName("minFeeConstant")
     val minFeeConstant: Ada,
+    @SerialName("minFeeReferenceScripts")
+    val minFeeReferenceScripts: MinFeeReferenceScripts? = null,
     @Contextual
     @SerialName("minUtxoDepositCoefficient")
     val minUtxoDepositCoefficient: BigInteger,
@@ -30,6 +33,8 @@ data class ProtocolParametersResult(
     val maxBlockHeaderSize: BytesSize,
     @SerialName("maxTransactionSize")
     val maxTransactionSize: BytesSize,
+    @SerialName("maxReferenceScriptsSize")
+    val maxReferenceScriptsSize: BytesSize? = null,
     @SerialName("maxValueSize")
     val maxValueSize: BytesSize,
     @SerialName("extraEntropy")
