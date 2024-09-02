@@ -13,6 +13,8 @@ sealed interface Certificate
 @Serializable
 @SerialName("stakeDelegation")
 data class StakeDelegationCertificate(
+    @SerialName("from")
+    val from: String,
     @SerialName("credential")
     val credential: String,
     @SerialName("stakePool")
@@ -24,6 +26,8 @@ data class StakeDelegationCertificate(
 @Serializable
 @SerialName("stakeCredentialRegistration")
 data class StakeCredentialRegistrationCertificate(
+    @SerialName("from")
+    val from: String,
     @SerialName("credential")
     val credential: String,
     @SerialName("deposit")
@@ -33,6 +37,8 @@ data class StakeCredentialRegistrationCertificate(
 @Serializable
 @SerialName("stakeCredentialDeregistration")
 data class StakeCredentialDeregistrationCertificate(
+    @SerialName("from")
+    val from: String,
     @SerialName("credential")
     val credential: String,
     @SerialName("deposit")
@@ -114,19 +120,45 @@ data class GenesisDelegation(
 )
 
 @Serializable
-@SerialName("constitutionalCommitteeHotKeyRegistration")
-data class ConstitutionalCommitteeHotKeyRegistrationCertificate(
+@SerialName("constitutionalCommitteeDelegation")
+data class ConstitutionalCommitteeDelegationCertificate(
     @SerialName("member")
     val member: IdHash,
-    @SerialName("hotKey")
-    val hotKey: String,
+    @SerialName("delegate")
+    val delegate: ConstitutionalCommitteeDelegate,
 ) : Certificate
+
+@Serializable
+@JsonClassDiscriminator("status")
+sealed interface ConstitutionalCommitteeDelegate
+
+@Serializable
+@SerialName("authorized")
+data class AuthorizedConstitutionalCommitteeDelegate(
+    @SerialName("id")
+    val id: String,
+    @SerialName("from")
+    val from: String,
+) : ConstitutionalCommitteeDelegate
+
+@Serializable
+@SerialName("resigned")
+data class ResignedConstitutionalCommitteeDelegate(
+    @SerialName("metadata")
+    val metadata: AnchorMetadata? = null,
+) : ConstitutionalCommitteeDelegate
+
+@Serializable
+@SerialName("none")
+data object NoneConstitutionalCommitteeDelegate : ConstitutionalCommitteeDelegate
 
 @Serializable
 @SerialName("constitutionalCommitteeRetirement")
 data class ConstitutionalCommitteeRetirementCertificate(
     @SerialName("member")
     val member: IdHash,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata? = null,
 ) : Certificate
 
 @Serializable
@@ -136,8 +168,8 @@ data class DelegateRepresentativeRegistrationCertificate(
     val delegateRepresentative: DelegateRepresentative,
     @SerialName("deposit")
     val deposit: Ada,
-    @SerialName("anchor")
-    val anchor: AnchorMetadata? = null,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata? = null,
 ) : Certificate
 
 @Serializable
@@ -145,8 +177,8 @@ data class DelegateRepresentativeRegistrationCertificate(
 data class DelegateRepresentativeUpdateCertificate(
     @SerialName("delegateRepresentative")
     val delegateRepresentative: DelegateRepresentative,
-    @SerialName("anchor")
-    val anchor: AnchorMetadata? = null,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata? = null,
 ) : Certificate
 
 @Serializable

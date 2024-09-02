@@ -7,4 +7,6 @@ import kotlinx.serialization.Serializable
 data class IdHash(
     @SerialName("id")
     val id: String,
+    @SerialName("from")
+    val from: String? = null,
 )

@@ -6,7 +6,7 @@ object Versions {
     const val JUNIT = "5.11.0"
     const val KOTLIN = "2.0.20"
     const val KOTLINX_DATETIME = "0.6.1"
-    const val KOTLINX_SERIALIZATION = "1.7.1"
+    const val KOTLINX_SERIALIZATION = "1.7.2"
     const val KTLINT = "1.3.1"
     const val KTLINT_PLUGIN = "12.1.1"
     const val KTOR = "2.3.12"
