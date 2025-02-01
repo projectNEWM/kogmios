@@ -13,13 +13,19 @@ sealed interface GovernanceAction
 @Serializable
 @SerialName("protocolParametersUpdate")
 data class ProtocolParametersUpdateGovernanceAction(
+    @SerialName("ancestor")
+    val ancestor: UtxoInput? = null,
     @SerialName("parameters")
     val parameters: ProposedProtocolParameters,
+    @SerialName("guardrails")
+    val guardrails: GuardrailsHash?,
 ) : GovernanceAction
 
 @Serializable
 @SerialName("hardForkInitiation")
 data class HardForkInitiationGovernanceAction(
+    @SerialName("ancestor")
+    val ancestor: UtxoInput? = null,
     @SerialName("version")
     val version: Version,
 ) : GovernanceAction
@@ -39,12 +45,16 @@ data class TreasuryTransferGovernanceAction(
 @SerialName("treasuryWithdrawals")
 data class TreasuryWithdrawalsGovernanceAction(
     @SerialName("withdrawals")
-    val rewards: Map<String, Ada>,
+    val withdrawals: Map<String, Ada>,
+    @SerialName("guardrails")
+    val guardrails: GuardrailsHash?,
 ) : GovernanceAction
 
 @Serializable
 @SerialName("constitutionalCommittee")
 data class ConstitutionalCommitteeGovernanceAction(
+    @SerialName("ancestor")
+    val ancestor: UtxoInput,
     @SerialName("members")
     val members: ConstitutionalCommitteeMembers,
     @SerialName("quorum")
@@ -64,6 +74,8 @@ data class ConstitutionalCommitteeMembers(
 data class AddedConstitutionalCommitteeMember(
     @SerialName("id")
     val id: String,
+    @SerialName("from")
+    val from: String,
     @SerialName("mandate")
     val mandate: Mandate,
 )
@@ -77,15 +89,20 @@ data class Mandate(
 @Serializable
 @SerialName("constitution")
 data class ConstitutionGovernanceAction(
-    @SerialName("hash")
-    val hash: String,
-    @SerialName("anchor")
-    val anchor: AnchorMetadata,
+    @SerialName("ancestor")
+    val ancestor: UtxoInput? = null,
+    @SerialName("guardrails")
+    val guardrails: GuardrailsHash?,
+    @SerialName("metadata")
+    val metadata: AnchorMetadata,
 ) : GovernanceAction
 
 @Serializable
 @SerialName("noConfidence")
-data object NoConfidenceGovernanceAction : GovernanceAction
+data class NoConfidenceGovernanceAction(
+    @SerialName("ancestor")
+    val ancestor: UtxoInput? = null,
+) : GovernanceAction
 
 @Serializable
 @SerialName("information")

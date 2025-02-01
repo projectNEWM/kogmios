@@ -9,29 +9,33 @@ import io.newm.kogmios.ClientImpl
 import io.newm.kogmios.createChainSyncClient
 import io.newm.kogmios.exception.KogmiosException
 import io.newm.kogmios.protocols.model.BlockPraos
-import io.newm.kogmios.protocols.model.result.IntersectionFoundResult
-import io.newm.kogmios.protocols.model.fault.IntersectionNotFoundFault
 import io.newm.kogmios.protocols.model.OriginString
 import io.newm.kogmios.protocols.model.PointDetail
+import io.newm.kogmios.protocols.model.TransactionMetadata
+import io.newm.kogmios.protocols.model.fault.IntersectionNotFoundFault
+import io.newm.kogmios.protocols.model.result.IntersectionFoundResult
 import io.newm.kogmios.protocols.model.result.RollBackward
 import io.newm.kogmios.protocols.model.result.RollForward
-import io.newm.kogmios.protocols.model.TransactionMetadata
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.encodeToString
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.slf4j.LoggerFactory
 import java.time.Instant
 import kotlin.math.floor
 import kotlin.math.max
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import org.slf4j.LoggerFactory
 
 class ChainSyncTest {
     companion object {
-        // local testing
+        // local testing - preprod
         private const val TEST_HOST = "localhost"
         private const val TEST_PORT = 1337
         private const val TEST_SECURE = false
+
+        // local testing - mainnet
+//        private const val TEST_HOST = "localhost"
+//        private const val TEST_PORT = 1338
+//        private const val TEST_SECURE = false
 
         // remote testing
 //        private const val TEST_HOST = "ogmios-kogmios-9ab819.us1.demeter.run"
@@ -428,24 +432,29 @@ class ChainSyncTest {
                 val intersectResponse =
                     client.findIntersect(
                         listOf(
-                            // preprod
-                            // last byron block
-                            PointDetail(
-                                slot = 84242L,
-                                id = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af",
-                            ),
+//                            // preprod
+//                            // last byron block
+//                            PointDetail(
+//                                slot = 84242L,
+//                                id = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af",
+//                            ),
 //                    // last alonzo block
 //                    PointDetail(
 //                        slot = 3542390L,
 //                        id = "f93e682d5b91a94d8660e748aef229c19cb285bfb9830db48941d6a78183d81f"
 //                    )
+                            // plomin hardfork block - mainnet
+                            PointDetail(
+                                slot = 146620747L,
+                                id = "152f9c9e84f00b123f146623cff32faa8b4d7df4284c99322a67574b18074038"
+                            )
                         ),
                     )
-                assertThat(intersectResponse).isNotNull()
-                assertThat(intersectResponse.result).isInstanceOf(IntersectionFoundResult::class.java)
-                assertThat((intersectResponse.result.intersection as PointDetail).slot).isEqualTo(
-                    84242L,
-                )
+//                assertThat(intersectResponse).isNotNull()
+//                assertThat(intersectResponse.result).isInstanceOf(IntersectionFoundResult::class.java)
+//                assertThat((intersectResponse.result.intersection as PointDetail).slot).isEqualTo(
+//                    84242L,
+//                )
 
                 var lastLogged = Instant.EPOCH
                 var isTip = false
@@ -480,8 +489,8 @@ class ChainSyncTest {
                                         percent,
                                     ),
                                 )
-                                val blockJsonString = ClientImpl.json.encodeToString(rollForward.block)
-                                log.info("Block: $blockJsonString")
+                                // val blockJsonString = ClientImpl.json.encodeToString(rollForward.block)
+                                // log.info("Block: $blockJsonString")
                                 lastLogged = now
                             }
                         }

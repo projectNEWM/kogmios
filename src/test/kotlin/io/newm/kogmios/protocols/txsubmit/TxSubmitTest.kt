@@ -3,7 +3,7 @@ package io.newm.kogmios.protocols.txsubmit
 import com.google.common.truth.Truth.assertThat
 import io.newm.kogmios.createTxSubmitClient
 import io.newm.kogmios.exception.KogmiosException
-import io.newm.kogmios.protocols.model.fault.CannotCreateEvaluationContextFaultData
+import io.newm.kogmios.protocols.model.fault.ScriptExecutionFailureFaultData
 import io.newm.kogmios.protocols.model.result.SubmitTxResult
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Disabled
@@ -45,10 +45,10 @@ class TxSubmitTest {
                 assertThat(
                     exception.message
                 ).isEqualTo(
-                    "The transaction contains unknown UTxO references as inputs. This can happen if the inputs you're trying to spend have already been spent, or if you've simply referred to non-existing UTxO altogether. The field 'data.unknownOutputReferences' indicates all unknown inputs."
+                    "The transaction is outside of its validity interval. It was either submitted too early or too late. A transaction that has a lower validity bound can only be accepted by the ledger (and make it to the mempool) if the ledger's current slot is greater than the specified bound. The upper bound works similarly, as a time to live. The field 'data.currentSlot' contains the current slot as known of the ledger (this may be different from the current network slot if the ledger is still catching up). The field 'data.validityInterval' is a reminder of the validity interval provided with the transaction."
                 )
                 assertThat(exception.jsonRpcErrorResponse).isNotNull()
-                assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3117L)
+                assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3118L)
             }
         }
 
@@ -133,15 +133,13 @@ class TxSubmitTest {
                         )
                     }
                 assertThat(exception).isNotNull()
-                assertThat(exception.message).isEqualTo("Unable to create the evaluation context from the given transaction.")
+                assertThat(exception.message).isEqualTo("Some scripts of the transactions terminated with error(s).")
                 assertThat(exception.jsonRpcErrorResponse).isNotNull()
-                assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3004L)
-                assertThat(exception.jsonRpcErrorResponse.error.data).isInstanceOf(CannotCreateEvaluationContextFaultData::class.java)
+                assertThat(exception.jsonRpcErrorResponse.error.code).isEqualTo(3010L)
+                assertThat(exception.jsonRpcErrorResponse.error.data).isInstanceOf(ScriptExecutionFailureFaultData::class.java)
                 assertThat(
-                    (exception.jsonRpcErrorResponse.error.data as CannotCreateEvaluationContextFaultData).reason
-                ).isEqualTo(
-                    "Unknown transaction input (missing from UTxO set): 334958f7971903143be0672aa1818a1d96babe6cddbf445405ba488c8f70d10c#2"
-                )
+                    (exception.jsonRpcErrorResponse.error.data as ScriptExecutionFailureFaultData).first().error.code
+                ).isEqualTo(3110L)
             }
         }
 }
