@@ -1,18 +1,80 @@
 package io.newm.kogmios
 
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.receiveDeserialized
+import io.ktor.client.plugins.websocket.sendSerialized
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.*
-import io.ktor.serialization.*
-import io.ktor.util.reflect.*
-import io.ktor.utils.io.charsets.*
-import io.ktor.websocket.*
+import io.ktor.http.HttpMethod
+import io.ktor.serialization.WebsocketContentConverter
+import io.ktor.util.reflect.TypeInfo
+import io.ktor.utils.io.charsets.Charset
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.Frame
+import io.ktor.websocket.FrameType
+import io.ktor.websocket.close
+import io.ktor.websocket.readText
 import io.newm.kogmios.exception.KogmiosException
-import io.newm.kogmios.protocols.messages.*
-import io.newm.kogmios.protocols.model.*
+import io.newm.kogmios.protocols.messages.Cbor
+import io.newm.kogmios.protocols.messages.HasTransaction
+import io.newm.kogmios.protocols.messages.JsonRpcErrorResponse
+import io.newm.kogmios.protocols.messages.JsonRpcRequest
+import io.newm.kogmios.protocols.messages.JsonRpcResponse
+import io.newm.kogmios.protocols.messages.JsonRpcSuccessResponse
+import io.newm.kogmios.protocols.messages.MsgAcquire
+import io.newm.kogmios.protocols.messages.MsgAcquireMempool
+import io.newm.kogmios.protocols.messages.MsgAcquireMempoolResponse
+import io.newm.kogmios.protocols.messages.MsgAcquireResponse
+import io.newm.kogmios.protocols.messages.MsgEvaluateTx
+import io.newm.kogmios.protocols.messages.MsgEvaluateTxResponse
+import io.newm.kogmios.protocols.messages.MsgFindIntersect
+import io.newm.kogmios.protocols.messages.MsgFindIntersectResponse
+import io.newm.kogmios.protocols.messages.MsgHasTransaction
+import io.newm.kogmios.protocols.messages.MsgHasTransactionResponse
+import io.newm.kogmios.protocols.messages.MsgNextBlock
+import io.newm.kogmios.protocols.messages.MsgNextBlockResponse
+import io.newm.kogmios.protocols.messages.MsgNextTransaction
+import io.newm.kogmios.protocols.messages.MsgNextTransactionResponse
+import io.newm.kogmios.protocols.messages.MsgQuery
+import io.newm.kogmios.protocols.messages.MsgQueryBlockHeightResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEpochResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEraStartResponse
+import io.newm.kogmios.protocols.messages.MsgQueryEraSummariesResponse
+import io.newm.kogmios.protocols.messages.MsgQueryGenesisConfigResponse
+import io.newm.kogmios.protocols.messages.MsgQueryLiveStakeDistributionResponse
+import io.newm.kogmios.protocols.messages.MsgQueryNetworkStartTimeResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProjectedRewardsResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProposedProtocolParametersResponse
+import io.newm.kogmios.protocols.messages.MsgQueryProtocolParametersResponse
+import io.newm.kogmios.protocols.messages.MsgQueryRewardAccountSummariesResponse
+import io.newm.kogmios.protocols.messages.MsgQueryStakePoolsResponse
+import io.newm.kogmios.protocols.messages.MsgQueryTipResponse
+import io.newm.kogmios.protocols.messages.MsgQueryUtxoResponse
+import io.newm.kogmios.protocols.messages.MsgRelease
+import io.newm.kogmios.protocols.messages.MsgReleaseMempool
+import io.newm.kogmios.protocols.messages.MsgReleaseMempoolResponse
+import io.newm.kogmios.protocols.messages.MsgReleaseResponse
+import io.newm.kogmios.protocols.messages.MsgSizeOfMempool
+import io.newm.kogmios.protocols.messages.MsgSizeOfMempoolResponse
+import io.newm.kogmios.protocols.messages.MsgSubmitTx
+import io.newm.kogmios.protocols.messages.MsgSubmitTxResponse
+import io.newm.kogmios.protocols.messages.SubmitOrEvalTx
+import io.newm.kogmios.protocols.model.FindIntersect
+import io.newm.kogmios.protocols.model.GenesisEra
+import io.newm.kogmios.protocols.model.ParamsGenesisConfig
+import io.newm.kogmios.protocols.model.ParamsPoolParameters
+import io.newm.kogmios.protocols.model.ParamsProjectedRewards
+import io.newm.kogmios.protocols.model.ParamsRewardAccountSummaries
+import io.newm.kogmios.protocols.model.ParamsUtxo
+import io.newm.kogmios.protocols.model.PointDetailOrOrigin
+import io.newm.kogmios.protocols.model.PointOrOrigin
+import io.newm.kogmios.protocols.model.StakePool
 import io.newm.kogmios.protocols.model.fault.InternalErrorFault
 import io.newm.kogmios.protocols.model.fault.StringFaultData
 import io.newm.kogmios.protocols.model.result.HealthResult
@@ -20,18 +82,27 @@ import io.newm.kogmios.serializers.BigFractionSerializer
 import io.newm.kogmios.serializers.BigIntegerSerializer
 import java.io.IOException
 import java.math.BigInteger
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.coroutines.channels.ClosedSendChannelException
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.encodeToString
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import org.apache.commons.numbers.fraction.BigFraction
@@ -81,7 +152,7 @@ internal class ClientImpl(
                         override suspend fun serialize(
                             charset: Charset,
                             typeInfo: TypeInfo,
-                            value: Any
+                            value: Any?
                         ): Frame {
                             log.trace("serialize() - charset: {}, typeInfo: {}, value: {}", charset, typeInfo, value)
                             return Frame.Text(
@@ -92,7 +163,7 @@ internal class ClientImpl(
                                             log.debug("sending: {}", it)
                                         }
 
-                                    else -> throw IllegalArgumentException("Unable to serialize ${value::class.java.canonicalName}")
+                                    else -> throw IllegalArgumentException("Unable to serialize ${value!!::class.java.canonicalName}")
                                 },
                             )
                         }
@@ -102,15 +173,21 @@ internal class ClientImpl(
                             typeInfo: TypeInfo,
                             content: Frame
                         ): Any {
-                            log.trace("deserialize() - charset: {}, typeInfo: {}, content: {}", charset, typeInfo, content)
+                            log.trace(
+                                "deserialize() - charset: {}, typeInfo: {}, content: {}",
+                                charset,
+                                typeInfo,
+                                content
+                            )
                             val jsonString = (content as Frame.Text).readText()
                             log.debug("received: {}", jsonString)
                             return try {
                                 json.decodeFromString<JsonRpcResponse>(jsonString)
                             } catch (e: Throwable) {
                                 // This should never happen unless WE have made an error in our parsers somewhere.
-                                val idRegex = """"id":"([^:{},]*: [a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})""""
-                                    .toRegex()
+                                val idRegex =
+                                    """"id":"([^:{},]*: [a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})""""
+                                        .toRegex()
                                 val id = idRegex.find(jsonString)?.let { it.groupValues[1] } ?: "-1"
                                 JsonRpcErrorResponse(
                                     error =
