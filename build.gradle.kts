@@ -19,7 +19,7 @@ if (!project.hasProperty("isGithubActions")) {
 }
 
 group = "io.newm"
-version = "2.4.0-SNAPSHOT"
+version = "2.5.0-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -51,6 +51,9 @@ dependencies {
     testImplementation("io.mockk:mockk:${Versions.MOCKK}")
     testImplementation("com.google.truth:truth:${Versions.GOOGLE_TRUTH}")
     testImplementation("org.junit.jupiter:junit-jupiter:${Versions.JUNIT}")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+    testImplementation("org.junit.platform:junit-platform-launcher:${Versions.JUNIT_PLATFORM}")
+
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
 }
 
