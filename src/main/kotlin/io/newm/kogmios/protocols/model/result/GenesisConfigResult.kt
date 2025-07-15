@@ -11,13 +11,13 @@ import io.newm.kogmios.protocols.model.Milliseconds
 import io.newm.kogmios.protocols.model.ShelleyGenesisProtocolParameters
 import io.newm.kogmios.protocols.model.ShelleyGenesisStakePools
 import io.newm.kogmios.protocols.model.UpdatableParameters
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonClassDiscriminator
 import org.apache.commons.numbers.fraction.BigFraction
 import java.math.BigInteger
+import kotlin.time.Instant
 
 @Serializable
 @JsonClassDiscriminator("era")

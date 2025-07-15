@@ -18,7 +18,7 @@ data class ProtocolParametersUpdateGovernanceAction(
     @SerialName("parameters")
     val parameters: ProposedProtocolParameters,
     @SerialName("guardrails")
-    val guardrails: GuardrailsHash?,
+    val guardrails: GuardrailsHash? = null,
 ) : GovernanceAction
 
 @Serializable
@@ -47,14 +47,14 @@ data class TreasuryWithdrawalsGovernanceAction(
     @SerialName("withdrawals")
     val withdrawals: Map<String, Ada>,
     @SerialName("guardrails")
-    val guardrails: GuardrailsHash?,
+    val guardrails: GuardrailsHash? = null,
 ) : GovernanceAction
 
 @Serializable
 @SerialName("constitutionalCommittee")
 data class ConstitutionalCommitteeGovernanceAction(
     @SerialName("ancestor")
-    val ancestor: UtxoInput,
+    val ancestor: UtxoInput? = null,
     @SerialName("members")
     val members: ConstitutionalCommitteeMembers,
     @SerialName("quorum")

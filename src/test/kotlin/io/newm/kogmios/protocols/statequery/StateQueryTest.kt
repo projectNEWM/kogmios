@@ -27,12 +27,12 @@ import io.newm.kogmios.protocols.model.result.StakePoolsResult
 import io.newm.kogmios.protocols.model.result.UtxoResult
 import java.io.IOException
 import java.math.BigInteger
+import kotlin.time.Instant
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 

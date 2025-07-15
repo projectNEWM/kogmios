@@ -1,7 +1,7 @@
 package io.newm.kogmios.protocols.model.serializers
 
 import io.newm.kogmios.protocols.model.result.InstantResult
-import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlin.time.Instant
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -14,13 +14,13 @@ object InstantResultSerializer : KSerializer<InstantResult> {
 
     override fun deserialize(decoder: Decoder): InstantResult {
         require(decoder is JsonDecoder)
-        return InstantResult(InstantIso8601Serializer.deserialize(decoder))
+        return InstantResult(Instant.parse(decoder.decodeString()))
     }
 
     override fun serialize(
         encoder: Encoder,
         value: InstantResult
     ) {
-        InstantIso8601Serializer.serialize(encoder, value.value)
+        encoder.encodeString(value.value.toString())
     }
 }

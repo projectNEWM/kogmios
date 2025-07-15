@@ -1,5 +1,4 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import org.hibernate.build.publish.auth.maven.MavenRepoAuthPlugin
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,18 +7,12 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint") version Versions.KTLINT_PLUGIN
     kotlin("jvm") version Versions.KOTLIN
     kotlin("plugin.serialization") version Versions.KOTLIN
-    id("maven-publish")
     id("signing")
-    id("org.hibernate.build.maven-repo-auth") version Versions.MAVEN_REPO_AUTH_PLUGIN apply false
-}
-
-if (!project.hasProperty("isGithubActions")) {
-    // only use this plugin if we're running locally, not on github.
-    apply<MavenRepoAuthPlugin>()
+    id("com.vanniktech.maven.publish") version Versions.MAVEN_PUBLISH
 }
 
 group = "io.newm"
-version = "2.5.0-SNAPSHOT"
+version = "2.5.1-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -44,7 +37,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.COROUTINES}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.KOTLINX_DATETIME}")
 
     implementation("org.apache.commons:commons-numbers-fraction:${Versions.COMMONS_NUMBERS}")
 
@@ -61,84 +53,40 @@ ktlint {
     version.set(Versions.KTLINT)
 }
 
-tasks {
-
-    val sourcesJar by registering(Jar::class) {
-        archiveClassifier.set("sources")
-        dependsOn("classes")
-        from(sourceSets["main"].allSource)
-    }
-
-    val javadocJar by registering(Jar::class) {
-        archiveClassifier.set("javadoc")
-        dependsOn("javadoc")
-        from("${layout.buildDirectory}/javadoc")
-    }
-
-    artifacts {
-        archives(javadocJar)
-        archives(sourcesJar)
-    }
-
-    assemble {
-        dependsOn("sourcesJar", "javadocJar")
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "ossrh"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            if (project.hasProperty("release")) {
-                setUrl(releasesRepoUrl)
-            } else {
-                setUrl(snapshotsRepoUrl)
-            }
-        }
-    }
-    publications {
-        create<MavenPublication>("mavenKotlin") {
-            from(components["kotlin"])
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
-
-            pom {
-                groupId = "io.newm"
-                artifactId = "kogmios"
-
-                name.set("Kogmios")
-                description.set("Kotlin Wrapper for Ogmios")
-                url.set("https://github.com/projectNEWM/kogmios")
-                licenses {
-                    license {
-                        name.set("Apache 2.0")
-                        url.set("https://github.com/projectNEWM/kogmios/blob/master/LICENSE")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("AndrewWestberg")
-                        name.set("Andrew Westberg")
-                        email.set("andrewwestberg@gmail.com")
-                        organization.set("NEWM")
-                        organizationUrl.set("https://newm.io")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:git://github.com/projectNEWM/kogmios.git")
-                    developerConnection.set("scm:git:ssh://github.com/projectNEWM/kogmios.git")
-                    url.set("https://github.com/projectNEWM/kogmios")
-                }
-            }
-        }
-    }
-}
-
 signing {
     useGpgCmd()
-    sign(publishing.publications["mavenKotlin"])
+}
+
+mavenPublishing {
+    publishToMavenCentral()
+    signAllPublications()
+    coordinates("io.newm", "kogmios", version.toString())
+    pom {
+        name.set("Kogmios")
+        description.set("Kotlin Wrapper for Ogmios")
+        url.set("https://github.com/projectNEWM/kogmios")
+        licenses {
+            license {
+                name.set("Apache 2.0")
+                url.set("https://github.com/projectNEWM/kogmios/blob/master/LICENSE")
+                distribution.set("https://github.com/projectNEWM/kogmios/blob/master/LICENSE")
+            }
+        }
+        developers {
+            developer {
+                id.set("AndrewWestberg")
+                name.set("Andrew Westberg")
+                email.set("andrewwestberg@gmail.com")
+                organization.set("NEWM")
+                organizationUrl.set("https://newm.io")
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/projectNEWM/kogmios.git")
+            developerConnection.set("scm:git:ssh://github.com/projectNEWM/kogmios.git")
+            url.set("https://github.com/projectNEWM/kogmios")
+        }
+    }
 }
 
 fun isNonStable(version: String): Boolean {
@@ -153,17 +101,17 @@ tasks.withType<Test> {
 }
 
 tasks.withType<DependencyUpdatesTask> {
-    // Example 1: reject all non stable versions
+// Example 1: reject all non stable versions
     rejectVersionIf {
         isNonStable(candidate.version)
     }
 
-    // Example 2: disallow release candidates as upgradable versions from stable versions
+// Example 2: disallow release candidates as upgradable versions from stable versions
     rejectVersionIf {
         isNonStable(candidate.version) && !isNonStable(currentVersion)
     }
 
-    // Example 3: using the full syntax
+// Example 3: using the full syntax
     resolutionStrategy {
         componentSelection {
             all {
@@ -193,6 +141,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlin.time.ExperimentalTime",
             )
         jvmTarget.set(JvmTarget.JVM_21)
     }
