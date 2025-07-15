@@ -434,20 +434,20 @@ class ChainSyncTest {
                         listOf(
 //                            // preprod
 //                            // last byron block
-//                            PointDetail(
-//                                slot = 84242L,
-//                                id = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af",
-//                            ),
+                            PointDetail(
+                                slot = 84242L,
+                                id = "45899e8002b27df291e09188bfe3aeb5397ac03546a7d0ead93aa2500860f1af",
+                            ),
 //                    // last alonzo block
 //                    PointDetail(
 //                        slot = 3542390L,
 //                        id = "f93e682d5b91a94d8660e748aef229c19cb285bfb9830db48941d6a78183d81f"
 //                    )
                             // plomin hardfork block - mainnet
-                            PointDetail(
-                                slot = 146620747L,
-                                id = "152f9c9e84f00b123f146623cff32faa8b4d7df4284c99322a67574b18074038"
-                            )
+//                            PointDetail(
+//                                slot = 146620747L,
+//                                id = "152f9c9e84f00b123f146623cff32faa8b4d7df4284c99322a67574b18074038"
+//                            )
                         ),
                     )
 //                assertThat(intersectResponse).isNotNull()
@@ -471,11 +471,11 @@ class ChainSyncTest {
                         )
                     when (response.result) {
                         is RollBackward -> {
-                            log.info("RollBackward: ${(response.result as RollBackward).point}")
+                            log.info("RollBackward: ${response.result.point}")
                         }
 
                         is RollForward -> {
-                            val rollForward = response.result as RollForward
+                            val rollForward = response.result
                             val blockHeight = (rollForward.block as BlockPraos).height
                             val tipBlockHeight = max(blockHeight, rollForward.tip.height)
                             isTip = blockHeight == tipBlockHeight
