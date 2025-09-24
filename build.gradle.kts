@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.newm"
-version = "2.5.1-SNAPSHOT"
+version = "2.6.0-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -101,25 +101,8 @@ tasks.withType<Test> {
 }
 
 tasks.withType<DependencyUpdatesTask> {
-// Example 1: reject all non stable versions
-    rejectVersionIf {
-        isNonStable(candidate.version)
-    }
-
-// Example 2: disallow release candidates as upgradable versions from stable versions
     rejectVersionIf {
         isNonStable(candidate.version) && !isNonStable(currentVersion)
-    }
-
-// Example 3: using the full syntax
-    resolutionStrategy {
-        componentSelection {
-            all {
-                if (isNonStable(candidate.version) && !isNonStable(currentVersion)) {
-                    reject("Release candidate")
-                }
-            }
-        }
     }
 }
 

@@ -728,9 +728,7 @@ internal class ClientImpl(
                 isClosing = true
                 log.debug("Closing WebSocket...")
                 session.close(CloseReason(CloseReason.Codes.NORMAL, "Ok"))
-                receiveClose.await()
                 sendQueue.close()
-                sendClose.await()
                 httpClient.close()
             }
             isConnected = false
