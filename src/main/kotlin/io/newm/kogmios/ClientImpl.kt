@@ -84,6 +84,7 @@ import java.io.IOException
 import java.math.BigInteger
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -335,6 +336,9 @@ internal class ClientImpl(
                         result.complete(false)
                     }
                 }
+            } catch (e: CancellationException) {
+                // rethrow to continue coroutine cancellation chain
+                throw e
             } catch (e: Throwable) {
                 log.error("Connection Error!", e)
                 e.printStackTrace()
