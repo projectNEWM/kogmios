@@ -158,13 +158,16 @@ internal class ClientImpl(
                             log.trace("serialize() - charset: {}, typeInfo: {}, value: {}", charset, typeInfo, value)
                             return Frame.Text(
                                 when (value) {
-                                    is JsonRpcRequest ->
+                                    is JsonRpcRequest -> {
                                         json.encodeToString(value).also {
                                             // temporary while we need to figure out how all the requests look
                                             log.debug("sending: {}", it)
                                         }
+                                    }
 
-                                    else -> throw IllegalArgumentException("Unable to serialize ${value!!::class.java.canonicalName}")
+                                    else -> {
+                                        throw IllegalArgumentException("Unable to serialize ${value!!::class.java.canonicalName}")
+                                    }
                                 },
                             )
                         }

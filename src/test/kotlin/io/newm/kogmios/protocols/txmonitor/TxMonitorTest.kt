@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.math.BigInteger
 
+@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class TxMonitorTest {
     companion object {
         // local testing

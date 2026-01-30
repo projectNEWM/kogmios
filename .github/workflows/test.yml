@@ -1,5 +1,3 @@
-# We may start running these on docker in the future,
-# but I wanted to put something in place in the meantime
 name: test
 on:
   push:
@@ -11,10 +9,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v5
+
+      - name: Cache Gradle Configuration Cache
+        # Caches the project-local configuration cache, which is NOT covered by the Gradle build action (it only caches Gradle User Home)
+        # Keyed on build scripts & settings so that structural changes invalidate appropriately.
+        uses: actions/cache@v4
+        with:
+          path: |
+            .gradle/configuration-cache
+            .gradle/kotlin
+          key: ${{ runner.os }}-config-cache-${{ hashFiles('**/*.gradle.kts', '**/*.gradle', 'gradle.properties', 'settings.gradle.kts', 'settings.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-config-cache-
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '21'
-      - name: run tests
-        run: ./gradlew test -PisGithubActions
+
+      - name: Setup Gradle (cache wrapper + dependencies)
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          # Allow writes only on master so PRs consume but don't fragment cache
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+          # Include wrapper so the distribution zip is restored instead of re-downloaded each run
+          gradle-home-cache-includes: caches,wrapper
+          # (Optional) keep default keying; can add version bump by changing cache-key-prefix if needed
+          # cache-key-prefix: gradle-home-v1
+
+      - name: Warm configuration cache
+        # Run a lightweight task to populate the configuration cache before heavier tasks.
+        # 'help' triggers full configuration for all subprojects but executes no work, generating the cache entry.
+        run: ./gradlew help --configuration-cache --build-cache --no-configure-on-demand -PisGithubActions
+
+      - name: All Tests
+        # Use aggregator task to force test execution across all subprojects; disable configuration on demand to ensure discovery.
+        run: ./gradlew test --configuration-cache --build-cache --no-configure-on-demand -PisGithubActions

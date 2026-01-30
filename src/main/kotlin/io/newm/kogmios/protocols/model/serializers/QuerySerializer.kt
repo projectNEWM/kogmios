@@ -13,7 +13,10 @@ import kotlinx.serialization.json.jsonObject
 object QuerySerializer : JsonContentPolymorphicSerializer<Params>(Params::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<Params> =
         when ((element.jsonObject["query"] as? JsonPrimitive)?.contentOrNull) {
-            "chainTip" -> ParamsChainTip.serializer()
+            "chainTip" -> {
+                ParamsChainTip.serializer()
+            }
+
             else -> {
                 if (element.jsonObject["query"]?.jsonObject?.let { "poolParameters" in it } == true) {
                     ParamsPoolParameters.serializer()

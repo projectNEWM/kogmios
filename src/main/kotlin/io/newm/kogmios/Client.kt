@@ -23,7 +23,8 @@ interface Client : Closeable {
     fun shutdown()
 
     companion object {
-        const val DEFAULT_REQUEST_TIMEOUT_MS = 10_000L
+        const val DEFAULT_REQUEST_TIMEOUT_MS = 10_000L // 10 seconds
+        const val MEDIUM_REQUEST_TIMEOUT_MS = 60_000L // 60 seconds
         const val LONG_REQUEST_TIMEOUT_MS = 180_000L // 3 minutes
         const val INSANE_REQUEST_TIMEOUT_MS = 300_000L // 5 minutes
         const val LUDICROUS_REQUEST_TIMEOUT_MS = 600_000L // 10 minutes
