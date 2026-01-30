@@ -3,6 +3,7 @@ package io.newm.kogmios
 import io.newm.kogmios.Client.Companion.DEFAULT_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.Client.Companion.INSANE_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.Client.Companion.LONG_REQUEST_TIMEOUT_MS
+import io.newm.kogmios.Client.Companion.MEDIUM_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.protocols.messages.MsgAcquireResponse
 import io.newm.kogmios.protocols.messages.MsgQueryBlockHeightResponse
 import io.newm.kogmios.protocols.messages.MsgQueryEpochResponse
@@ -127,7 +128,7 @@ interface StateQueryClient : Client {
      */
     suspend fun utxo(
         params: ParamsUtxo,
-        timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS
+        timeoutMs: Long = MEDIUM_REQUEST_TIMEOUT_MS
     ): MsgQueryUtxoResponse
 
     /**

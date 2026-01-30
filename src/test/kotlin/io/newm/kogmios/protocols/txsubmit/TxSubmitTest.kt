@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
+@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class TxSubmitTest {
     companion object {
         // local testing

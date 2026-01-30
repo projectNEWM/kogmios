@@ -33,9 +33,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
+@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class StateQueryTest {
     companion object {
         // local testing

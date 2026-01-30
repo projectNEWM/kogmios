@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.newm"
-version = "2.6.1-SNAPSHOT"
+version = "2.7.1-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21
@@ -103,6 +103,10 @@ tasks.withType<Test> {
 tasks.withType<DependencyUpdatesTask> {
     rejectVersionIf {
         isNonStable(candidate.version) && !isNonStable(currentVersion)
+    }
+    filterConfigurations = Spec<Configuration> {
+//        println("checking ${it.name}")
+        it.name.contains("ktlint", ignoreCase = true).not()
     }
 }
 

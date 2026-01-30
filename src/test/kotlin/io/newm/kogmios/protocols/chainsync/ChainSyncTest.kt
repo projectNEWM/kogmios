@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 
+@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class ChainSyncTest {
     companion object {
         // local testing - preprod
@@ -342,7 +343,7 @@ class ChainSyncTest {
                     17801422L,
                 )
 
-                val block = (response2.result as RollForward).block as BlockPraos
+                val block = response2.result.block as BlockPraos
                 val transaction = block.transactions.firstOrNull {
                     it.id ==
                         "13211d06ab3c63ee1d493fbd35608df4f3bfdf20b70ee0b1552d5aecfdfcce2b"
@@ -400,7 +401,7 @@ class ChainSyncTest {
                     68862139L,
                 )
 
-                val block = (response2.result as RollForward).block as BlockPraos
+                val block = response2.result.block as BlockPraos
                 val transaction = block.transactions.firstOrNull {
                     it.id ==
                         "fba6f45218d1797a3eeafd98d5105fc86f335d01dc405634d9918ab002ba8026"
@@ -411,7 +412,7 @@ class ChainSyncTest {
             Unit
         }
 
-    @Disabled
+    @Disabled("Disabled by default since it requires continuous running to sync the chain.")
     @Test
     fun `test blockchain sync`() =
         runBlocking {
