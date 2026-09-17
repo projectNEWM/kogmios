@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
-    id("com.github.ben-manes.versions") version Versions.VERSIONS_PLUGIN
+    id("io.github.ben-manes.versions") version Versions.VERSIONS_PLUGIN
     id("org.jlleitschuh.gradle.ktlint") version Versions.KTLINT_PLUGIN
     kotlin("jvm") version Versions.KOTLIN
     kotlin("plugin.serialization") version Versions.KOTLIN
