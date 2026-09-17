@@ -15,12 +15,15 @@ import io.newm.kogmios.protocols.messages.MsgQuery
 import io.newm.kogmios.protocols.messages.MsgQueryBlockHeightResponse
 import io.newm.kogmios.protocols.messages.MsgQueryProjectedRewardsResponse
 import io.newm.kogmios.protocols.messages.MsgQueryUtxoResponse
+import io.newm.kogmios.protocols.messages.MsgQueryRewardAccountSummariesResponse
+import io.newm.kogmios.protocols.messages.MsgQueryStakePoolsResponse
 import io.newm.kogmios.protocols.messages.MsgSubmitTx
 import io.newm.kogmios.protocols.messages.SubmitOrEvalTx
 import io.newm.kogmios.protocols.model.Asset
 import io.newm.kogmios.protocols.model.Certificate
 import io.newm.kogmios.protocols.model.DelegateRepresentative
 import io.newm.kogmios.protocols.model.DelegateRepresentativeAbstain
+import io.newm.kogmios.protocols.model.DelegateRepresentativeRegistered
 import io.newm.kogmios.protocols.model.ExecutionPrices
 import io.newm.kogmios.protocols.model.result.GenesisConfigResult
 import io.newm.kogmios.protocols.model.GovernanceAction
@@ -33,6 +36,7 @@ import io.newm.kogmios.protocols.model.MetadataList
 import io.newm.kogmios.protocols.model.MetadataMap
 import io.newm.kogmios.protocols.model.MetadataString
 import io.newm.kogmios.protocols.model.Origin
+import io.newm.kogmios.protocols.model.ProtocolParametersUpdateGovernanceAction
 import io.newm.kogmios.protocols.model.OriginString
 import io.newm.kogmios.protocols.model.Script
 import io.newm.kogmios.protocols.model.ScriptNative
@@ -227,6 +231,12 @@ class OgmiosJsonTest {
 
         assertThat(mapper.readValue("""{"type":"information"}""", GovernanceAction::class.java))
             .isSameInstanceAs(InformationGovernanceAction)
+        val protocolParametersUpdate =
+            mapper.readValue(
+                """{"type":"protocolParametersUpdate","parameters":{"minFeeCoefficient":44}}""",
+                GovernanceAction::class.java,
+            ) as ProtocolParametersUpdateGovernanceAction
+        assertThat(protocolParametersUpdate.parameters.minFeeCoefficient).isEqualTo(BigInteger.valueOf(44))
         assertThat(mapper.readValue("""{"from":"stake","credential":"cred","type":"stakeDelegation"}""", Certificate::class.java))
             .isInstanceOf(StakeDelegationCertificate::class.java)
         assertThat(mapper.readValue("""{"type":"abstain"}""", DelegateRepresentative::class.java))
@@ -240,6 +250,106 @@ class OgmiosJsonTest {
                 """{"cbor":"03","language":"plutus:v3"}""" to ScriptPlutusV3::class.java,
             )
         scripts.forEach { (json, type) -> assertThat(mapper.readValue(json, Script::class.java)).isInstanceOf(type) }
+    }
+
+    @Test
+    fun `Ogmios 6 14 reward summaries preserve identity delegation and exact values`() {
+        val credential = "3a8c70eba78fb47c5a017e38b04254b4e9545b4619cce2aa6b7143b3"
+        val huge = BigInteger("922337203685477580812345")
+        val response =
+            mapper.readValue(
+                """{"jsonrpc":"2.0","method":"queryLedgerState/rewardAccountSummaries","result":[{"from":"verificationKey","credential":"$credential","stakePool":{"id":"pool1lgd9u8nshsh60asqszepfaalt2c5c5w6fvc85xne9st3g3fwtvm"},"rewards":{"ada":{"lovelace":0}},"deposit":{"ada":{"lovelace":2000000}}},{"from":"script","credential":"$credential","delegateRepresentative":{"type":"registered","id":"11111111111111111111111111111111111111111111111111111111","from":"script"},"rewards":{"ada":{"lovelace":$huge}},"deposit":{"ada":{"lovelace":1}}},{"from":"verificationKey","credential":"both","stakePool":{"id":"pool-both"},"delegateRepresentative":{"type":"abstain"},"rewards":{"ada":{"lovelace":2}},"deposit":{"ada":{"lovelace":3}}},{"from":"verificationKey","credential":"no-confidence","delegateRepresentative":{"type":"noConfidence"},"rewards":{"ada":{"lovelace":4}},"deposit":{"ada":{"lovelace":5}}},{"from":"verificationKey","credential":"neither","rewards":{"ada":{"lovelace":6}},"deposit":{"ada":{"lovelace":7}}}],"id":"compat-reward"}""",
+                JsonRpcResponse::class.java,
+            ) as MsgQueryRewardAccountSummariesResponse
+
+        assertThat(response.result.map { it.from to it.credential })
+            .containsExactly(
+                "verificationKey" to credential,
+                "script" to credential,
+                "verificationKey" to "both",
+                "verificationKey" to "no-confidence",
+                "verificationKey" to "neither",
+            ).inOrder()
+        val captured = response.result[0]
+        assertThat(captured.stakePool!!.id).isEqualTo("pool1lgd9u8nshsh60asqszepfaalt2c5c5w6fvc85xne9st3g3fwtvm")
+        assertThat(captured.rewards.ada.lovelace).isEqualTo(BigInteger.ZERO)
+        assertThat(captured.deposit.ada.lovelace).isEqualTo(BigInteger.valueOf(2_000_000))
+        assertThat(captured.delegateRepresentative).isNull()
+        val script = response.result[1]
+        assertThat(script.stakePool).isNull()
+        assertThat(script.rewards.ada.lovelace).isEqualTo(huge)
+        assertThat(script.delegateRepresentative).isInstanceOf(DelegateRepresentativeRegistered::class.java)
+        assertThat((script.delegateRepresentative as DelegateRepresentativeRegistered).from).isEqualTo("script")
+        assertThat(response.result[2].stakePool!!.id).isEqualTo("pool-both")
+        assertThat(response.result[2].delegateRepresentative).isSameInstanceAs(DelegateRepresentativeAbstain)
+        assertThat(response.result[3].delegateRepresentative)
+            .isSameInstanceAs(io.newm.kogmios.protocols.model.DelegateRepresentativeNoConfidence)
+        assertThat(response.result[4].stakePool).isNull()
+        assertThat(response.result[4].delegateRepresentative).isNull()
+
+        val empty =
+            mapper.readValue(
+                """{"jsonrpc":"2.0","method":"queryLedgerState/rewardAccountSummaries","result":[],"id":"empty"}""",
+                JsonRpcResponse::class.java,
+            ) as MsgQueryRewardAccountSummariesResponse
+        assertThat(empty.result).isEmpty()
+
+        listOf(
+            """{"from":"verificationKey","rewards":{"ada":{"lovelace":0}},"deposit":{"ada":{"lovelace":0}}}""",
+            """{"credential":"$credential","rewards":{"ada":{"lovelace":0}},"deposit":{"ada":{"lovelace":0}}}""",
+        ).forEach { entry ->
+            assertThrows<JsonMappingException> {
+                mapper.readValue(
+                    """{"jsonrpc":"2.0","method":"queryLedgerState/rewardAccountSummaries","result":[$entry],"id":"invalid"}""",
+                    JsonRpcResponse::class.java,
+                )
+            }
+        }
+        assertThrows<JsonMappingException> {
+            mapper.readValue(
+                """{"type":"registered","id":"11111111111111111111111111111111111111111111111111111111"}""",
+                DelegateRepresentative::class.java,
+            )
+        }
+
+        val certificate =
+            mapper.readValue(
+                """{"type":"stakeDelegation","from":"verificationKey","credential":"$credential","delegateRepresentative":{"type":"registered","id":"11111111111111111111111111111111111111111111111111111111","from":"verificationKey"}}""",
+                Certificate::class.java,
+            ) as StakeDelegationCertificate
+        assertThat((certificate.delegateRepresentative as DelegateRepresentativeRegistered).from)
+            .isEqualTo("verificationKey")
+    }
+
+    @Test
+    fun `Ogmios 6 14 sparse stake pool views retain ids and optional stake`() {
+        val response =
+            mapper.readValue(
+                """{"jsonrpc":"2.0","method":"queryLedgerState/stakePools","result":{"retired":{"id":"pool-retired","stake":{"ada":{"lovelace":123}}},"id-only":{"id":"pool-id-only"}},"id":"pools"}""",
+                JsonRpcResponse::class.java,
+            ) as MsgQueryStakePoolsResponse
+
+        val retired = response.result.getValue("retired")
+        assertThat(retired.id).isEqualTo("pool-retired")
+        assertThat(retired.stake!!.ada.lovelace).isEqualTo(BigInteger.valueOf(123))
+        assertThat(retired.vrfVerificationKeyHash).isNull()
+        assertThat(retired.pledge).isNull()
+        assertThat(retired.cost).isNull()
+        assertThat(retired.margin).isNull()
+        assertThat(retired.rewardAccount).isNull()
+        assertThat(retired.owners).isNull()
+        assertThat(retired.relays).isNull()
+        assertThat(retired.metadata).isNull()
+        val idOnly = response.result.getValue("id-only")
+        assertThat(idOnly.id).isEqualTo("pool-id-only")
+        assertThat(idOnly.stake).isNull()
+
+        assertThrows<JsonMappingException> {
+            mapper.readValue(
+                """{"jsonrpc":"2.0","method":"queryLedgerState/stakePools","result":{"invalid":{"stake":{"ada":{"lovelace":1}}}},"id":"invalid"}""",
+                JsonRpcResponse::class.java,
+            )
+        }
     }
 
     @Test

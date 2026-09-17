@@ -14,6 +14,9 @@ data class DelegateRepresentativeRegistered(
     @param:JsonProperty(value = "id", required = true)
     @get:JsonProperty("id")
     val id: String,
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
+    val from: String,
 ) : DelegateRepresentative
 
 @JsonTypeName("noConfidence")

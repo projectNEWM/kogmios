@@ -3,7 +3,7 @@ package io.newm.kogmios.protocols.model.result
 import io.newm.kogmios.protocols.model.RewardAccountSummary
 
 class RewardAccountSummariesResult :
-    LinkedHashMap<String, RewardAccountSummary>(),
+    ArrayList<RewardAccountSummary>(),
     OgmiosResult {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

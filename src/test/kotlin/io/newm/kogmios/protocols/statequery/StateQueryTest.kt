@@ -323,12 +323,9 @@ class StateQueryTest {
                 val response = client.rewardAccountSummaries(listOf(stakeHash))
                 assertThat(response).isNotNull()
                 assertThat(response.result).isInstanceOf(RewardAccountSummariesResult::class.java)
-                assertThat(response.result.size).isEqualTo(1)
-                assertThat(response.result[stakeHash]!!.delegate.id).isEqualTo("pool1lgd9u8nshsh60asqszepfaalt2c5c5w6fvc85xne9st3g3fwtvm")
-                assertThat(
-                    response.result[stakeHash]!!
-                        .rewards.ada.lovelace
-                ).isEqualTo(BigInteger.ZERO)
+                val summary = response.result.single { it.credential == stakeHash && it.from == "verificationKey" }
+                assertThat(summary.credential).isEqualTo(stakeHash)
+                assertThat(summary.from).isEqualTo("verificationKey")
             }
         }
 
@@ -534,28 +531,6 @@ class StateQueryTest {
                 assertThat(response).isNotNull()
                 assertThat(response.result).isInstanceOf(ProjectedRewardsResult::class.java)
                 assertThat(response.result.size).isEqualTo(2)
-            }
-        }
-
-    @Test
-    fun `test query proposedProtocolParameters`() =
-        runBlocking {
-            createStateQueryClient(
-                websocketHost = TEST_HOST,
-                websocketPort = TEST_PORT,
-                secure = TEST_SECURE,
-            ).use { client ->
-                val connectResult = client.connect()
-                assertThat(connectResult).isTrue()
-                assertThat(client.isConnected).isTrue()
-
-                val response = client.proposedProtocolParameters()
-                assertThat(response).isNotNull()
-                assertThat(
-                    response.result
-                ).isInstanceOf(io.newm.kogmios.protocols.model.result.ProposedProtocolParametersResult::class.java)
-                // FIXME: We don't currently have a way to test until they change a param on preprod. Then we'll
-                // have to implement the correct response object.
             }
         }
 
