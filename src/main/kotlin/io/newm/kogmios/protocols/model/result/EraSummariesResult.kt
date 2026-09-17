@@ -1,10 +1,7 @@
 package io.newm.kogmios.protocols.model.result
 
 import io.newm.kogmios.protocols.model.EraSummary
-import io.newm.kogmios.protocols.model.serializers.EraSummariesResultSerializer
-import kotlinx.serialization.Serializable
 
-@Serializable(with = EraSummariesResultSerializer::class)
 class EraSummariesResult :
     ArrayList<EraSummary>(),
     OgmiosResult {

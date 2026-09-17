@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ReleaseMempoolResult(
-    @SerialName("released")
+    @param:JsonProperty(value = "released", required = true)
+    @get:JsonProperty("released")
     val released: String,
 ) : OgmiosResult

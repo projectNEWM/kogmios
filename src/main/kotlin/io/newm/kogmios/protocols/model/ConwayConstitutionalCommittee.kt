@@ -1,15 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class ConwayConstitutionalCommittee(
-    @SerialName("members")
+    @param:JsonProperty(value = "members", required = true)
+    @get:JsonProperty("members")
     val members: List<ConwayConstitutionalCommitteeMember>,
-    @Contextual
-    @SerialName("quorum")
+    @param:JsonProperty(value = "quorum", required = true)
+    @get:JsonProperty("quorum")
     val quorum: BigFraction,
 )

@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class Software(
-    @SerialName("appName")
+    @param:JsonProperty(value = "appName", required = true)
+    @get:JsonProperty("appName")
     val appName: String,
-    @SerialName("number")
+    @param:JsonProperty(value = "number", required = true)
+    @get:JsonProperty("number")
     val number: Long,
 )

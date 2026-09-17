@@ -1,53 +1,60 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 import java.math.BigInteger
 
-@Serializable
 data class UpdatableParameters(
-    @SerialName("scriptVersion")
+    @param:JsonProperty(value = "scriptVersion", required = true)
+    @get:JsonProperty("scriptVersion")
     val scriptVersion: Int,
-    @SerialName("slotDuration")
+    @param:JsonProperty(value = "slotDuration", required = true)
+    @get:JsonProperty("slotDuration")
     val slotDuration: Long,
-    @SerialName("maxBlockBodySize")
+    @param:JsonProperty(value = "maxBlockBodySize", required = true)
+    @get:JsonProperty("maxBlockBodySize")
     val maxBlockBodySize: BytesSize,
-    @SerialName("maxBlockHeaderSize")
+    @param:JsonProperty(value = "maxBlockHeaderSize", required = true)
+    @get:JsonProperty("maxBlockHeaderSize")
     val maxBlockHeaderSize: BytesSize,
-    @SerialName("maxTransactionSize")
+    @param:JsonProperty(value = "maxTransactionSize", required = true)
+    @get:JsonProperty("maxTransactionSize")
     val maxTransactionSize: BytesSize,
-    @SerialName("maxUpdateProposalSize")
+    @param:JsonProperty(value = "maxUpdateProposalSize", required = true)
+    @get:JsonProperty("maxUpdateProposalSize")
     val maxUpdateProposalSize: BytesSize,
-    @SerialName("multiPartyComputationThreshold")
-    @Contextual
+    @param:JsonProperty(value = "multiPartyComputationThreshold", required = true)
+    @get:JsonProperty("multiPartyComputationThreshold")
     val multiPartyComputationThreshold: BigFraction,
-    @SerialName("heavyDelegationThreshold")
-    @Contextual
+    @param:JsonProperty(value = "heavyDelegationThreshold", required = true)
+    @get:JsonProperty("heavyDelegationThreshold")
     val heavyDelegationThreshold: BigFraction,
-    @SerialName("updateVoteThreshold")
-    @Contextual
+    @param:JsonProperty(value = "updateVoteThreshold", required = true)
+    @get:JsonProperty("updateVoteThreshold")
     val updateVoteThreshold: BigFraction,
-    @SerialName("updateProposalThreshold")
-    @Contextual
+    @param:JsonProperty(value = "updateProposalThreshold", required = true)
+    @get:JsonProperty("updateProposalThreshold")
     val updateProposalThreshold: BigFraction,
-    @SerialName("updateProposalTimeToLive")
+    @param:JsonProperty(value = "updateProposalTimeToLive", required = true)
+    @get:JsonProperty("updateProposalTimeToLive")
     val updateProposalTimeToLive: Long,
-    @SerialName("unlockStakeEpoch")
-    @Contextual
+    @param:JsonProperty(value = "unlockStakeEpoch", required = true)
+    @get:JsonProperty("unlockStakeEpoch")
     val unlockStakeEpoch: BigInteger,
-    @SerialName("softForkInitThreshold")
-    @Contextual
+    @param:JsonProperty(value = "softForkInitThreshold", required = true)
+    @get:JsonProperty("softForkInitThreshold")
     val softForkInitThreshold: BigFraction,
-    @SerialName("softForkMinThreshold")
-    @Contextual
+    @param:JsonProperty(value = "softForkMinThreshold", required = true)
+    @get:JsonProperty("softForkMinThreshold")
     val softForkMinThreshold: BigFraction,
-    @SerialName("softForkDecrementThreshold")
-    @Contextual
+    @param:JsonProperty(value = "softForkDecrementThreshold", required = true)
+    @get:JsonProperty("softForkDecrementThreshold")
     val softForkDecrementThreshold: BigFraction,
-    @SerialName("minFeeConstant")
+    @param:JsonProperty(value = "minFeeConstant", required = true)
+    @get:JsonProperty("minFeeConstant")
     val minFeeConstant: Ada,
-    @SerialName("minFeeCoefficient")
+    @param:JsonProperty(value = "minFeeCoefficient", required = true)
+    @get:JsonProperty("minFeeCoefficient")
     val minFeeCoefficient: Int,
 )

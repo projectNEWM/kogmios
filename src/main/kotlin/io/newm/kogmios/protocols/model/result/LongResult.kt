@@ -1,9 +1,10 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.serializers.LongResultSerializer
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
-@Serializable(with = LongResultSerializer::class)
-data class LongResult(
-    val value: Long
-) : OgmiosResult
+data class LongResult
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val value: Long,
+    ) : OgmiosResult

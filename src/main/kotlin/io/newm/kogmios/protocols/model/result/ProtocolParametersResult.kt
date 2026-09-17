@@ -1,5 +1,7 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.Ada
 import io.newm.kogmios.protocols.model.BytesSize
 import io.newm.kogmios.protocols.model.ExecutionPrices
@@ -7,76 +9,81 @@ import io.newm.kogmios.protocols.model.ExecutionUnits
 import io.newm.kogmios.protocols.model.MinFeeReferenceScripts
 import io.newm.kogmios.protocols.model.PlutusCostModels
 import java.math.BigInteger
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class ProtocolParametersResult(
-    @Contextual
-    @SerialName("minFeeCoefficient")
+    @param:JsonProperty(value = "minFeeCoefficient", required = true)
+    @get:JsonProperty("minFeeCoefficient")
     val minFeeCoefficient: BigInteger,
-    @SerialName("minFeeConstant")
+    @param:JsonProperty(value = "minFeeConstant", required = true)
+    @get:JsonProperty("minFeeConstant")
     val minFeeConstant: Ada,
-    @SerialName("minFeeReferenceScripts")
     val minFeeReferenceScripts: MinFeeReferenceScripts? = null,
-    @Contextual
-    @SerialName("minUtxoDepositCoefficient")
+    @param:JsonProperty(value = "minUtxoDepositCoefficient", required = true)
+    @get:JsonProperty("minUtxoDepositCoefficient")
     val minUtxoDepositCoefficient: BigInteger,
-    @Contextual
-    @SerialName("minUtxoDepositConstant")
+    @param:JsonProperty(value = "minUtxoDepositConstant", required = true)
+    @get:JsonProperty("minUtxoDepositConstant")
     val minUtxoDepositConstant: Ada,
-    @SerialName("maxBlockBodySize")
+    @param:JsonProperty(value = "maxBlockBodySize", required = true)
+    @get:JsonProperty("maxBlockBodySize")
     val maxBlockBodySize: BytesSize,
-    @SerialName("maxBlockHeaderSize")
+    @param:JsonProperty(value = "maxBlockHeaderSize", required = true)
+    @get:JsonProperty("maxBlockHeaderSize")
     val maxBlockHeaderSize: BytesSize,
-    @SerialName("maxTransactionSize")
+    @param:JsonProperty(value = "maxTransactionSize", required = true)
+    @get:JsonProperty("maxTransactionSize")
     val maxTransactionSize: BytesSize,
-    @SerialName("maxReferenceScriptsSize")
     val maxReferenceScriptsSize: BytesSize? = null,
-    @SerialName("maxValueSize")
+    @param:JsonProperty(value = "maxValueSize", required = true)
+    @get:JsonProperty("maxValueSize")
     val maxValueSize: BytesSize,
-    @SerialName("extraEntropy")
     val extraEntropy: String? = null,
-    @SerialName("stakeCredentialDeposit")
+    @param:JsonProperty(value = "stakeCredentialDeposit", required = true)
+    @get:JsonProperty("stakeCredentialDeposit")
     val stakeCredentialDeposit: Ada,
-    @SerialName("stakePoolDeposit")
+    @param:JsonProperty(value = "stakePoolDeposit", required = true)
+    @get:JsonProperty("stakePoolDeposit")
     val stakePoolDeposit: Ada,
-    @Contextual
-    @SerialName("stakePoolRetirementEpochBound")
+    @param:JsonProperty(value = "stakePoolRetirementEpochBound", required = true)
+    @get:JsonProperty("stakePoolRetirementEpochBound")
     val stakePoolRetirementEpochBound: BigInteger,
-    @Contextual
-    @SerialName("stakePoolPledgeInfluence")
+    @param:JsonProperty(value = "stakePoolPledgeInfluence", required = true)
+    @get:JsonProperty("stakePoolPledgeInfluence")
     val stakePoolPledgeInfluence: BigFraction,
-    @SerialName("minStakePoolCost")
+    @param:JsonProperty(value = "minStakePoolCost", required = true)
+    @get:JsonProperty("minStakePoolCost")
     val minStakePoolCost: Ada,
-    @Contextual
-    @SerialName("desiredNumberOfStakePools")
+    @param:JsonProperty(value = "desiredNumberOfStakePools", required = true)
+    @get:JsonProperty("desiredNumberOfStakePools")
     val desiredNumberOfStakePools: BigInteger,
-    @Contextual
-    @SerialName("federatedBlockProductionRatio")
     val federatedBlockProductionRatio: BigFraction? = null,
-    @SerialName("monetaryExpansion")
-    @Contextual
+    @param:JsonProperty(value = "monetaryExpansion", required = true)
+    @get:JsonProperty("monetaryExpansion")
     val monetaryExpansion: BigFraction,
-    @SerialName("treasuryExpansion")
-    @Contextual
+    @param:JsonProperty(value = "treasuryExpansion", required = true)
+    @get:JsonProperty("treasuryExpansion")
     val treasuryExpansion: BigFraction,
-    @Contextual
-    @SerialName("collateralPercentage")
+    @param:JsonProperty(value = "collateralPercentage", required = true)
+    @get:JsonProperty("collateralPercentage")
     val collateralPercentage: BigInteger,
-    @Contextual
-    @SerialName("maxCollateralInputs")
+    @param:JsonProperty(value = "maxCollateralInputs", required = true)
+    @get:JsonProperty("maxCollateralInputs")
     val maxCollateralInputs: BigInteger,
-    @SerialName("plutusCostModels")
+    @param:JsonProperty(value = "plutusCostModels", required = true)
+    @get:JsonProperty("plutusCostModels")
     val plutusCostModels: PlutusCostModels,
-    @SerialName("scriptExecutionPrices")
+    @param:JsonProperty(value = "scriptExecutionPrices", required = true)
+    @get:JsonProperty("scriptExecutionPrices")
     val scriptExecutionPrices: ExecutionPrices,
-    @SerialName("maxExecutionUnitsPerTransaction")
+    @param:JsonProperty(value = "maxExecutionUnitsPerTransaction", required = true)
+    @get:JsonProperty("maxExecutionUnitsPerTransaction")
     val maxExecutionUnitsPerTransaction: ExecutionUnits,
-    @SerialName("maxExecutionUnitsPerBlock")
+    @param:JsonProperty(value = "maxExecutionUnitsPerBlock", required = true)
+    @get:JsonProperty("maxExecutionUnitsPerBlock")
     val maxExecutionUnitsPerBlock: ExecutionUnits,
-    @SerialName("version")
+    @param:JsonProperty(value = "version", required = true)
+    @get:JsonProperty("version")
     val version: io.newm.kogmios.protocols.model.Version,
 ) : OgmiosResult

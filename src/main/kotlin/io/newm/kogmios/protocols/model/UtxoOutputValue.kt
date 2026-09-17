@@ -1,13 +1,10 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.serializers.UtxoOutputValueSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable(with = UtxoOutputValueSerializer::class)
 data class UtxoOutputValue(
-    @SerialName("ada")
+    @param:JsonProperty(value = "ada", required = true)
+    @get:JsonProperty("ada")
     val ada: Ada,
-    @SerialName("assets")
     val assets: List<Asset>? = null,
 )

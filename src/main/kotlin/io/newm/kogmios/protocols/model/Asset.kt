@@ -1,17 +1,17 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.math.BigInteger
 
-@Serializable
 data class Asset(
-    @SerialName("policyId")
+    @param:JsonProperty(value = "policyId", required = true)
+    @get:JsonProperty("policyId")
     val policyId: String,
-    @SerialName("name")
+    @param:JsonProperty(value = "name", required = true)
+    @get:JsonProperty("name")
     val name: String,
-    @Contextual
-    @SerialName("quantity")
+    @param:JsonProperty(value = "quantity", required = true)
+    @get:JsonProperty("quantity")
     val quantity: BigInteger,
 )

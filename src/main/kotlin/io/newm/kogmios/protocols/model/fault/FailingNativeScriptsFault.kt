@@ -1,21 +1,24 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@SerialName("3103")
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeName("3103")
 data class FailingNativeScriptsFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: FailingNativeScriptsFaultData,
 ) : Fault
 
-@Serializable
 data class FailingNativeScriptsFaultData(
-    @SerialName("failingNativeScripts")
+    @param:JsonProperty(value = "failingNativeScripts", required = true)
+    @get:JsonProperty("failingNativeScripts")
     val failingNativeScripts: List<String>,
 ) : FaultData

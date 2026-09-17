@@ -1,18 +1,20 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Must acquire a mempool snapshot prior to performing any query.
  */
-@Serializable
-@SerialName("4000")
+
+@JsonTypeName("4000")
 data class MustAcquireMempoolFirstFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
     override val data: FaultData? = null,
 ) : Fault

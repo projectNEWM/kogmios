@@ -1,26 +1,31 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * The era of the transaction does not match the era of the ledger.
  */
-@Serializable
-@SerialName("3005")
+
+@JsonTypeName("3005")
 data class EraMismatchFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: EraMismatchFaultData,
 ) : Fault
 
-@Serializable
 data class EraMismatchFaultData(
-    @SerialName("queryEra")
+    @param:JsonProperty(value = "queryEra", required = true)
+    @get:JsonProperty("queryEra")
     val queryEra: String,
-    @SerialName("ledgerEra")
+    @param:JsonProperty(value = "ledgerEra", required = true)
+    @get:JsonProperty("ledgerEra")
     val ledgerEra: String,
 ) : FaultData

@@ -1,25 +1,29 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Some script witnesses are missing. Indeed, any script used in a transaction (when spending, minting, withdrawing or publishing certificates) must be provided in full with the transaction.
  * Scripts must therefore be added either to the witness set or provided as a reference inputs should you use Plutus V2+ and a format from Babbage and beyond.
  */
-@Serializable
-@SerialName("3102")
+
+@JsonTypeName("3102")
 data class MissingScriptsFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: MissingScriptsFaultData,
 ) : Fault
 
-@Serializable
 data class MissingScriptsFaultData(
-    @SerialName("missingScripts")
+    @param:JsonProperty(value = "missingScripts", required = true)
+    @get:JsonProperty("missingScripts")
     val missingScripts: List<String>,
 ) : FaultData

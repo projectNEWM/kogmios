@@ -1,24 +1,23 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@JsonClassDiscriminator("type")
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 sealed interface DelegateRepresentative
 
-@Serializable
-@SerialName("registered")
+@JsonTypeName("registered")
 data class DelegateRepresentativeRegistered(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : DelegateRepresentative
 
-@Serializable
-@SerialName("noConfidence")
+@JsonTypeName("noConfidence")
 data object DelegateRepresentativeNoConfidence : DelegateRepresentative
 
-@Serializable
-@SerialName("abstain")
+@JsonTypeName("abstain")
 data object DelegateRepresentativeAbstain : DelegateRepresentative

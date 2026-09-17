@@ -1,32 +1,42 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.CardanoEra
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.CardanoEra
+
 data class HealthResult(
-    @SerialName("connectionStatus")
+    @param:JsonProperty(value = "connectionStatus", required = true)
+    @get:JsonProperty("connectionStatus")
     val connectionStatus: String,
-    @SerialName("currentEpoch")
+    @param:JsonProperty(value = "currentEpoch", required = true)
+    @get:JsonProperty("currentEpoch")
     val currentEpoch: Long,
-    @SerialName("currentEra")
+    @param:JsonProperty(value = "currentEra", required = true)
+    @get:JsonProperty("currentEra")
     val currentEra: CardanoEra,
-    @SerialName("lastKnownTip")
+    @param:JsonProperty(value = "lastKnownTip", required = true)
+    @get:JsonProperty("lastKnownTip")
     val lastKnownTip: LastKnownTip,
-    @SerialName("lastTipUpdate")
+    @param:JsonProperty(value = "lastTipUpdate", required = true)
+    @get:JsonProperty("lastTipUpdate")
     val lastTipUpdate: String,
-    @SerialName("metrics")
+    @param:JsonProperty(value = "metrics", required = true)
+    @get:JsonProperty("metrics")
     val metrics: Metrics,
-    @SerialName("network")
+    @param:JsonProperty(value = "network", required = true)
+    @get:JsonProperty("network")
     val network: String,
-    @SerialName("networkSynchronization")
+    @param:JsonProperty(value = "networkSynchronization", required = true)
+    @get:JsonProperty("networkSynchronization")
     val networkSynchronization: Double,
-    @SerialName("slotInEpoch")
+    @param:JsonProperty(value = "slotInEpoch", required = true)
+    @get:JsonProperty("slotInEpoch")
     val slotInEpoch: Long,
-    @SerialName("startTime")
+    @param:JsonProperty(value = "startTime", required = true)
+    @get:JsonProperty("startTime")
     val startTime: String,
-    @SerialName("version")
+    @param:JsonProperty(value = "version", required = true)
+    @get:JsonProperty("version")
     val version: String
 )
 

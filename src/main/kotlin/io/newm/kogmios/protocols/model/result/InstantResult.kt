@@ -1,10 +1,11 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.serializers.InstantResultSerializer
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import kotlin.time.Instant
-import kotlinx.serialization.Serializable
 
-@Serializable(with = InstantResultSerializer::class)
-data class InstantResult(
-    val value: Instant
-) : OgmiosResult
+data class InstantResult
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val value: Instant,
+    ) : OgmiosResult

@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.VoterReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction contains an invalid governance action: it tries to add new members to the constitutional committee with a retirement epoch in the past. The field 'data.alreadyRetiredMembers' indicates the faulty members that would otherwise be already retired.
  */
-@Serializable
-@SerialName("3157")
+
+@JsonTypeName("3157")
 data class InvalidCommitteeUpdateFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: InvalidCommitteeUpdateFaultData,
 ) : Fault
 
-@Serializable
 data class InvalidCommitteeUpdateFaultData(
-    @SerialName("alreadyRetiredMembers")
+    @param:JsonProperty(value = "alreadyRetiredMembers", required = true)
+    @get:JsonProperty("alreadyRetiredMembers")
     val alreadyRetiredMembers: List<VoterReference>,
 ) : FaultData

@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class CertifiedVrf(
-    @SerialName("output")
+    @param:JsonProperty(value = "output", required = true)
+    @get:JsonProperty("output")
     val output: String,
-    @SerialName("proof")
+    @param:JsonProperty(value = "proof", required = true)
+    @get:JsonProperty("proof")
     val proof: String,
 )

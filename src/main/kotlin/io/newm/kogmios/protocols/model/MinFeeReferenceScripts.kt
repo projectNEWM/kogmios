@@ -1,14 +1,15 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class MinFeeReferenceScripts(
-    @SerialName("range")
+    @param:JsonProperty(value = "range", required = true)
+    @get:JsonProperty("range")
     val range: Int,
-    @SerialName("base")
+    @param:JsonProperty(value = "base", required = true)
+    @get:JsonProperty("base")
     val base: Double,
-    @SerialName("multiplier")
+    @param:JsonProperty(value = "multiplier", required = true)
+    @get:JsonProperty("multiplier")
     val multiplier: Double,
 )

@@ -1,16 +1,18 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class IssuerPraos(
-    @SerialName("verificationKey")
+    @param:JsonProperty(value = "verificationKey", required = true)
+    @get:JsonProperty("verificationKey")
     val verificationKey: String,
-    @SerialName("vrfVerificationKey")
+    @param:JsonProperty(value = "vrfVerificationKey", required = true)
+    @get:JsonProperty("vrfVerificationKey")
     val vrfVerificationKey: String,
-    @SerialName("operationalCertificate")
+    @param:JsonProperty(value = "operationalCertificate", required = true)
+    @get:JsonProperty("operationalCertificate")
     val operationalCertificate: OperationalCertificatePraos,
-    @SerialName("leaderValue")
+    @param:JsonProperty(value = "leaderValue", required = true)
+    @get:JsonProperty("leaderValue")
     val leaderValue: CertifiedVrf,
 )

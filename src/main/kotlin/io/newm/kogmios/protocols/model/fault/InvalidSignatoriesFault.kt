@@ -1,24 +1,28 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Some signatures are invalid. Only the serialised transaction *body*, without metadata or witnesses, must be signed.
  */
-@Serializable
-@SerialName("3100")
+
+@JsonTypeName("3100")
 data class InvalidSignatoriesFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: InvalidSignatoriesFaultData,
 ) : Fault
 
-@Serializable
 data class InvalidSignatoriesFaultData(
-    @SerialName("invalidSignatories")
+    @param:JsonProperty(value = "invalidSignatories", required = true)
+    @get:JsonProperty("invalidSignatories")
     val invalidSignatories: List<String>,
 ) : FaultData

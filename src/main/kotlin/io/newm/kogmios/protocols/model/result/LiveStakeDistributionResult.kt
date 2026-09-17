@@ -1,10 +1,7 @@
 package io.newm.kogmios.protocols.model.result
 
 import io.newm.kogmios.protocols.model.PoolDistribution
-import io.newm.kogmios.protocols.model.serializers.LiveStakeDistributionResultSerializer
-import kotlinx.serialization.Serializable
 
-@Serializable(with = LiveStakeDistributionResultSerializer::class)
 class LiveStakeDistributionResult :
     LinkedHashMap<String, PoolDistribution>(),
     OgmiosResult {

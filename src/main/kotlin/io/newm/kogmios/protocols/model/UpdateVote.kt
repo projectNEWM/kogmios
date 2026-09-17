@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class UpdateVote(
-    @SerialName("voter")
+    @param:JsonProperty(value = "voter", required = true)
+    @get:JsonProperty("voter")
     val voter: VerificationKey,
-    @SerialName("proposal")
+    @param:JsonProperty(value = "proposal", required = true)
+    @get:JsonProperty("proposal")
     val proposal: UpdateProposalId,
 )

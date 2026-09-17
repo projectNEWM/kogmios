@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class IdHashWithVrf(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("vrfVerificationKeyHash")
+    @param:JsonProperty(value = "vrfVerificationKeyHash", required = true)
+    @get:JsonProperty("vrfVerificationKeyHash")
     val vrfVerificationKeyHash: String,
 )

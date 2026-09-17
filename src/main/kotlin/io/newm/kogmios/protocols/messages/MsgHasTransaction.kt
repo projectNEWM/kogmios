@@ -1,19 +1,18 @@
 package io.newm.kogmios.protocols.messages
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.util.UUID
 
 /**
  * Check whether the mempool snapshot has a given transaction in it.
  */
-@Serializable
+
 data class MsgHasTransaction(
-    @SerialName("method")
     override val method: String = METHOD_NAME,
-    @SerialName("params")
+    @param:JsonProperty(value = "params", required = true)
+    @get:JsonProperty("params")
     val params: HasTransaction,
-    @SerialName("id")
     override val id: String = "$method: ${UUID.randomUUID()}",
 ) : JsonRpcRequest() {
     companion object {
@@ -21,8 +20,8 @@ data class MsgHasTransaction(
     }
 }
 
-@Serializable
 data class HasTransaction(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 )

@@ -1,34 +1,40 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.GovernanceVoter
 import io.newm.kogmios.protocols.model.UtxoOutputReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction contains votes from unauthorized voters. The field 'data.unauthorizedVotes' indicates the faulty voters and the action they attempted to incorrectly vote for.
  */
-@Serializable
-@SerialName("3137")
+
+@JsonTypeName("3137")
 data class UnauthorizedVotesFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: UnauthorizedVotesFaultData,
 ) : Fault
 
-@Serializable
 data class UnauthorizedVotesFaultData(
-    @SerialName("unauthorizedVotes")
+    @param:JsonProperty(value = "unauthorizedVotes", required = true)
+    @get:JsonProperty("unauthorizedVotes")
     val unauthorizedVotes: List<UnauthorizedVote>,
 ) : FaultData
 
-@Serializable
 data class UnauthorizedVote(
-    @SerialName("proposal")
+    @param:JsonProperty(value = "proposal", required = true)
+    @get:JsonProperty("proposal")
     val proposal: UtxoOutputReference,
-    @SerialName("voter")
+    @param:JsonProperty(value = "voter", required = true)
+    @get:JsonProperty("voter")
     val voter: GovernanceVoter,
 )

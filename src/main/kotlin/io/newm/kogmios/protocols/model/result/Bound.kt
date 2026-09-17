@@ -1,15 +1,17 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.Seconds
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.Seconds
+
 data class Bound(
-    @SerialName("time")
+    @param:JsonProperty(value = "time", required = true)
+    @get:JsonProperty("time")
     val time: Seconds,
-    @SerialName("slot")
+    @param:JsonProperty(value = "slot", required = true)
+    @get:JsonProperty("slot")
     val slot: Long,
-    @SerialName("epoch")
+    @param:JsonProperty(value = "epoch", required = true)
+    @get:JsonProperty("epoch")
     val epoch: Long,
 ) : OgmiosResult

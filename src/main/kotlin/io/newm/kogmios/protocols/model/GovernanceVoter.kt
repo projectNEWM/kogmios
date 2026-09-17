@@ -1,45 +1,55 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@JsonClassDiscriminator("role")
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "role",
+    visible = true,
+)
 sealed interface GovernanceVoter
 
-@Serializable
-@SerialName("genesisDelegate")
+@JsonTypeName("genesisDelegate")
 data class GovernanceVoterGenesisDelegate(
-    @SerialName("role")
+    @param:JsonProperty(value = "role", required = true)
+    @get:JsonProperty("role")
     val role: String,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : GovernanceVoter
 
-@Serializable
-@SerialName("constitutionalCommittee")
+@JsonTypeName("constitutionalCommittee")
 data class GovernanceVoterConstitutionalCommittee(
-    @SerialName("role")
+    @param:JsonProperty(value = "role", required = true)
+    @get:JsonProperty("role")
     val role: String,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : GovernanceVoter
 
-@Serializable
-@SerialName("delegateRepresentative")
+@JsonTypeName("delegateRepresentative")
 data class GovernanceVoterDelegateRepresentative(
-    @SerialName("role")
+    @param:JsonProperty(value = "role", required = true)
+    @get:JsonProperty("role")
     val role: String,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : GovernanceVoter
 
-@Serializable
-@SerialName("stakePoolOperator")
+@JsonTypeName("stakePoolOperator")
 data class GovernanceVoterStakePoolOperator(
-    @SerialName("role")
+    @param:JsonProperty(value = "role", required = true)
+    @get:JsonProperty("role")
     val role: String,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : GovernanceVoter

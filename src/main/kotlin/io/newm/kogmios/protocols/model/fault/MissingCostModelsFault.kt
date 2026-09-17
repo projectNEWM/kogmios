@@ -1,24 +1,28 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * It seems like the transaction is using a Plutus version for which there's no available cost model yet. This could be because that language version is known of the ledger but hasn't yet been enabled through hard-fork. The field 'data.missingCostModels' lists all the languages for which a cost model is missing.
  */
-@Serializable
-@SerialName("3115")
+
+@JsonTypeName("3115")
 data class MissingCostModelsFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: MissingCostModelsFaultData,
 ) : Fault
 
-@Serializable
 data class MissingCostModelsFaultData(
-    @SerialName("missingCostModels")
+    @param:JsonProperty(value = "missingCostModels", required = true)
+    @get:JsonProperty("missingCostModels")
     val missingCostModels: List<String>,
 ) : FaultData

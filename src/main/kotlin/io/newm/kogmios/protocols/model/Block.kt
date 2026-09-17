@@ -1,21 +1,13 @@
 package io.newm.kogmios.protocols.model
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
-
-@Serializable
-@JsonClassDiscriminator("type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 sealed interface Block {
-    @SerialName("era")
     val era: String
 
-    @SerialName("id")
     val id: String
 
-    @SerialName("ancestor")
     val ancestor: String
 
-    @SerialName("height")
     val height: Long
 }

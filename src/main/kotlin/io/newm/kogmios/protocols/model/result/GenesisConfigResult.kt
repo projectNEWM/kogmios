@@ -1,5 +1,11 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Ada
 import io.newm.kogmios.protocols.model.AlonzoGenesisProtocolParameters
 import io.newm.kogmios.protocols.model.ConwayConstitution
@@ -11,100 +17,124 @@ import io.newm.kogmios.protocols.model.Milliseconds
 import io.newm.kogmios.protocols.model.ShelleyGenesisProtocolParameters
 import io.newm.kogmios.protocols.model.ShelleyGenesisStakePools
 import io.newm.kogmios.protocols.model.UpdatableParameters
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+
 import org.apache.commons.numbers.fraction.BigFraction
 import java.math.BigInteger
 import kotlin.time.Instant
 
-@Serializable
-@JsonClassDiscriminator("era")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "era",
+    visible = true,
+)
 sealed interface GenesisConfigResult : OgmiosResult
 
-@Serializable
-@SerialName("byron")
+@JsonTypeName("byron")
 data class ByronGenesisConfigResult(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     val era: String,
-    @SerialName("genesisKeyHashes")
+    @param:JsonProperty(value = "genesisKeyHashes", required = true)
+    @get:JsonProperty("genesisKeyHashes")
     val genesisKeyHashes: List<String>,
-    @SerialName("genesisDelegations")
+    @param:JsonProperty(value = "genesisDelegations", required = true)
+    @get:JsonProperty("genesisDelegations")
     val genesisDelegations: Map<String, GenesisDelegationConfig>,
-    @SerialName("startTime")
+    @param:JsonProperty(value = "startTime", required = true)
+    @get:JsonProperty("startTime")
     val startTime: Instant,
-    @SerialName("initialFunds")
+    @param:JsonProperty(value = "initialFunds", required = true)
+    @get:JsonProperty("initialFunds")
     val initialFunds: Map<String, Ada>,
-    @SerialName("initialVouchers")
+    @param:JsonProperty(value = "initialVouchers", required = true)
+    @get:JsonProperty("initialVouchers")
     val initialVouchers: Map<String, Ada>,
-    @SerialName("securityParameter")
-    @Contextual
+    @param:JsonProperty(value = "securityParameter", required = true)
+    @get:JsonProperty("securityParameter")
     val securityParameter: BigInteger,
-    @SerialName("networkMagic")
+    @param:JsonProperty(value = "networkMagic", required = true)
+    @get:JsonProperty("networkMagic")
     val networkMagic: Long,
-    @SerialName("updatableParameters")
+    @param:JsonProperty(value = "updatableParameters", required = true)
+    @get:JsonProperty("updatableParameters")
     val updatableParameters: UpdatableParameters,
 ) : GenesisConfigResult
 
-@Serializable
-@SerialName("shelley")
+@JsonTypeName("shelley")
 data class ShelleyGenesisConfigResult(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     val era: String,
-    @SerialName("startTime")
+    @param:JsonProperty(value = "startTime", required = true)
+    @get:JsonProperty("startTime")
     val startTime: Instant,
-    @SerialName("networkMagic")
+    @param:JsonProperty(value = "networkMagic", required = true)
+    @get:JsonProperty("networkMagic")
     val networkMagic: Long,
-    @SerialName("network")
+    @param:JsonProperty(value = "network", required = true)
+    @get:JsonProperty("network")
     val network: String,
-    @SerialName("activeSlotsCoefficient")
-    @Contextual
+    @param:JsonProperty(value = "activeSlotsCoefficient", required = true)
+    @get:JsonProperty("activeSlotsCoefficient")
     val activeSlotsCoefficient: BigFraction,
-    @SerialName("securityParameter")
-    @Contextual
+    @param:JsonProperty(value = "securityParameter", required = true)
+    @get:JsonProperty("securityParameter")
     val securityParameter: BigInteger,
-    @SerialName("epochLength")
+    @param:JsonProperty(value = "epochLength", required = true)
+    @get:JsonProperty("epochLength")
     val epochLength: Long,
-    @SerialName("slotsPerKesPeriod")
+    @param:JsonProperty(value = "slotsPerKesPeriod", required = true)
+    @get:JsonProperty("slotsPerKesPeriod")
     val slotsPerKesPeriod: Long,
-    @SerialName("maxKesEvolutions")
+    @param:JsonProperty(value = "maxKesEvolutions", required = true)
+    @get:JsonProperty("maxKesEvolutions")
     val maxKesEvolutions: Long,
-    @SerialName("slotLength")
+    @param:JsonProperty(value = "slotLength", required = true)
+    @get:JsonProperty("slotLength")
     val slotLength: Milliseconds,
-    @SerialName("updateQuorum")
+    @param:JsonProperty(value = "updateQuorum", required = true)
+    @get:JsonProperty("updateQuorum")
     val updateQuorum: Long,
-    @SerialName("maxLovelaceSupply")
-    @Contextual
+    @param:JsonProperty(value = "maxLovelaceSupply", required = true)
+    @get:JsonProperty("maxLovelaceSupply")
     val maxLovelaceSupply: BigInteger,
-    @SerialName("initialParameters")
+    @param:JsonProperty(value = "initialParameters", required = true)
+    @get:JsonProperty("initialParameters")
     val initialParameters: ShelleyGenesisProtocolParameters,
-    @SerialName("initialDelegates")
+    @param:JsonProperty(value = "initialDelegates", required = true)
+    @get:JsonProperty("initialDelegates")
     val initialDelegates: List<GenesisDelegate>,
-    @SerialName("initialFunds")
+    @param:JsonProperty(value = "initialFunds", required = true)
+    @get:JsonProperty("initialFunds")
     val initialFunds: Map<String, Ada>,
-    @SerialName("initialStakePools")
+    @param:JsonProperty(value = "initialStakePools", required = true)
+    @get:JsonProperty("initialStakePools")
     val initialStakePools: ShelleyGenesisStakePools,
 ) : GenesisConfigResult
 
-@Serializable
-@SerialName("alonzo")
+@JsonTypeName("alonzo")
 data class AlonzoGenesisConfigResult(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     val era: String,
-    @SerialName("updatableParameters")
+    @param:JsonProperty(value = "updatableParameters", required = true)
+    @get:JsonProperty("updatableParameters")
     val updatableParameters: AlonzoGenesisProtocolParameters,
 ) : GenesisConfigResult
 
-@Serializable
-@SerialName("conway")
+@JsonTypeName("conway")
 data class ConwayGenesisConfigResult(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     val era: String,
-    @SerialName("constitution")
+    @param:JsonProperty(value = "constitution", required = true)
+    @get:JsonProperty("constitution")
     val constitution: ConwayConstitution,
-    @SerialName("constitutionalCommittee")
+    @param:JsonProperty(value = "constitutionalCommittee", required = true)
+    @get:JsonProperty("constitutionalCommittee")
     val constitutionalCommittee: ConwayConstitutionalCommittee,
-    @SerialName("updatableParameters")
+    @param:JsonProperty(value = "updatableParameters", required = true)
+    @get:JsonProperty("updatableParameters")
     val updatableParameters: ConwayGenesisProtocolParameters,
 ) : GenesisConfigResult

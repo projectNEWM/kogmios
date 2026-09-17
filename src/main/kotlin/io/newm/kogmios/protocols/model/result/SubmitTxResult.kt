@@ -1,11 +1,11 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.Transaction
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.Transaction
+
 data class SubmitTxResult(
-    @SerialName("transaction")
+    @param:JsonProperty(value = "transaction", required = true)
+    @get:JsonProperty("transaction")
     val transaction: Transaction,
 ) : OgmiosResult

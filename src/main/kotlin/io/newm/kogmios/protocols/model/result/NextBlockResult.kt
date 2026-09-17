@@ -1,8 +1,5 @@
 package io.newm.kogmios.protocols.model.result
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
-
-@Serializable
-@JsonClassDiscriminator("direction")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "direction")
 sealed interface NextBlockResult : OgmiosResult

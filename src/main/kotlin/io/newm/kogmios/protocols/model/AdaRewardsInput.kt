@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 class AdaRewardsInput(
-    @SerialName("ada")
+    @param:JsonProperty(value = "ada", required = true)
+    @get:JsonProperty("ada")
     val ada: Lovelace,
 ) : ProjectedRewardsInput

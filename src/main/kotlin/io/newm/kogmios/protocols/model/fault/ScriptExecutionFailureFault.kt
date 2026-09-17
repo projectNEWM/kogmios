@@ -1,25 +1,28 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Validator
-import io.newm.kogmios.protocols.model.serializers.ScriptExecutionFailureFaultDataSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * One or more script execution terminated with an error.
  */
-@Serializable
-@SerialName("3010")
+
+@JsonTypeName("3010")
 data class ScriptExecutionFailureFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: ScriptExecutionFailureFaultData,
 ) : Fault
 
-@Serializable(with = ScriptExecutionFailureFaultDataSerializer::class)
 class ScriptExecutionFailureFaultData :
     ArrayList<ScriptExecutionFailureFaultDataItem>(),
     FaultData {
@@ -33,10 +36,11 @@ class ScriptExecutionFailureFaultData :
     override fun hashCode(): Int = super.hashCode()
 }
 
-@Serializable
 data class ScriptExecutionFailureFaultDataItem(
-    @SerialName("validator")
+    @param:JsonProperty(value = "validator", required = true)
+    @get:JsonProperty("validator")
     val validator: Validator,
-    @SerialName("error")
+    @param:JsonProperty(value = "error", required = true)
+    @get:JsonProperty("error")
     val error: Fault,
 ) : FaultData

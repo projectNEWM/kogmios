@@ -1,10 +1,11 @@
 package io.newm.kogmios.protocols.model
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import io.newm.kogmios.protocols.Const
-import io.newm.kogmios.protocols.model.serializers.OriginStringSerializer
-import kotlinx.serialization.Serializable
 
-@Serializable(with = OriginStringSerializer::class)
-data class OriginString(
-    val origin: String = Const.ORIGIN,
-) : PointDetailOrOrigin()
+data class OriginString
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val origin: String = Const.ORIGIN,
+    ) : PointDetailOrOrigin()

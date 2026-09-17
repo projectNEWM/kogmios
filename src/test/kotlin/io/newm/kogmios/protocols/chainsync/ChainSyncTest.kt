@@ -5,13 +5,12 @@ import ch.qos.logback.classic.Logger
 import com.google.common.truth.Truth.assertThat
 import io.newm.kogmios.Client.Companion.DEFAULT_REQUEST_TIMEOUT_MS
 import io.newm.kogmios.Client.Companion.INFINITE_REQUEST_TIMEOUT_MS
-import io.newm.kogmios.ClientImpl
 import io.newm.kogmios.createChainSyncClient
 import io.newm.kogmios.exception.KogmiosException
 import io.newm.kogmios.protocols.model.BlockPraos
 import io.newm.kogmios.protocols.model.OriginString
 import io.newm.kogmios.protocols.model.PointDetail
-import io.newm.kogmios.protocols.model.TransactionMetadata
+import io.newm.kogmios.protocols.model.ScriptNative
 import io.newm.kogmios.protocols.model.fault.IntersectionNotFoundFault
 import io.newm.kogmios.protocols.model.result.IntersectionFoundResult
 import io.newm.kogmios.protocols.model.result.RollBackward
@@ -25,7 +24,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 
-//@Disabled("Disabled by default since it requires a running Ogmios instance.")
+// @Disabled("Disabled by default since it requires a running Ogmios instance.")
 class ChainSyncTest {
     companion object {
         // local testing - preprod
@@ -437,7 +436,26 @@ class ChainSyncTest {
                 assertThat((response.result.intersection as PointDetail).slot).isEqualTo(133883282L)
 
                 assertThat(client.nextBlock().result).isInstanceOf(RollBackward::class.java)
-                assertThat(client.nextBlock().result).isInstanceOf(RollForward::class.java)
+                val rollForward = client.nextBlock().result as RollForward
+                val block = rollForward.block as BlockPraos
+                assertThat(block.slot).isEqualTo(133883340L)
+                val transaction =
+                    block.transactions.single {
+                        it.id == "f90dce5765108da976abdbb9fc618f9a6ffd9fa4d93b2f288eed1808545424c9"
+                    }
+                val script =
+                    transaction.scripts!!
+                        .getValue("ff3efca65569f6b0b868a3d34abdb1ad8eccf745e0da71fa94fb4f18") as ScriptNative
+                var node = script.json
+                var nestedAllClauses = 0
+                while (node.path("clause").textValue() == "all") {
+                    node = node.path("from")[0]
+                    nestedAllClauses++
+                }
+                assertThat(nestedAllClauses).isEqualTo(5_383)
+                assertThat(node.path("clause").textValue()).isEqualTo("signature")
+                assertThat(node.path("from").textValue())
+                    .isEqualTo("ba386209c0f81f9570b6feb45cedc2649144440157677c720bfd314a")
             }
         }
 
@@ -519,79 +537,11 @@ class ChainSyncTest {
                                         percent,
                                     ),
                                 )
-                                // val blockJsonString = ClientImpl.json.encodeToString(rollForward.block)
-                                // log.info("Block: $blockJsonString")
                                 lastLogged = now
                             }
                         }
                     }
                 }
             }
-        }
-
-    @Test
-    fun `test metadata deserialize`() =
-        runBlocking {
-            val metadataJsonString =
-                """
-                {
-                    "hash": "9742d8fbd7c04941c51f87f27948d39ddf30f4507cd4e29eba0df13eaac8edc5",
-                    "labels":
-                    {
-                        "674":
-                        {
-                            "json": {
-                                "map":
-                                [
-                                    {
-                                        "k":
-                                        {
-                                            "string": "msg"
-                                        },
-                                        "v":
-                                        {
-                                            "list":
-                                            [
-                                                {
-                                                    "string": "Minted some nice tokens for you there"
-                                                },
-                                                {
-                                                    "int": 42
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "k":
-                                        {
-                                            "bytes": "deadbeefcafebabe"
-                                        },
-                                        "v":
-                                        {
-                                            "map":
-                                            [
-                                                {
-                                                    "k":
-                                                    {
-                                                        "string": "favorite_number"
-                                                    },
-                                                    "v":
-                                                    {
-                                                        "int": 79223372036854775807
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    },
-                    "scripts":
-                    []
-                }
-                """.trimIndent()
-            val txMetadata: TransactionMetadata = ClientImpl.json.decodeFromString(metadataJsonString)
-            println(txMetadata)
         }
 }

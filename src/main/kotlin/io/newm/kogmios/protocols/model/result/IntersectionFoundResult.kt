@@ -1,17 +1,19 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.PointDetailOrOrigin
 import io.newm.kogmios.protocols.model.Tip
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * An intersection has been found between the requested points.
  */
-@Serializable
+
 data class IntersectionFoundResult(
-    @SerialName("intersection")
+    @param:JsonProperty(value = "intersection", required = true)
+    @get:JsonProperty("intersection")
     val intersection: PointDetailOrOrigin,
-    @SerialName("tip")
+    @param:JsonProperty(value = "tip", required = true)
+    @get:JsonProperty("tip")
     val tip: Tip,
 ) : OgmiosResult

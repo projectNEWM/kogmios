@@ -1,20 +1,24 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class Metrics(
-    @SerialName("activeConnections")
+    @param:JsonProperty(value = "activeConnections", required = true)
+    @get:JsonProperty("activeConnections")
     val activeConnections: Int,
-    @SerialName("runtimeStats")
+    @param:JsonProperty(value = "runtimeStats", required = true)
+    @get:JsonProperty("runtimeStats")
     val runtimeStats: RuntimeStats,
-    @SerialName("sessionDurations")
+    @param:JsonProperty(value = "sessionDurations", required = true)
+    @get:JsonProperty("sessionDurations")
     val sessionDurations: SessionDurations,
-    @SerialName("totalConnections")
+    @param:JsonProperty(value = "totalConnections", required = true)
+    @get:JsonProperty("totalConnections")
     val totalConnections: Long,
-    @SerialName("totalMessages")
+    @param:JsonProperty(value = "totalMessages", required = true)
+    @get:JsonProperty("totalMessages")
     val totalMessages: Long,
-    @SerialName("totalUnrouted")
+    @param:JsonProperty(value = "totalUnrouted", required = true)
+    @get:JsonProperty("totalUnrouted")
     val totalUnrouted: Long,
 )

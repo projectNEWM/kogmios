@@ -1,16 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class GovernanceVote(
-    @SerialName("issuer")
+    @param:JsonProperty(value = "issuer", required = true)
+    @get:JsonProperty("issuer")
     val issuer: Voter,
-    @SerialName("anchor")
     val anchor: AnchorMetadata? = null,
-    @SerialName("vote")
+    @param:JsonProperty(value = "vote", required = true)
+    @get:JsonProperty("vote")
     val vote: Vote,
-    @SerialName("proposal")
     val proposal: UtxoOutputReference? = null,
 )

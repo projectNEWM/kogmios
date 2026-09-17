@@ -1,9 +1,10 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.serializers.Blake2bDigestCredentialSerializer
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
-@Serializable(with = Blake2bDigestCredentialSerializer::class)
-class Blake2bDigestCredential(
-    val digest: String,
-) : ProjectedRewardsInput
+class Blake2bDigestCredential
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val digest: String,
+    ) : ProjectedRewardsInput

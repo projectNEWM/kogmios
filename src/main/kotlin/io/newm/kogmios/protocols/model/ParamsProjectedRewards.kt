@@ -1,14 +1,15 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ParamsProjectedRewards(
-    @SerialName("stake")
+    @param:JsonProperty(value = "stake", required = true)
+    @get:JsonProperty("stake")
     val stake: List<AdaRewardsInput>,
-    @SerialName("scripts")
+    @param:JsonProperty(value = "scripts", required = true)
+    @get:JsonProperty("scripts")
     val scripts: List<String>,
-    @SerialName("keys")
+    @param:JsonProperty(value = "keys", required = true)
+    @get:JsonProperty("keys")
     val keys: List<String>,
 ) : Params()

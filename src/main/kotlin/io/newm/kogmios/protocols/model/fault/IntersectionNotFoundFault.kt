@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Tip
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * No intersection found with the requested points.
  */
-@Serializable
-@SerialName("1000")
+
+@JsonTypeName("1000")
 data class IntersectionNotFoundFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: IntersectionNotFoundFaultData,
 ) : Fault
 
-@Serializable
 data class IntersectionNotFoundFaultData(
-    @SerialName("tip")
+    @param:JsonProperty(value = "tip", required = true)
+    @get:JsonProperty("tip")
     val tip: Tip,
 ) : FaultData

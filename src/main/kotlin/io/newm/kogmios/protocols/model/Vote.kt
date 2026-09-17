@@ -1,16 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 enum class Vote {
-    @SerialName("yes")
+    @JsonProperty("yes")
     YES,
 
-    @SerialName("no")
+    @JsonProperty("no")
     NO,
 
-    @SerialName("abstain")
+    @JsonProperty("abstain")
     ABSTAIN,
 }

@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ProtocolVersion(
-    @SerialName("version")
+    @param:JsonProperty(value = "version", required = true)
+    @get:JsonProperty("version")
     val version: Version,
 )

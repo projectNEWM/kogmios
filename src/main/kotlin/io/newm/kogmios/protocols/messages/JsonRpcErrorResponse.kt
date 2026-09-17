@@ -1,19 +1,20 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonIgnore
 import io.newm.kogmios.protocols.model.fault.Fault
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 /**
  * Container for an error response from Ogmios
  */
-@Serializable
 data class JsonRpcErrorResponse(
-    @SerialName("error")
+    @param:JsonProperty(value = "error", required = true)
+    @get:JsonProperty("error")
     val error: Fault,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     override val id: String,
-    @Transient
+    @get:JsonIgnore
     val cause: Throwable? = null,
 ) : JsonRpcResponse()

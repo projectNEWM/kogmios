@@ -1,26 +1,31 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * There's a mismatch between the provided metadata hash digest and the one computed from the actual metadata. The two must match exactly. The field 'data.provided.hash' references the provided hash as found in the transaction body, whereas 'data.computed.hash' contains the one the ledger computed from the actual metadata.
  */
-@Serializable
-@SerialName("3107")
+
+@JsonTypeName("3107")
 data class MetadataHashMismatchFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: MetadataHashMismatchFaultData,
 ) : Fault
 
-@Serializable
 data class MetadataHashMismatchFaultData(
-    @SerialName("provided")
+    @param:JsonProperty(value = "provided", required = true)
+    @get:JsonProperty("provided")
     val provided: MetadataHash,
-    @SerialName("computed")
+    @param:JsonProperty(value = "computed", required = true)
+    @get:JsonProperty("computed")
     val computed: MetadataHash,
 ) : FaultData

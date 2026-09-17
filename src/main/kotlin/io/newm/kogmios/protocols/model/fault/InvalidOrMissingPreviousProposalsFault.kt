@@ -1,36 +1,41 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.AnchorMetadata
 import io.newm.kogmios.protocols.model.UtxoOutputReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction contains invalid or missing reference to previous (ratified) governance proposals. Indeed, some governance proposals such as protocol parameters update or consitutional committee change must point to last action of the same purpose that was ratified. The field 'data.invalidOrMissingPreviousProposals' contains a list of submitted actions that are missing details. For each item, we provide the anchor of the corresponding proposal, the type of previous proposal that is expected and the invalid proposal reference if relevant.
  */
-@Serializable
-@SerialName("3159")
+
+@JsonTypeName("3159")
 data class InvalidOrMissingPreviousProposalsFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: InvalidOrMissingPreviousProposalsFaultData,
 ) : Fault
 
-@Serializable
 data class InvalidOrMissingPreviousProposalsFaultData(
-    @SerialName("invalidOrMissingPreviousProposals")
+    @param:JsonProperty(value = "invalidOrMissingPreviousProposals", required = true)
+    @get:JsonProperty("invalidOrMissingPreviousProposals")
     val invalidOrMissingPreviousProposals: List<InvalidOrMissingPreviousProposal>,
 ) : FaultData
 
-@Serializable
 data class InvalidOrMissingPreviousProposal(
-    @SerialName("anchor")
+    @param:JsonProperty(value = "anchor", required = true)
+    @get:JsonProperty("anchor")
     val anchor: AnchorMetadata,
-    @SerialName("type")
+    @param:JsonProperty(value = "type", required = true)
+    @get:JsonProperty("type")
     val type: String,
-    @SerialName("invalidPreviousProposal")
     val invalidPreviousProposal: UtxoOutputReference? = null,
 )

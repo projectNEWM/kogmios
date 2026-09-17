@@ -1,25 +1,39 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@SerialName("-32602")
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeName("-32602")
 data class EvaluateTransactionDeserializationErrorFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: EvaluateTransactionDeserializationError,
 ) : Fault
 
-@Serializable
 data class EvaluateTransactionDeserializationError(
+    @param:JsonProperty(value = "shelley", required = true)
+    @get:JsonProperty("shelley")
     val shelley: String,
+    @param:JsonProperty(value = "allegra", required = true)
+    @get:JsonProperty("allegra")
     val allegra: String,
+    @param:JsonProperty(value = "mary", required = true)
+    @get:JsonProperty("mary")
     val mary: String,
+    @param:JsonProperty(value = "alonzo", required = true)
+    @get:JsonProperty("alonzo")
     val alonzo: String,
+    @param:JsonProperty(value = "babbage", required = true)
+    @get:JsonProperty("babbage")
     val babbage: String,
+    @param:JsonProperty(value = "conway", required = true)
+    @get:JsonProperty("conway")
     val conway: String,
 ) : FaultData

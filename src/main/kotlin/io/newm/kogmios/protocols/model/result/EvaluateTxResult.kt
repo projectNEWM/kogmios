@@ -1,12 +1,10 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.ExecutionUnits
 import io.newm.kogmios.protocols.model.Validator
-import io.newm.kogmios.protocols.model.serializers.EvaluateTxResultSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable(with = EvaluateTxResultSerializer::class)
 class EvaluateTxResult :
     ArrayList<EvaluateTx>(),
     OgmiosResult {
@@ -20,10 +18,11 @@ class EvaluateTxResult :
     override fun hashCode(): Int = super.hashCode()
 }
 
-@Serializable
 data class EvaluateTx(
-    @SerialName("validator")
+    @param:JsonProperty(value = "validator", required = true)
+    @get:JsonProperty("validator")
     val validator: Validator,
-    @SerialName("budget")
+    @param:JsonProperty(value = "budget", required = true)
+    @get:JsonProperty("budget")
     val budget: ExecutionUnits,
 )

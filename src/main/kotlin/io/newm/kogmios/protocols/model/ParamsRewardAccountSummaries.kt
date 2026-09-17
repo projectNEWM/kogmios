@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ParamsRewardAccountSummaries(
-    @SerialName("keys")
+    @param:JsonProperty(value = "keys", required = true)
+    @get:JsonProperty("keys")
     val keys: List<String>,
 ) : Params()

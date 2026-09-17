@@ -1,17 +1,21 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.result.TxResult
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Response that comes back from Ogmios after a nextTransaction mempool message is sent.
  */
-@Serializable
-@SerialName(MsgNextTransaction.METHOD_NAME)
+
+@JsonTypeName(MsgNextTransaction.METHOD_NAME)
 data class MsgNextTransactionResponse(
-    @SerialName("result")
+    @param:JsonProperty(value = "result", required = true)
+    @get:JsonProperty("result")
     override val result: TxResult,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     override val id: String,
 ) : JsonRpcSuccessResponse()

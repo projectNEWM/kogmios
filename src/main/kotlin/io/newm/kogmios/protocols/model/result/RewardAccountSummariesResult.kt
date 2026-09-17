@@ -1,10 +1,7 @@
 package io.newm.kogmios.protocols.model.result
 
 import io.newm.kogmios.protocols.model.RewardAccountSummary
-import io.newm.kogmios.protocols.model.serializers.RewardAccountSummariesResultSerializer
-import kotlinx.serialization.Serializable
 
-@Serializable(with = RewardAccountSummariesResultSerializer::class)
 class RewardAccountSummariesResult :
     LinkedHashMap<String, RewardAccountSummary>(),
     OgmiosResult {

@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.DelegateRepresentative
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Trying to re-register some already known delegate representative. Delegate representatives can only be registered once. The field 'data.knownDelegateRepresentatives' points to an already known credential that's being re-registered by this transaction.
  */
-@Serializable
-@SerialName("3152")
+
+@JsonTypeName("3152")
 data class DRepAlreadyRegisteredFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: DRepAlreadyRegisteredFaultData,
 ) : Fault
 
-@Serializable
 data class DRepAlreadyRegisteredFaultData(
-    @SerialName("knownDelegateRepresentative")
+    @param:JsonProperty(value = "knownDelegateRepresentative", required = true)
+    @get:JsonProperty("knownDelegateRepresentative")
     val knownDelegateRepresentative: DelegateRepresentative,
 ) : FaultData

@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class VerificationKey(
-    @SerialName("verificationKey")
+    @param:JsonProperty(value = "verificationKey", required = true)
+    @get:JsonProperty("verificationKey")
     val verificationKey: String,
 )

@@ -1,9 +1,10 @@
 package io.newm.kogmios.protocols.model.fault
 
-import io.newm.kogmios.protocols.model.serializers.StringFaultDataSerializer
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
-@Serializable(with = StringFaultDataSerializer::class)
-data class StringFaultData(
-    val value: String,
-) : FaultData
+data class StringFaultData
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val value: String,
+    ) : FaultData

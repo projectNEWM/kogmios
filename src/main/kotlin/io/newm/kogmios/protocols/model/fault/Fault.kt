@@ -1,18 +1,16 @@
 package io.newm.kogmios.protocols.model.fault
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
-
-@Serializable
-@JsonClassDiscriminator("code")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "code",
+    visible = true,
+)
 sealed interface Fault {
-    @SerialName("code")
     val code: Long
 
-    @SerialName("message")
     val message: String
 
-    @SerialName("data")
     val data: FaultData?
 }

@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class RewardAccountSummary(
-    @SerialName("delegate")
+    @param:JsonProperty(value = "delegate", required = true)
+    @get:JsonProperty("delegate")
     val delegate: StakePool,
-    @SerialName("rewards")
+    @param:JsonProperty(value = "rewards", required = true)
+    @get:JsonProperty("rewards")
     val rewards: Ada,
 )

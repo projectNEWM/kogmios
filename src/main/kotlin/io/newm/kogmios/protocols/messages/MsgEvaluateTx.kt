@@ -1,19 +1,18 @@
 package io.newm.kogmios.protocols.messages
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.util.UUID
 
 /**
  * Evaluate the costs for a transaction
  */
-@Serializable
+
 data class MsgEvaluateTx(
-    @SerialName("method")
     override val method: String = METHOD_EVALUATE_TX,
-    @SerialName("params")
+    @param:JsonProperty(value = "params", required = true)
+    @get:JsonProperty("params")
     val params: SubmitOrEvalTx,
-    @SerialName("id")
     override val id: String = "$method: ${UUID.randomUUID()}",
 ) : JsonRpcRequest() {
     companion object {

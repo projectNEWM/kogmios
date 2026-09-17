@@ -1,10 +1,7 @@
 package io.newm.kogmios.protocols.model.result
 
 import io.newm.kogmios.protocols.model.NonMyopicMemberRewardsResult
-import io.newm.kogmios.protocols.model.serializers.ProjectedRewardsResultSerializer
-import kotlinx.serialization.Serializable
 
-@Serializable(with = ProjectedRewardsResultSerializer::class)
 class ProjectedRewardsResult :
     LinkedHashMap<String, NonMyopicMemberRewardsResult>(),
     OgmiosResult {

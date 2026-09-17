@@ -1,38 +1,44 @@
 package io.newm.kogmios.serializers
 
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import org.apache.commons.numbers.fraction.BigFraction
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import java.math.BigDecimal
+import java.math.BigInteger
+import org.apache.commons.numbers.fraction.BigFraction
 
-object BigFractionSerializer : KSerializer<BigFraction> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor("io.newm.kogmios.serializers.BigFractionSerializer", PrimitiveKind.STRING)
-
+internal object BigFractionSerializer : JsonSerializer<BigFraction>() {
     override fun serialize(
-        encoder: Encoder,
-        value: BigFraction
+        value: BigFraction,
+        generator: JsonGenerator,
+        serializers: SerializerProvider
     ) {
-        val rationalString = value.toString().replace(" ", "")
-        encoder.encodeString(rationalString)
+        generator.writeString(value.toString().replace(" ", ""))
     }
+}
 
-    override fun deserialize(decoder: Decoder): BigFraction {
-        val decodedString = decoder.decodeString()
-        return if ('/' in decodedString) {
-            // decode rational like "3/4"
-            BigFraction.parse(decodedString)
-        } else {
-            // decode decimal like "0.75"
-            val bigDecimal = BigDecimal(decodedString)
-            val scale = bigDecimal.scale()
-            val denominator = BigDecimal.TEN.pow(scale).toBigIntegerExact()
-            val numerator = bigDecimal.movePointRight(scale).toBigIntegerExact()
-            BigFraction.of(numerator, denominator)
+internal object BigFractionDeserializer : StdDeserializer<BigFraction>(BigFraction::class.java) {
+    override fun deserialize(
+        parser: JsonParser,
+        context: DeserializationContext
+    ): BigFraction {
+        val value = parser.valueAsString
+        return try {
+            if ('/' in value) {
+                BigFraction.parse(value)
+            } else {
+                val decimal = BigDecimal(value)
+                if (decimal.scale() >= 0) {
+                    BigFraction.of(decimal.unscaledValue(), BigInteger.TEN.pow(decimal.scale()))
+                } else {
+                    BigFraction.of(decimal.unscaledValue().multiply(BigInteger.TEN.pow(-decimal.scale())), BigInteger.ONE)
+                }
+            }
+        } catch (exception: RuntimeException) {
+            throw context.weirdStringException(value, BigFraction::class.java, exception.message)
         }
     }
 }

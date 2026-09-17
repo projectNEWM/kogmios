@@ -1,16 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class Signatory(
-    @SerialName("key")
+    @param:JsonProperty(value = "key", required = true)
+    @get:JsonProperty("key")
     val key: String,
-    @SerialName("signature")
+    @param:JsonProperty(value = "signature", required = true)
+    @get:JsonProperty("signature")
     val signature: String,
-    @SerialName("chainCode")
     val chainCode: String? = null,
-    @SerialName("addressAttributes")
     val addressAttributes: String? = null,
 )

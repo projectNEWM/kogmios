@@ -1,28 +1,26 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
+import com.fasterxml.jackson.annotation.JsonAlias
 
-@Serializable
 enum class CardanoEra {
-    @JsonNames("byron")
+    @JsonAlias("byron")
     BYRON,
 
-    @JsonNames("shelley")
+    @JsonAlias("shelley")
     SHELLEY,
 
-    @JsonNames("allegra")
+    @JsonAlias("allegra")
     ALLEGRA,
 
-    @JsonNames("mary")
+    @JsonAlias("mary")
     MARY,
 
-    @JsonNames("alonzo")
+    @JsonAlias("alonzo")
     ALONZO,
 
-    @JsonNames("babbage")
+    @JsonAlias("babbage")
     BABBAGE,
 
-    @JsonNames("conway")
+    @JsonAlias("conway")
     CONWAY,
 }

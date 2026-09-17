@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.VoterReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction references an unknown constitutional committee member. This can be either because that member does not actually exist or because it was registered but has resigned. The field 'data.unknownConstitutionalCommitteeMember' indicates what credential is unknown.
  */
-@Serializable
-@SerialName("3154")
+
+@JsonTypeName("3154")
 data class UnknownConstitutionalCommitteeMemberFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: UnknownConstitutionalCommitteeMemberFaultData,
 ) : Fault
 
-@Serializable
 data class UnknownConstitutionalCommitteeMemberFaultData(
-    @SerialName("unknownConstitutionalCommitteeMember")
+    @param:JsonProperty(value = "unknownConstitutionalCommitteeMember", required = true)
+    @get:JsonProperty("unknownConstitutionalCommitteeMember")
     val unknownConstitutionalCommitteeMember: VoterReference,
 ) : FaultData

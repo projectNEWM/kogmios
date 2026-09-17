@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.UtxoOutput
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Some output associated with legacy / bootstrap (a.k.a. Byron) addresses have attributes that are too large. The field 'data.bootstrapOutputs' lists all affected outputs.
  */
-@Serializable
-@SerialName("3126")
+
+@JsonTypeName("3126")
 data class BootstrapAttributesTooLargeFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: BootstrapAttributesTooLargeFaultData,
 ) : Fault
 
-@Serializable
 data class BootstrapAttributesTooLargeFaultData(
-    @SerialName("bootstrapOutputs")
+    @param:JsonProperty(value = "bootstrapOutputs", required = true)
+    @get:JsonProperty("bootstrapOutputs")
     val bootstrapOutputs: List<UtxoOutput>,
 ) : FaultData

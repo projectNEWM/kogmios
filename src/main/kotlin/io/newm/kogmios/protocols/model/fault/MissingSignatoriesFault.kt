@@ -1,25 +1,29 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Some signatures are missing. A signed transaction must carry signatures for all inputs locked by verification keys or a native script.
  * Transaction may also need signatures for each required extra signatories often required by Plutus Scripts.
  */
-@Serializable
-@SerialName("3101")
+
+@JsonTypeName("3101")
 data class MissingSignatoriesFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: MissingSignatoriesFaultData,
 ) : Fault
 
-@Serializable
 data class MissingSignatoriesFaultData(
-    @SerialName("missingSignatories")
+    @param:JsonProperty(value = "missingSignatories", required = true)
+    @get:JsonProperty("missingSignatories")
     val missingSignatories: List<String>,
 ) : FaultData

@@ -1,14 +1,13 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class Version(
-    @SerialName("major")
+    @param:JsonProperty(value = "major", required = true)
+    @get:JsonProperty("major")
     val major: Int,
-    @SerialName("minor")
+    @param:JsonProperty(value = "minor", required = true)
+    @get:JsonProperty("minor")
     val minor: Int,
-    @SerialName("patch")
     val patch: Int? = null,
 )

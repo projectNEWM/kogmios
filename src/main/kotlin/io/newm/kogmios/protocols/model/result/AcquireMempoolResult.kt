@@ -1,18 +1,18 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.math.BigInteger
 
 /**
  * A mempool snapshot has been successfully acquired at a given slot.
  */
-@Serializable
+
 data class AcquireMempoolResult(
-    @SerialName("acquired")
+    @param:JsonProperty(value = "acquired", required = true)
+    @get:JsonProperty("acquired")
     val acquired: String,
-    @Contextual
-    @SerialName("slot")
+    @param:JsonProperty(value = "slot", required = true)
+    @get:JsonProperty("slot")
     val slot: BigInteger,
 ) : OgmiosResult

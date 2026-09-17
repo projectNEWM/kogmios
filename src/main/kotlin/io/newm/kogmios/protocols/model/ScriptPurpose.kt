@@ -1,45 +1,55 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@JsonClassDiscriminator("purpose")
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "purpose",
+    visible = true,
+)
 sealed interface ScriptPurpose
 
-@Serializable
-@SerialName("spend")
+@JsonTypeName("spend")
 data class ScriptPurposeSpend(
-    @SerialName("purpose")
+    @param:JsonProperty(value = "purpose", required = true)
+    @get:JsonProperty("purpose")
     val purpose: String,
-    @SerialName("outputReference")
+    @param:JsonProperty(value = "outputReference", required = true)
+    @get:JsonProperty("outputReference")
     val outputReference: UtxoOutputReference,
 ) : ScriptPurpose
 
-@Serializable
-@SerialName("mint")
+@JsonTypeName("mint")
 data class ScriptPurposeMint(
-    @SerialName("purpose")
+    @param:JsonProperty(value = "purpose", required = true)
+    @get:JsonProperty("purpose")
     val purpose: String,
-    @SerialName("policy")
+    @param:JsonProperty(value = "policy", required = true)
+    @get:JsonProperty("policy")
     val policy: String,
 ) : ScriptPurpose
 
-@Serializable
-@SerialName("publish")
+@JsonTypeName("publish")
 data class ScriptPurposePublish(
-    @SerialName("purpose")
+    @param:JsonProperty(value = "purpose", required = true)
+    @get:JsonProperty("purpose")
     val purpose: String,
-    @SerialName("certificate")
+    @param:JsonProperty(value = "certificate", required = true)
+    @get:JsonProperty("certificate")
     val certificate: Certificate,
 ) : ScriptPurpose
 
-@Serializable
-@SerialName("withdraw")
+@JsonTypeName("withdraw")
 data class ScriptPurposeWithdraw(
-    @SerialName("purpose")
+    @param:JsonProperty(value = "purpose", required = true)
+    @get:JsonProperty("purpose")
     val purpose: String,
-    @SerialName("rewardAccount")
+    @param:JsonProperty(value = "rewardAccount", required = true)
+    @get:JsonProperty("rewardAccount")
     val rewardAccount: String,
 ) : ScriptPurpose

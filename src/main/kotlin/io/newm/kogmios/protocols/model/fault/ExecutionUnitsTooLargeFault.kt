@@ -1,27 +1,33 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.ExecutionUnits
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction execution budget for scripts execution is above the allowed limit. The protocol limits the amount of execution that a single transaction can do. This limit is set by a protocol parameter. The field 'data.maximumExecutionUnits' indicates the current limit and the field 'data.providedExecutionUnits' indicates how much the transaction requires.
  */
-@Serializable
-@SerialName("3134")
+
+@JsonTypeName("3134")
 data class ExecutionUnitsTooLargeFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: ExecutionUnitsTooLargeFaultData,
 ) : Fault
 
-@Serializable
 data class ExecutionUnitsTooLargeFaultData(
-    @SerialName("providedExecutionUnits")
+    @param:JsonProperty(value = "providedExecutionUnits", required = true)
+    @get:JsonProperty("providedExecutionUnits")
     val providedExecutionUnits: ExecutionUnits,
-    @SerialName("maximumExecutionUnits")
+    @param:JsonProperty(value = "maximumExecutionUnits", required = true)
+    @get:JsonProperty("maximumExecutionUnits")
     val maximumExecutionUnits: ExecutionUnits,
 ) : FaultData

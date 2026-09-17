@@ -1,16 +1,17 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.math.BigInteger
 
-@Serializable
 data class PlutusCostModels(
-    @SerialName("plutus:v1")
-    val plutusV1: List<@Contextual BigInteger>? = null,
-    @SerialName("plutus:v2")
-    val plutusV2: List<@Contextual BigInteger>? = null,
-    @SerialName("plutus:v3")
-    val plutusV3: List<@Contextual BigInteger>? = null,
+    @param:JsonProperty("plutus:v1")
+    @get:JsonProperty("plutus:v1")
+    val plutusV1: List<BigInteger>? = null,
+    @param:JsonProperty("plutus:v2")
+    @get:JsonProperty("plutus:v2")
+    val plutusV2: List<BigInteger>? = null,
+    @param:JsonProperty("plutus:v3")
+    @get:JsonProperty("plutus:v3")
+    val plutusV3: List<BigInteger>? = null,
 )

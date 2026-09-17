@@ -1,29 +1,27 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@JsonClassDiscriminator("type")
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 sealed interface RelayResult
 
-@Serializable
-@SerialName("hostname")
+@JsonTypeName("hostname")
 data class HostnameRelayResult(
-    @SerialName("hostname")
+    @param:JsonProperty(value = "hostname", required = true)
+    @get:JsonProperty("hostname")
     val hostname: String,
-    @SerialName("port")
     val port: Int? = null,
 ) : RelayResult
 
-@Serializable
-@SerialName("ipAddress")
+@JsonTypeName("ipAddress")
 data class IpAddressRelayResult(
-    @SerialName("ipv4")
     val ipv4: String? = null,
-    @SerialName("ipv6")
     val ipv6: String? = null,
-    @SerialName("port")
+    @param:JsonProperty(value = "port", required = true)
+    @get:JsonProperty("port")
     val port: Int,
 ) : RelayResult

@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class Point(
-    @SerialName("point")
+    @param:JsonProperty(value = "point", required = true)
+    @get:JsonProperty("point")
     val point: PointDetail,
 ) : PointOrOrigin()

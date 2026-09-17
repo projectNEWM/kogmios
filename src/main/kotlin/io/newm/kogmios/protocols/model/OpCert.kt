@@ -1,16 +1,18 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class OpCert(
-    @SerialName("hotVk")
+    @param:JsonProperty(value = "hotVk", required = true)
+    @get:JsonProperty("hotVk")
     val hotVk: String,
-    @SerialName("count")
+    @param:JsonProperty(value = "count", required = true)
+    @get:JsonProperty("count")
     val count: Int,
-    @SerialName("kesPeriod")
+    @param:JsonProperty(value = "kesPeriod", required = true)
+    @get:JsonProperty("kesPeriod")
     val kesPeriod: Int,
-    @SerialName("sigma")
+    @param:JsonProperty(value = "sigma", required = true)
+    @get:JsonProperty("sigma")
     val sigma: String,
 )

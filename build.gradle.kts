@@ -6,7 +6,6 @@ plugins {
     id("io.github.ben-manes.versions") version Versions.VERSIONS_PLUGIN
     id("org.jlleitschuh.gradle.ktlint") version Versions.KTLINT_PLUGIN
     kotlin("jvm") version Versions.KOTLIN
-    kotlin("plugin.serialization") version Versions.KOTLIN
     id("signing")
     id("com.vanniktech.maven.publish") version Versions.MAVEN_PUBLISH
 }
@@ -36,7 +35,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.COROUTINES}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KOTLINX_SERIALIZATION}")
+    implementation(platform("com.fasterxml.jackson:jackson-bom:${Versions.JACKSON}"))
+    implementation("com.fasterxml.jackson.core:jackson-databind")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.KOTLIN}")
 
     implementation("org.apache.commons:commons-numbers-fraction:${Versions.COMMONS_NUMBERS}")
 
@@ -126,7 +128,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
             listOf(
                 "-Xjsr305=strict",
                 "-opt-in=kotlin.RequiresOptIn",
-                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                 "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-opt-in=kotlin.time.ExperimentalTime",
             )

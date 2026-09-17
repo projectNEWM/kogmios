@@ -1,14 +1,15 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class SessionDurations(
-    @SerialName("max")
+    @param:JsonProperty(value = "max", required = true)
+    @get:JsonProperty("max")
     val max: Double,
-    @SerialName("mean")
+    @param:JsonProperty(value = "mean", required = true)
+    @get:JsonProperty("mean")
     val mean: Double,
-    @SerialName("min")
+    @param:JsonProperty(value = "min", required = true)
+    @get:JsonProperty("min")
     val min: Double,
 )

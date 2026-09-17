@@ -1,13 +1,11 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.Script
 import io.newm.kogmios.protocols.model.Transaction
 import io.newm.kogmios.protocols.model.UtxoOutputValue
-import io.newm.kogmios.protocols.model.serializers.UtxoResultSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
-@Serializable(with = UtxoResultSerializer::class)
 class UtxoResult :
     ArrayList<UtxoResultItem>(),
     OgmiosResult {
@@ -21,20 +19,20 @@ class UtxoResult :
     override fun hashCode(): Int = super.hashCode()
 }
 
-@Serializable
 data class UtxoResultItem(
-    @SerialName("transaction")
+    @param:JsonProperty(value = "transaction", required = true)
+    @get:JsonProperty("transaction")
     val transaction: Transaction,
-    @SerialName("index")
+    @param:JsonProperty(value = "index", required = true)
+    @get:JsonProperty("index")
     val index: Int,
-    @SerialName("address")
+    @param:JsonProperty(value = "address", required = true)
+    @get:JsonProperty("address")
     val address: String,
-    @SerialName("value")
+    @param:JsonProperty(value = "value", required = true)
+    @get:JsonProperty("value")
     val value: UtxoOutputValue,
-    @SerialName("datumHash")
     val datumHash: String? = null,
-    @SerialName("datum")
     val datum: String? = null,
-    @SerialName("script")
     val script: Script? = null,
 )

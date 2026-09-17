@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class RedeemerPointer(
-    @SerialName("purpose")
+    @param:JsonProperty(value = "purpose", required = true)
+    @get:JsonProperty("purpose")
     val purpose: String,
-    @SerialName("index")
+    @param:JsonProperty(value = "index", required = true)
+    @get:JsonProperty("index")
     val index: Int,
 )

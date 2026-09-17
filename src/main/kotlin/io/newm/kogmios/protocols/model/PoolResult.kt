@@ -1,29 +1,35 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class PoolResult(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("vrfVerificationKeyHash")
+    @param:JsonProperty(value = "vrfVerificationKeyHash", required = true)
+    @get:JsonProperty("vrfVerificationKeyHash")
     val vrfVerificationKeyHash: String,
-    @SerialName("pledge")
+    @param:JsonProperty(value = "pledge", required = true)
+    @get:JsonProperty("pledge")
     val pledge: Ada,
-    @SerialName("cost")
+    @param:JsonProperty(value = "cost", required = true)
+    @get:JsonProperty("cost")
     val cost: Ada,
-    @Contextual
-    @SerialName("margin")
+    @param:JsonProperty(value = "margin", required = true)
+    @get:JsonProperty("margin")
     val margin: BigFraction,
-    @SerialName("rewardAccount")
+    @param:JsonProperty(value = "rewardAccount", required = true)
+    @get:JsonProperty("rewardAccount")
     val rewardAccount: String,
-    @SerialName("owners")
+    @param:JsonProperty(value = "owners", required = true)
+    @get:JsonProperty("owners")
     val owners: List<String>,
-    @SerialName("relays")
+    @param:JsonProperty(value = "relays", required = true)
+    @get:JsonProperty("relays")
     val relays: List<RelayResult>?,
-    @SerialName("metadata")
+    @param:JsonProperty(value = "metadata", required = true)
+    @get:JsonProperty("metadata")
     val metadata: MetadataResult,
 )
