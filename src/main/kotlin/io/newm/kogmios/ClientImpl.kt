@@ -50,7 +50,6 @@ import io.newm.kogmios.protocols.messages.MsgQueryGenesisConfigResponse
 import io.newm.kogmios.protocols.messages.MsgQueryLiveStakeDistributionResponse
 import io.newm.kogmios.protocols.messages.MsgQueryNetworkStartTimeResponse
 import io.newm.kogmios.protocols.messages.MsgQueryProjectedRewardsResponse
-import io.newm.kogmios.protocols.messages.MsgQueryProposedProtocolParametersResponse
 import io.newm.kogmios.protocols.messages.MsgQueryProtocolParametersResponse
 import io.newm.kogmios.protocols.messages.MsgQueryRewardAccountSummariesResponse
 import io.newm.kogmios.protocols.messages.MsgQueryStakePoolsResponse
@@ -530,20 +529,6 @@ internal class ClientImpl(
         return coroutineScope {
             withTimeout(timeoutMs) {
                 message.completableDeferred.await() as MsgQueryProjectedRewardsResponse
-            }
-        }
-    }
-
-    override suspend fun proposedProtocolParameters(timeoutMs: Long): MsgQueryProposedProtocolParametersResponse {
-        assertConnected()
-        val message =
-            MsgQuery(
-                method = MsgQuery.METHOD_QUERY_LEDGER_STATE_PROPOSED_PROTOCOL_PARAMETERS,
-            )
-        sendQueue.send(message)
-        return coroutineScope {
-            withTimeout(timeoutMs) {
-                message.completableDeferred.await() as MsgQueryProposedProtocolParametersResponse
             }
         }
     }

@@ -13,7 +13,6 @@ import io.newm.kogmios.protocols.messages.MsgQueryGenesisConfigResponse
 import io.newm.kogmios.protocols.messages.MsgQueryLiveStakeDistributionResponse
 import io.newm.kogmios.protocols.messages.MsgQueryNetworkStartTimeResponse
 import io.newm.kogmios.protocols.messages.MsgQueryProjectedRewardsResponse
-import io.newm.kogmios.protocols.messages.MsgQueryProposedProtocolParametersResponse
 import io.newm.kogmios.protocols.messages.MsgQueryProtocolParametersResponse
 import io.newm.kogmios.protocols.messages.MsgQueryRewardAccountSummariesResponse
 import io.newm.kogmios.protocols.messages.MsgQueryStakePoolsResponse
@@ -107,11 +106,6 @@ interface StateQueryClient : Client {
         params: ParamsProjectedRewards,
         timeoutMs: Long = LONG_REQUEST_TIMEOUT_MS
     ): MsgQueryProjectedRewardsResponse
-
-    /**
-     * Get proposed protocol parameters for update, if any.
-     */
-    suspend fun proposedProtocolParameters(timeoutMs: Long = DEFAULT_REQUEST_TIMEOUT_MS): MsgQueryProposedProtocolParametersResponse
 
     /**
      * Get the current stake pool distribution. This request may be quite long, use with care.

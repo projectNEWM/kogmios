@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.newm"
-version = "2.7.1-SNAPSHOT"
+version = "3.0.0-SNAPSHOT"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
 java.targetCompatibility = JavaVersion.VERSION_21

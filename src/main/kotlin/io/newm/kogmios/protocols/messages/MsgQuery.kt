@@ -28,7 +28,6 @@ data class MsgQuery(
         const val METHOD_QUERY_LEDGER_STATE_LIVE_STAKE_DISTRIBUTION = "queryLedgerState/liveStakeDistribution"
         const val METHOD_QUERY_LEDGER_STATE_PROJECTED_REWARDS = "queryLedgerState/projectedRewards"
         const val METHOD_QUERY_LEDGER_STATE_PROTOCOL_PARAMETERS = "queryLedgerState/protocolParameters"
-        const val METHOD_QUERY_LEDGER_STATE_PROPOSED_PROTOCOL_PARAMETERS = "queryLedgerState/proposedProtocolParameters"
         const val METHOD_QUERY_LEDGER_STATE_REWARD_ACCOUNT_SUMMARIES = "queryLedgerState/rewardAccountSummaries"
         const val METHOD_QUERY_LEDGER_STATE_REWARDS_PROVENANCE = "queryLedgerState/rewardsProvenance"
         const val METHOD_QUERY_LEDGER_STATE_STAKE_POOLS = "queryLedgerState/stakePools"

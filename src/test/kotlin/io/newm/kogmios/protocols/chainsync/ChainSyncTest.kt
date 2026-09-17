@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 
-// @Disabled("Disabled by default since it requires a running Ogmios instance.")
+@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class ChainSyncTest {
     companion object {
         // local testing - preprod
