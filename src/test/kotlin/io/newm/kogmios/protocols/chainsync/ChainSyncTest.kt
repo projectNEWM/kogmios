@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 
-@Disabled("Disabled by default since it requires a running Ogmios instance.")
+//@Disabled("Disabled by default since it requires a running Ogmios instance.")
 class ChainSyncTest {
     companion object {
         // local testing - preprod
@@ -410,6 +410,35 @@ class ChainSyncTest {
                 assertThat(block.era).isEqualTo("conway")
             }
             Unit
+        }
+
+    @Test
+    fun `test RequestNext crash reproduction`() =
+        runBlocking {
+            createChainSyncClient(
+                websocketHost = TEST_HOST,
+                websocketPort = TEST_PORT,
+                secure = TEST_SECURE,
+            ).use { client ->
+                val connectResult = client.connect()
+                assertThat(connectResult).isTrue()
+                assertThat(client.isConnected).isTrue()
+
+                val response =
+                    client.findIntersect(
+                        listOf(
+                            PointDetail(
+                                slot = 133883282L,
+                                id = "0581b5b8d6aba5ff6f54281855dbd8b9181c5c8fea066cef1d76bb013ef2ab14",
+                            ),
+                        ),
+                    )
+                assertThat(response.result).isInstanceOf(IntersectionFoundResult::class.java)
+                assertThat((response.result.intersection as PointDetail).slot).isEqualTo(133883282L)
+
+                assertThat(client.nextBlock().result).isInstanceOf(RollBackward::class.java)
+                assertThat(client.nextBlock().result).isInstanceOf(RollForward::class.java)
+            }
         }
 
     @Disabled("Disabled by default since it requires continuous running to sync the chain.")
