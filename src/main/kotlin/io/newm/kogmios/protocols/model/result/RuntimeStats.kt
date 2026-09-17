@@ -1,16 +1,18 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class RuntimeStats(
-    @SerialName("cpuTime")
+    @param:JsonProperty(value = "cpuTime", required = true)
+    @get:JsonProperty("cpuTime")
     val cpuTime: Long,
-    @SerialName("currentHeapSize")
+    @param:JsonProperty(value = "currentHeapSize", required = true)
+    @get:JsonProperty("currentHeapSize")
     val currentHeapSize: Long,
-    @SerialName("gcCpuTime")
+    @param:JsonProperty(value = "gcCpuTime", required = true)
+    @get:JsonProperty("gcCpuTime")
     val gcCpuTime: Long,
-    @SerialName("maxHeapSize")
+    @param:JsonProperty(value = "maxHeapSize", required = true)
+    @get:JsonProperty("maxHeapSize")
     val maxHeapSize: Long,
 )

@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class GenesisDelegationConfig(
-    @SerialName("issuer")
+    @param:JsonProperty(value = "issuer", required = true)
+    @get:JsonProperty("issuer")
     val issuer: VerificationKey,
-    @SerialName("delegate")
+    @param:JsonProperty(value = "delegate", required = true)
+    @get:JsonProperty("delegate")
     val delegate: VerificationKey,
 )

@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.UtxoOutputReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Transaction failed because some Plutus scripts are missing their associated datums. 'data.missingDatums' contains a set of data hashes for the missing datums. Ensure all Plutus scripts have an associated datum in the transaction's witness set or, are provided through inline datums in reference inputs.
  */
-@Serializable
-@SerialName("3114")
+
+@JsonTypeName("3114")
 data class OrphanScriptInputsFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: OrphanScriptInputsFaultData,
 ) : Fault
 
-@Serializable
 data class OrphanScriptInputsFaultData(
-    @SerialName("orphanScriptInputs")
+    @param:JsonProperty(value = "orphanScriptInputs", required = true)
+    @get:JsonProperty("orphanScriptInputs")
     val orphanScriptInputs: List<UtxoOutputReference>,
 ) : FaultData

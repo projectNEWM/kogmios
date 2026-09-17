@@ -1,14 +1,15 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class TxRedeemer(
-    @SerialName("executionUnits")
+    @param:JsonProperty(value = "executionUnits", required = true)
+    @get:JsonProperty("executionUnits")
     val executionUnits: ExecutionUnits,
-    @SerialName("redeemer")
+    @param:JsonProperty(value = "redeemer", required = true)
+    @get:JsonProperty("redeemer")
     val redeemer: String,
-    @SerialName("validator")
+    @param:JsonProperty(value = "validator", required = true)
+    @get:JsonProperty("validator")
     val validator: Validator,
 )

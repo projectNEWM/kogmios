@@ -1,13 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.result.StakePoolsResult
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.result.StakePoolsResult
+
 data class ShelleyGenesisStakePools(
-    @SerialName("stakePools")
+    @param:JsonProperty(value = "stakePools", required = true)
+    @get:JsonProperty("stakePools")
     val stakePools: StakePoolsResult,
-    @SerialName("delegators")
+    @param:JsonProperty(value = "delegators", required = true)
+    @get:JsonProperty("delegators")
     val delegators: Map<String, String>,
 )

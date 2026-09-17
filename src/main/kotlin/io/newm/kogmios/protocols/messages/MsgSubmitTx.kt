@@ -1,19 +1,18 @@
 package io.newm.kogmios.protocols.messages
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.util.UUID
 
 /**
  * Submit a transaction to the node's mempool.
  */
-@Serializable
+
 data class MsgSubmitTx(
-    @SerialName("method")
     override val method: String = METHOD_SUBMIT_TX,
-    @SerialName("params")
+    @param:JsonProperty(value = "params", required = true)
+    @get:JsonProperty("params")
     val params: SubmitOrEvalTx,
-    @SerialName("id")
     override val id: String = "$method: ${UUID.randomUUID()}",
 ) : JsonRpcRequest() {
     companion object {
@@ -21,14 +20,14 @@ data class MsgSubmitTx(
     }
 }
 
-@Serializable
 data class SubmitOrEvalTx(
-    @SerialName("transaction")
+    @param:JsonProperty(value = "transaction", required = true)
+    @get:JsonProperty("transaction")
     val transaction: Cbor,
 )
 
-@Serializable
 data class Cbor(
-    @SerialName("cbor")
+    @param:JsonProperty(value = "cbor", required = true)
+    @get:JsonProperty("cbor")
     val cbor: String,
 )

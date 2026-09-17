@@ -1,14 +1,13 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class EraParameters(
-    @SerialName("epochLength")
+    @param:JsonProperty(value = "epochLength", required = true)
+    @get:JsonProperty("epochLength")
     val epochLength: Long,
-    @SerialName("slotLength")
+    @param:JsonProperty(value = "slotLength", required = true)
+    @get:JsonProperty("slotLength")
     val slotLength: Milliseconds,
-    @SerialName("safeZone")
     val safeZone: Long? = null,
 )

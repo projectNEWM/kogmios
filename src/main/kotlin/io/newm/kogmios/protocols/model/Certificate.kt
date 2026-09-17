@@ -1,191 +1,196 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
-@JsonClassDiscriminator("type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 sealed interface Certificate
 
-@Serializable
-@SerialName("stakeDelegation")
+@JsonTypeName("stakeDelegation")
 data class StakeDelegationCertificate(
-    @SerialName("from")
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
     val from: String,
-    @SerialName("credential")
+    @param:JsonProperty(value = "credential", required = true)
+    @get:JsonProperty("credential")
     val credential: String,
-    @SerialName("stakePool")
     val stakePool: StakePool? = null,
-    @SerialName("delegateRepresentative")
     val delegateRepresentative: DelegateRepresentative? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("stakeCredentialRegistration")
+@JsonTypeName("stakeCredentialRegistration")
 data class StakeCredentialRegistrationCertificate(
-    @SerialName("from")
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
     val from: String,
-    @SerialName("credential")
+    @param:JsonProperty(value = "credential", required = true)
+    @get:JsonProperty("credential")
     val credential: String,
-    @SerialName("deposit")
     val deposit: Ada? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("stakeCredentialDeregistration")
+@JsonTypeName("stakeCredentialDeregistration")
 data class StakeCredentialDeregistrationCertificate(
-    @SerialName("from")
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
     val from: String,
-    @SerialName("credential")
+    @param:JsonProperty(value = "credential", required = true)
+    @get:JsonProperty("credential")
     val credential: String,
-    @SerialName("deposit")
     val deposit: Ada? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("stakePoolRegistration")
+@JsonTypeName("stakePoolRegistration")
 data class StakePoolRegistrationCertificate(
-    @SerialName("stakePool")
+    @param:JsonProperty(value = "stakePool", required = true)
+    @get:JsonProperty("stakePool")
     val stakePool: StakePoolRegistration,
 ) : Certificate
 
-@Serializable
 data class StakePoolRegistration(
-    // bech32 encoding of a pool's verification key
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    // base16 encoding of a pool's verification key
-    @SerialName("vrfVerificationKeyHash")
+    @param:JsonProperty(value = "vrfVerificationKeyHash", required = true)
+    @get:JsonProperty("vrfVerificationKeyHash")
     val vrfVerificationKeyHash: String,
-    @SerialName("owners")
+    @param:JsonProperty(value = "owners", required = true)
+    @get:JsonProperty("owners")
     val owners: List<String>,
-    @SerialName("cost")
+    @param:JsonProperty(value = "cost", required = true)
+    @get:JsonProperty("cost")
     val cost: Ada,
-    @SerialName("margin")
-    @Contextual
+    @param:JsonProperty(value = "margin", required = true)
+    @get:JsonProperty("margin")
     val margin: BigFraction,
-    @SerialName("pledge")
+    @param:JsonProperty(value = "pledge", required = true)
+    @get:JsonProperty("pledge")
     val pledge: Ada,
-    @SerialName("rewardAccount")
+    @param:JsonProperty(value = "rewardAccount", required = true)
+    @get:JsonProperty("rewardAccount")
     val rewardAccount: String,
-    @SerialName("metadata")
     val metadata: AnchorMetadata? = null,
-    @SerialName("relays")
+    @param:JsonProperty(value = "relays", required = true)
+    @get:JsonProperty("relays")
     val relays: List<RelayResult>,
 )
 
-@Serializable
 data class AnchorMetadata(
-    @SerialName("hash")
+    @param:JsonProperty(value = "hash", required = true)
+    @get:JsonProperty("hash")
     val hash: String,
-    @SerialName("url")
+    @param:JsonProperty(value = "url", required = true)
+    @get:JsonProperty("url")
     val url: String,
 )
 
-@Serializable
-@SerialName("stakePoolRetirement")
+@JsonTypeName("stakePoolRetirement")
 data class StakePoolRetirementCertificate(
-    @SerialName("stakePool")
+    @param:JsonProperty(value = "stakePool", required = true)
+    @get:JsonProperty("stakePool")
     val stakePool: PoolRetirement,
 ) : Certificate
 
-@Serializable
 data class PoolRetirement(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("retirementEpoch")
+    @param:JsonProperty(value = "retirementEpoch", required = true)
+    @get:JsonProperty("retirementEpoch")
     val retirementEpoch: Long,
 )
 
-@Serializable
-@SerialName("genesisDelegation")
+@JsonTypeName("genesisDelegation")
 data class GenesisDelegationCertificate(
-    @SerialName("delegate")
+    @param:JsonProperty(value = "delegate", required = true)
+    @get:JsonProperty("delegate")
     val delegate: IdHashWithVrf,
-    @SerialName("issuer")
+    @param:JsonProperty(value = "issuer", required = true)
+    @get:JsonProperty("issuer")
     val issuer: IdHash,
 ) : Certificate
 
-@Serializable
 data class GenesisDelegation(
-    @SerialName("delegateKeyHash")
+    @param:JsonProperty(value = "delegateKeyHash", required = true)
+    @get:JsonProperty("delegateKeyHash")
     val delegateKeyHash: String,
-    @SerialName("verificationKeyHash")
+    @param:JsonProperty(value = "verificationKeyHash", required = true)
+    @get:JsonProperty("verificationKeyHash")
     val verificationKeyHash: String,
-    @SerialName("vrfVerificationKeyHash")
+    @param:JsonProperty(value = "vrfVerificationKeyHash", required = true)
+    @get:JsonProperty("vrfVerificationKeyHash")
     val vrfVerificationKeyHash: String,
 )
 
-@Serializable
-@SerialName("constitutionalCommitteeDelegation")
+@JsonTypeName("constitutionalCommitteeDelegation")
 data class ConstitutionalCommitteeDelegationCertificate(
-    @SerialName("member")
+    @param:JsonProperty(value = "member", required = true)
+    @get:JsonProperty("member")
     val member: IdHash,
-    @SerialName("delegate")
+    @param:JsonProperty(value = "delegate", required = true)
+    @get:JsonProperty("delegate")
     val delegate: ConstitutionalCommitteeDelegate,
 ) : Certificate
 
-@Serializable
-@JsonClassDiscriminator("status")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "status")
 sealed interface ConstitutionalCommitteeDelegate
 
-@Serializable
-@SerialName("authorized")
+@JsonTypeName("authorized")
 data class AuthorizedConstitutionalCommitteeDelegate(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("from")
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
     val from: String,
 ) : ConstitutionalCommitteeDelegate
 
-@Serializable
-@SerialName("resigned")
+@JsonTypeName("resigned")
 data class ResignedConstitutionalCommitteeDelegate(
-    @SerialName("metadata")
     val metadata: AnchorMetadata? = null,
 ) : ConstitutionalCommitteeDelegate
 
-@Serializable
-@SerialName("none")
+@JsonTypeName("none")
 data object NoneConstitutionalCommitteeDelegate : ConstitutionalCommitteeDelegate
 
-@Serializable
-@SerialName("constitutionalCommitteeRetirement")
+@JsonTypeName("constitutionalCommitteeRetirement")
 data class ConstitutionalCommitteeRetirementCertificate(
-    @SerialName("member")
+    @param:JsonProperty(value = "member", required = true)
+    @get:JsonProperty("member")
     val member: IdHash,
-    @SerialName("metadata")
     val metadata: AnchorMetadata? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("delegateRepresentativeRegistration")
+@JsonTypeName("delegateRepresentativeRegistration")
 data class DelegateRepresentativeRegistrationCertificate(
-    @SerialName("delegateRepresentative")
+    @param:JsonProperty(value = "delegateRepresentative", required = true)
+    @get:JsonProperty("delegateRepresentative")
     val delegateRepresentative: DelegateRepresentative,
-    @SerialName("deposit")
+    @param:JsonProperty(value = "deposit", required = true)
+    @get:JsonProperty("deposit")
     val deposit: Ada,
-    @SerialName("metadata")
     val metadata: AnchorMetadata? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("delegateRepresentativeUpdate")
+@JsonTypeName("delegateRepresentativeUpdate")
 data class DelegateRepresentativeUpdateCertificate(
-    @SerialName("delegateRepresentative")
+    @param:JsonProperty(value = "delegateRepresentative", required = true)
+    @get:JsonProperty("delegateRepresentative")
     val delegateRepresentative: DelegateRepresentative,
-    @SerialName("metadata")
     val metadata: AnchorMetadata? = null,
 ) : Certificate
 
-@Serializable
-@SerialName("delegateRepresentativeRetirement")
+@JsonTypeName("delegateRepresentativeRetirement")
 data class DelegateRepresentativeRetirementCertificate(
-    @SerialName("delegateRepresentative")
+    @param:JsonProperty(value = "delegateRepresentative", required = true)
+    @get:JsonProperty("delegateRepresentative")
     val delegateRepresentative: DelegateRepresentative,
-    @SerialName("deposit")
+    @param:JsonProperty(value = "deposit", required = true)
+    @get:JsonProperty("deposit")
     val deposit: Ada,
 ) : Certificate

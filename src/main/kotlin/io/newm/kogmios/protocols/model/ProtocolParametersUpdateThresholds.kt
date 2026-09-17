@@ -1,22 +1,20 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class ProtocolParametersUpdateThresholds(
-    @SerialName("network")
-    @Contextual
+    @param:JsonProperty(value = "network", required = true)
+    @get:JsonProperty("network")
     val network: BigFraction,
-    @SerialName("economic")
-    @Contextual
+    @param:JsonProperty(value = "economic", required = true)
+    @get:JsonProperty("economic")
     val economic: BigFraction,
-    @SerialName("technical")
-    @Contextual
+    @param:JsonProperty(value = "technical", required = true)
+    @get:JsonProperty("technical")
     val technical: BigFraction,
-    @SerialName("governance")
-    @Contextual
+    @param:JsonProperty(value = "governance", required = true)
+    @get:JsonProperty("governance")
     val governance: BigFraction,
 )

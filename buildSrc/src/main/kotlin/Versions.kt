@@ -6,7 +6,7 @@ object Versions {
     const val JUNIT = "6.1.3"
     const val JUNIT_PLATFORM = "6.1.3"
     const val KOTLIN = "2.4.20"
-    const val KOTLINX_SERIALIZATION = "1.11.0"
+    const val JACKSON = "2.22.2"
     const val KTLINT = "1.8.0"
     const val KTLINT_PLUGIN = "14.0.1"
     const val KTOR = "3.6.0"

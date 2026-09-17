@@ -1,26 +1,26 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class DelegateRepresentativeVotingThresholds(
-    @SerialName("noConfidence")
-    @Contextual
+    @param:JsonProperty(value = "noConfidence", required = true)
+    @get:JsonProperty("noConfidence")
     val noConfidence: BigFraction,
-    @SerialName("constitution")
-    @Contextual
+    @param:JsonProperty(value = "constitution", required = true)
+    @get:JsonProperty("constitution")
     val constitution: BigFraction,
-    @SerialName("constitutionalCommittee")
+    @param:JsonProperty(value = "constitutionalCommittee", required = true)
+    @get:JsonProperty("constitutionalCommittee")
     val constitutionalCommittee: ConstitutionalCommitteeVotingThresholds,
-    @SerialName("hardForkInitiation")
-    @Contextual
+    @param:JsonProperty(value = "hardForkInitiation", required = true)
+    @get:JsonProperty("hardForkInitiation")
     val hardForkInitiation: BigFraction,
-    @SerialName("protocolParametersUpdate")
+    @param:JsonProperty(value = "protocolParametersUpdate", required = true)
+    @get:JsonProperty("protocolParametersUpdate")
     val protocolParametersUpdate: ProtocolParametersUpdateThresholds,
-    @SerialName("treasuryWithdrawals")
-    @Contextual
+    @param:JsonProperty(value = "treasuryWithdrawals", required = true)
+    @get:JsonProperty("treasuryWithdrawals")
     val treasuryWithdrawals: BigFraction,
 )

@@ -1,26 +1,31 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Some of the (V1) scripts failed to evaluate to a positive outcome.
  */
-@Serializable
-@SerialName("3012")
+
+@JsonTypeName("3012")
 data class ValidationFailureFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: ValidationFailureFaultData,
 ) : Fault
 
-@Serializable
 data class ValidationFailureFaultData(
-    @SerialName("validationError")
+    @param:JsonProperty(value = "validationError", required = true)
+    @get:JsonProperty("validationError")
     val validationError: String,
-    @SerialName("traces")
+    @param:JsonProperty(value = "traces", required = true)
+    @get:JsonProperty("traces")
     val traces: List<String>,
 ) : FaultData

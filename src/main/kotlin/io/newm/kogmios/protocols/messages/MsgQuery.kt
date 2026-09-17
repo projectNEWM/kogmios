@@ -1,20 +1,20 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.Params
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+
 import java.util.UUID
 
 /**
  * Message sent to query various ledger state items.
  */
-@Serializable
+
 data class MsgQuery(
-    @SerialName("method")
+    @param:JsonProperty(value = "method", required = true)
+    @get:JsonProperty("method")
     override val method: String,
-    @SerialName("params")
     val params: Params? = null,
-    @SerialName("id")
     override val id: String = "$method: ${UUID.randomUUID()}",
 ) : JsonRpcRequest() {
     companion object {

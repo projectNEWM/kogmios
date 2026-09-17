@@ -1,24 +1,28 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Trying to re-register some already known credentials. Stake credentials can only be registered once. This is true for both keys and scripts. The field 'data.knownCredential' points to an already known credential that's being re-registered by this transaction.
  */
-@Serializable
-@SerialName("3145")
+
+@JsonTypeName("3145")
 data class CredentialAlreadyRegisteredFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: CredentialAlreadyRegisteredFaultData,
 ) : Fault
 
-@Serializable
 data class CredentialAlreadyRegisteredFaultData(
-    @SerialName("knownCredential")
+    @param:JsonProperty(value = "knownCredential", required = true)
+    @get:JsonProperty("knownCredential")
     val knownCredential: String,
 ) : FaultData

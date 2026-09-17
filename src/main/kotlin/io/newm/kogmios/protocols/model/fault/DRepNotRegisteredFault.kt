@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.DelegateRepresentative
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The transaction references an unknown delegate representative. To delegate to a representative, it must first register as such. This may be done in the same transaction or in an earlier transaction but cannot happen retro-actively. The field 'data.unknownDelegateRepresentative' indicates what credential is used without being registered.
  */
-@Serializable
-@SerialName("3153")
+
+@JsonTypeName("3153")
 data class DRepNotRegisteredFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: DRepNotRegisteredFaultData,
 ) : Fault
 
-@Serializable
 data class DRepNotRegisteredFaultData(
-    @SerialName("unknownDelegateRepresentative")
+    @param:JsonProperty(value = "unknownDelegateRepresentative", required = true)
+    @get:JsonProperty("unknownDelegateRepresentative")
     val unknownDelegateRepresentative: DelegateRepresentative,
 ) : FaultData

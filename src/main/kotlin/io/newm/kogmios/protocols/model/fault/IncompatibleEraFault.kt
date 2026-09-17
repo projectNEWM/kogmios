@@ -1,24 +1,28 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Returned when trying to evaluate execution units of a pre-Alonzo transaction. Note that this isn't possible with Ogmios because transactions are always de-serialized as Alonzo transactions.
  */
-@Serializable
-@SerialName("3000")
+
+@JsonTypeName("3000")
 data class IncompatibleEraFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: IncompatibleEraFaultData,
 ) : Fault
 
-@Serializable
 data class IncompatibleEraFaultData(
-    @SerialName("incompatibleEra")
+    @param:JsonProperty(value = "incompatibleEra", required = true)
+    @get:JsonProperty("incompatibleEra")
     val incompatibleEra: String
 ) : FaultData

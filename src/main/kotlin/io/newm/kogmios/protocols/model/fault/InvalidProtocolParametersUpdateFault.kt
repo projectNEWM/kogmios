@@ -1,18 +1,20 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * The transaction contains an invalid or unauthorized protocol parameters update. This operation is reserved to genesis key holders.
  */
-@Serializable
-@SerialName("3139")
+
+@JsonTypeName("3139")
 data class InvalidProtocolParametersUpdateFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
     override val data: FaultData? = null,
 ) : Fault

@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Ada
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Trying to unregister stake credentials associated to a non empty reward account. You must empty the reward account first (or do it as part of the same transaction) to proceed. The field 'data.nonEmptyRewardAccountBalance' indicates how much Lovelace is left in the account.
  */
-@Serializable
-@SerialName("3147")
+
+@JsonTypeName("3147")
 data class NonEmptyRewardAccountFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: NonEmptyRewardAccountFaultData,
 ) : Fault
 
-@Serializable
 data class NonEmptyRewardAccountFaultData(
-    @SerialName("nonEmptyRewardAccountBalance")
+    @param:JsonProperty(value = "nonEmptyRewardAccountBalance", required = true)
+    @get:JsonProperty("nonEmptyRewardAccountBalance")
     val nonEmptyRewardAccountBalance: Ada,
 ) : FaultData

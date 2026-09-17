@@ -1,24 +1,30 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class AlonzoGenesisProtocolParameters(
-    @SerialName("minUtxoDepositCoefficient")
+    @param:JsonProperty(value = "minUtxoDepositCoefficient", required = true)
+    @get:JsonProperty("minUtxoDepositCoefficient")
     val minUtxoDepositCoefficient: Long,
-    @SerialName("collateralPercentage")
+    @param:JsonProperty(value = "collateralPercentage", required = true)
+    @get:JsonProperty("collateralPercentage")
     val collateralPercentage: Long,
-    @SerialName("plutusCostModels")
+    @param:JsonProperty(value = "plutusCostModels", required = true)
+    @get:JsonProperty("plutusCostModels")
     val plutusCostModels: PlutusCostModels,
-    @SerialName("maxCollateralInputs")
+    @param:JsonProperty(value = "maxCollateralInputs", required = true)
+    @get:JsonProperty("maxCollateralInputs")
     val maxCollateralInputs: Long,
-    @SerialName("maxExecutionUnitsPerBlock")
+    @param:JsonProperty(value = "maxExecutionUnitsPerBlock", required = true)
+    @get:JsonProperty("maxExecutionUnitsPerBlock")
     val maxExecutionUnitsPerBlock: ExecutionUnits,
-    @SerialName("maxExecutionUnitsPerTransaction")
+    @param:JsonProperty(value = "maxExecutionUnitsPerTransaction", required = true)
+    @get:JsonProperty("maxExecutionUnitsPerTransaction")
     val maxExecutionUnitsPerTransaction: ExecutionUnits,
-    @SerialName("maxValueSize")
+    @param:JsonProperty(value = "maxValueSize", required = true)
+    @get:JsonProperty("maxValueSize")
     val maxValueSize: BytesSize,
-    @SerialName("scriptExecutionPrices")
+    @param:JsonProperty(value = "scriptExecutionPrices", required = true)
+    @get:JsonProperty("scriptExecutionPrices")
     val scriptExecutionPrices: ExecutionPrices,
 )

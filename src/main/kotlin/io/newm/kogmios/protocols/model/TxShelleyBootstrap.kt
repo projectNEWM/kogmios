@@ -1,16 +1,18 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class TxShelleyBootstrap(
-    @SerialName("signature")
+    @param:JsonProperty(value = "signature", required = true)
+    @get:JsonProperty("signature")
     val signature: String,
-    @SerialName("key")
+    @param:JsonProperty(value = "key", required = true)
+    @get:JsonProperty("key")
     val key: String,
-    @SerialName("chainCode")
+    @param:JsonProperty(value = "chainCode", required = true)
+    @get:JsonProperty("chainCode")
     val chainCode: String?,
-    @SerialName("addressAttributes")
+    @param:JsonProperty(value = "addressAttributes", required = true)
+    @get:JsonProperty("addressAttributes")
     val addressAttributes: String?,
 )

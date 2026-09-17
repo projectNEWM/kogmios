@@ -1,17 +1,21 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.result.IntersectionFoundResult
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Response that comes back from Ogmios after a MsgFindIntersect message is sent.
  */
-@Serializable
-@SerialName(MsgFindIntersect.METHOD_FIND_INTERSECTION)
+
+@JsonTypeName(MsgFindIntersect.METHOD_FIND_INTERSECTION)
 data class MsgFindIntersectResponse(
-    @SerialName("result")
+    @param:JsonProperty(value = "result", required = true)
+    @get:JsonProperty("result")
     override val result: IntersectionFoundResult,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     override val id: String,
 ) : JsonRpcSuccessResponse()

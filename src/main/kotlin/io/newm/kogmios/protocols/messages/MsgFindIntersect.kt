@@ -1,20 +1,20 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.FindIntersect
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+
 import java.util.UUID
 
 /**
  * Acquire a point of intersection for syncing the blockchain
  */
-@Serializable
+
 data class MsgFindIntersect(
-    @SerialName("method")
     override val method: String = METHOD_FIND_INTERSECTION,
-    @SerialName("params")
+    @param:JsonProperty(value = "params", required = true)
+    @get:JsonProperty("params")
     val params: FindIntersect,
-    @SerialName("id")
     override val id: String = "$method: ${UUID.randomUUID()}",
 ) : JsonRpcRequest() {
     companion object {

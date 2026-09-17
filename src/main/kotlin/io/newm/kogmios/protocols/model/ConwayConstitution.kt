@@ -1,13 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import io.newm.kogmios.protocols.model.fault.MetadataHash
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.fault.MetadataHash
+
 data class ConwayConstitution(
-    @SerialName("guardrails")
     val guardrails: MetadataHash? = null,
-    @SerialName("metadata")
+    @param:JsonProperty(value = "metadata", required = true)
+    @get:JsonProperty("metadata")
     val metadata: AnchorMetadata,
 )

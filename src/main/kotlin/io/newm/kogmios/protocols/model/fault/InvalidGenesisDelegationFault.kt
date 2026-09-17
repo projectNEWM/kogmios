@@ -1,18 +1,20 @@
 package io.newm.kogmios.protocols.model.fault
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
 
 /**
  * Invalid or unauthorized genesis delegation. The genesis delegate is unknown, invalid or already in use.
  */
-@Serializable
-@SerialName("3148")
+
+@JsonTypeName("3148")
 data class InvalidGenesisDelegationFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
     override val data: FaultData? = null,
 ) : Fault

@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class TransactionMetadata(
-    @SerialName("hash")
+    @param:JsonProperty(value = "hash", required = true)
+    @get:JsonProperty("hash")
     val hash: String,
-    @SerialName("labels")
+    @param:JsonProperty(value = "labels", required = true)
+    @get:JsonProperty("labels")
     val labels: Map<String, Label>,
 )

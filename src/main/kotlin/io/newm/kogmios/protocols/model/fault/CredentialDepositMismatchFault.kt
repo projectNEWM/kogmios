@@ -1,27 +1,33 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Ada
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The deposit specified in a stake credential registration (for delegation or governance) does not match the current value set by protocol parameters. The field 'data.expectedDeposit', when present, indicates the deposit amount as currently expected by ledger.
  */
-@Serializable
-@SerialName("3151")
+
+@JsonTypeName("3151")
 data class CredentialDepositMismatchFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: CredentialDepositMismatchFaultData,
 ) : Fault
 
-@Serializable
 data class CredentialDepositMismatchFaultData(
-    @SerialName("providedDeposit")
+    @param:JsonProperty(value = "providedDeposit", required = true)
+    @get:JsonProperty("providedDeposit")
     val providedDeposit: Ada,
-    @SerialName("expectedDeposit")
+    @param:JsonProperty(value = "expectedDeposit", required = true)
+    @get:JsonProperty("expectedDeposit")
     val expectedDeposit: Ada,
 ) : FaultData

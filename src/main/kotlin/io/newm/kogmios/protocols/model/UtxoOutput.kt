@@ -1,18 +1,15 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class UtxoOutput(
-    @SerialName("address")
+    @param:JsonProperty(value = "address", required = true)
+    @get:JsonProperty("address")
     val address: String,
-    @SerialName("value")
+    @param:JsonProperty(value = "value", required = true)
+    @get:JsonProperty("value")
     val value: UtxoOutputValue,
-    @SerialName("datumHash")
     val datumHash: String? = null,
-    @SerialName("datum")
     val datum: String? = null,
-    @SerialName("script")
     val script: Script? = null,
 )

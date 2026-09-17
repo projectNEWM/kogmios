@@ -1,19 +1,17 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 sealed class ParamsUtxo : Params()
 
-@Serializable
 data class ParamsUtxoByOutputReferences(
-    @SerialName("outputReferences")
+    @param:JsonProperty(value = "outputReferences", required = true)
+    @get:JsonProperty("outputReferences")
     val outputReferences: List<UtxoOutputReference>,
 ) : ParamsUtxo()
 
-@Serializable
 data class ParamsUtxoByAddresses(
-    @SerialName("addresses")
+    @param:JsonProperty(value = "addresses", required = true)
+    @get:JsonProperty("addresses")
     val addresses: List<String>,
 ) : ParamsUtxo()

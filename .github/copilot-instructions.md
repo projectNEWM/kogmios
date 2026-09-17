@@ -41,7 +41,7 @@
 
 - This is **Kogmios**, a Kotlin client library for the Ogmios WebSocket interface
 - Single-module Gradle project (Kotlin DSL) targeting Java 21
-- Core tech: Kotlin 2.x, Ktor client (CIO + websockets), kotlinx-serialization, coroutines
+- Core tech: Kotlin 2.x, Ktor client (CIO + websockets), Jackson, coroutines
 - Domain: Cardano/Ogmios JSON-WSP protocol messages mapped to typed models
 
 ## CI Pipeline Context

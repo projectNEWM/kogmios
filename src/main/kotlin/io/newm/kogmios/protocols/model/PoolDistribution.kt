@@ -1,15 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class PoolDistribution(
-    @SerialName("stake")
-    @Contextual
+    @param:JsonProperty(value = "stake", required = true)
+    @get:JsonProperty("stake")
     val stake: BigFraction,
-    @SerialName("vrf")
+    @param:JsonProperty(value = "vrf", required = true)
+    @get:JsonProperty("vrf")
     val vrf: String,
 )

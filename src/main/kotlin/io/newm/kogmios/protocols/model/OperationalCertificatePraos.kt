@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class OperationalCertificatePraos(
-    @SerialName("count")
+    @param:JsonProperty(value = "count", required = true)
+    @get:JsonProperty("count")
     val count: Long,
-    @SerialName("kes")
+    @param:JsonProperty(value = "kes", required = true)
+    @get:JsonProperty("kes")
     val kes: Kes,
 )

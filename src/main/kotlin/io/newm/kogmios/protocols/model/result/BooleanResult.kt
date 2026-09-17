@@ -1,9 +1,10 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.serializers.BooleanResultSerializer
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 
-@Serializable(with = BooleanResultSerializer::class)
-data class BooleanResult(
-    val value: Boolean
-) : OgmiosResult
+data class BooleanResult
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    constructor(
+        @get:JsonValue val value: Boolean,
+    ) : OgmiosResult

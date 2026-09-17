@@ -1,25 +1,30 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.UtxoOutputReference
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  *
  */
-@Serializable
-@SerialName("3013")
+
+@JsonTypeName("3013")
 data class UnsuitableOutputReferenceFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: UnsuitableOutputReferenceFaultData,
 ) : Fault
 
-@Serializable
 data class UnsuitableOutputReferenceFaultData(
-    @SerialName("outputReference")
+    @param:JsonProperty(value = "outputReference", required = true)
+    @get:JsonProperty("outputReference")
     val outputReference: UtxoOutputReference,
 ) : FaultData

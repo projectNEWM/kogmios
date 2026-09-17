@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ParamsGenesisConfig(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     val era: String,
 ) : Params()

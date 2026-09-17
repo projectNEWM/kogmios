@@ -1,28 +1,34 @@
 package io.newm.kogmios.protocols.model.fault
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.BytesSize
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Transaction failed because it exceeds the maximum size allowed by the protocol. Indeed, once serialized, transactions must be under a bytes limit specified by a protocol parameter. The field 'data.measuredTransactionSize' indicates the actual measured size of your serialized transaction, whereas 'data.maximumTransactionSize' indicates the current maximum size enforced by the ledger.
  */
-@Serializable
-@SerialName("3119")
+
+@JsonTypeName("3119")
 data class TransactionTooLargeFault(
-    @SerialName("code")
+    @param:JsonProperty(value = "code", required = true)
+    @get:JsonProperty("code")
     override val code: Long,
-    @SerialName("message")
+    @param:JsonProperty(value = "message", required = true)
+    @get:JsonProperty("message")
     override val message: String,
-    @SerialName("data")
+    @param:JsonProperty(value = "data", required = true)
+    @get:JsonProperty("data")
     override val data: TransactionTooLargeFaultData,
 ) : Fault
 
-@Serializable
 data class TransactionTooLargeFaultData(
-    @SerialName("measuredTransactionSize")
+    @param:JsonProperty(value = "measuredTransactionSize", required = true)
+    @get:JsonProperty("measuredTransactionSize")
     val measuredTransactionSize: BytesSize,
-    @SerialName("maximumTransactionSize")
+    @param:JsonProperty(value = "maximumTransactionSize", required = true)
+    @get:JsonProperty("maximumTransactionSize")
     val maximumTransactionSize: BytesSize,
 ) : FaultData
 

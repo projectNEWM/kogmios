@@ -1,21 +1,23 @@
 package io.newm.kogmios.protocols.model.result
 
-import io.newm.kogmios.protocols.model.BytesSize
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
+import io.newm.kogmios.protocols.model.BytesSize
+
 data class SizeOfMempoolResult(
-    @SerialName("maxCapacity")
+    @param:JsonProperty(value = "maxCapacity", required = true)
+    @get:JsonProperty("maxCapacity")
     val maxCapacity: BytesSize,
-    @SerialName("currentSize")
+    @param:JsonProperty(value = "currentSize", required = true)
+    @get:JsonProperty("currentSize")
     val currentSize: BytesSize,
-    @SerialName("transactions")
+    @param:JsonProperty(value = "transactions", required = true)
+    @get:JsonProperty("transactions")
     val transactions: TransactionCount,
 ) : OgmiosResult
 
-@Serializable
 data class TransactionCount(
-    @SerialName("count")
+    @param:JsonProperty(value = "count", required = true)
+    @get:JsonProperty("count")
     val count: Long,
 )

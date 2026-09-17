@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ProtocolUpdate(
-    @SerialName("epoch")
+    @param:JsonProperty(value = "epoch", required = true)
+    @get:JsonProperty("epoch")
     val epoch: Long,
-    @SerialName("proposal")
+    @param:JsonProperty(value = "proposal", required = true)
+    @get:JsonProperty("proposal")
     val proposal: Map<String, UpdateProposal>,
 )

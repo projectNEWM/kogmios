@@ -1,16 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class ExecutionPrices(
-    @Contextual
-    @SerialName("memory")
+    @param:JsonProperty(value = "memory", required = true)
+    @get:JsonProperty("memory")
     val memory: BigFraction,
-    @Contextual
-    @SerialName("cpu")
+    @param:JsonProperty(value = "cpu", required = true)
+    @get:JsonProperty("cpu")
     val cpu: BigFraction,
 )

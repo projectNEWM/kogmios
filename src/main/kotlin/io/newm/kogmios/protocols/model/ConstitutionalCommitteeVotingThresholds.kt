@@ -1,16 +1,14 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class ConstitutionalCommitteeVotingThresholds(
-    @SerialName("default")
-    @Contextual
+    @param:JsonProperty(value = "default", required = true)
+    @get:JsonProperty("default")
     val default: BigFraction,
-    @SerialName("stateOfNoConfidence")
-    @Contextual
+    @param:JsonProperty(value = "stateOfNoConfidence", required = true)
+    @get:JsonProperty("stateOfNoConfidence")
     val stateOfNoConfidence: BigFraction,
 )

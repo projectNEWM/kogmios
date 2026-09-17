@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ParamsPoolParameters(
-    @SerialName("stakePools")
+    @param:JsonProperty(value = "stakePools", required = true)
+    @get:JsonProperty("stakePools")
     val stakePools: List<StakePool>,
 ) : Params()

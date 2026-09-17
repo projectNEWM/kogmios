@@ -1,51 +1,55 @@
 package io.newm.kogmios.protocols.model.serializers
 
+import com.fasterxml.jackson.core.JsonGenerator
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import io.newm.kogmios.protocols.model.Ada
 import io.newm.kogmios.protocols.model.Asset
 import io.newm.kogmios.protocols.model.Lovelace
 import io.newm.kogmios.protocols.model.UtxoOutputValue
-import io.newm.kogmios.serializers.BigIntegerSerializer
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.MapSerializer
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonDecoder
+import java.math.BigInteger
 
-object UtxoOutputValueSerializer : KSerializer<UtxoOutputValue> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("UtxoOutputValue")
-
-    private val delegateMapSerializer =
-        MapSerializer(String.serializer(), MapSerializer(String.serializer(), BigIntegerSerializer))
-
-    override fun deserialize(decoder: Decoder): UtxoOutputValue {
-        require(decoder is JsonDecoder)
-        val elements = delegateMapSerializer.deserialize(decoder)
-        val adaMap = elements["ada"] ?: throw IllegalStateException("ada value not found in UtxoOutputValue")
-        val lovelace = adaMap["lovelace"] ?: throw IllegalStateException("lovelace value not found in UtxoOutputValue")
+internal class UtxoOutputValueDeserializer : StdDeserializer<UtxoOutputValue>(UtxoOutputValue::class.java) {
+    override fun deserialize(
+        parser: JsonParser,
+        context: DeserializationContext
+    ): UtxoOutputValue {
+        val node = context.readTree(parser)
+        val lovelaceNode = node.path("ada").path("lovelace")
+        if (lovelaceNode.isMissingNode) {
+            return context.reportInputMismatch(UtxoOutputValue::class.java, "ada.lovelace is required")
+        }
         val assets =
-            elements.entries.filterNot { it.key == "ada" }.flatMap { policy ->
-                val policyId = policy.key
-                policy.value.map {
-                    Asset(
-                        policyId = policyId,
-                        name = it.key,
-                        quantity = it.value
-                    )
-                }
-            }
-        return UtxoOutputValue(
-            ada = Ada(Lovelace(lovelace)),
-            assets = assets
-        )
+            node
+                .fields()
+                .asSequence()
+                .filterNot { it.key == "ada" }
+                .flatMap { (policyId, quantities) ->
+                    quantities.fields().asSequence().map { (name, quantity) ->
+                        Asset(policyId, name, context.readTreeAsValue(quantity, BigInteger::class.java))
+                    }
+                }.toList()
+        return UtxoOutputValue(Ada(Lovelace(context.readTreeAsValue(lovelaceNode, BigInteger::class.java))), assets)
     }
+}
 
+internal class UtxoOutputValueSerializer : JsonSerializer<UtxoOutputValue>() {
     override fun serialize(
-        encoder: Encoder,
-        value: UtxoOutputValue
+        value: UtxoOutputValue,
+        generator: JsonGenerator,
+        serializers: SerializerProvider
     ) {
-        // not implemented
+        generator.writeStartObject()
+        generator.writeObjectField("ada", value.ada.ada)
+        value.assets.orEmpty().groupBy(Asset::policyId).forEach { (policyId, assets) ->
+            generator.writeObjectFieldStart(policyId)
+            assets.forEach { generator.writeObjectField(it.name, it.quantity) }
+            generator.writeEndObject()
+        }
+        generator.writeEndObject()
     }
 }

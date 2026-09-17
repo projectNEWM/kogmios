@@ -1,17 +1,21 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@SerialName("ebb")
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeName("ebb")
 data class BlockEBB(
-    @SerialName("era")
+    @param:JsonProperty(value = "era", required = true)
+    @get:JsonProperty("era")
     override val era: String,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     override val id: String,
-    @SerialName("ancestor")
+    @param:JsonProperty(value = "ancestor", required = true)
+    @get:JsonProperty("ancestor")
     override val ancestor: String,
-    @SerialName("height")
+    @param:JsonProperty(value = "height", required = true)
+    @get:JsonProperty("height")
     override val height: Long,
 ) : Block

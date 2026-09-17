@@ -1,14 +1,15 @@
 package io.newm.kogmios.protocols.model.result
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class LastKnownTip(
-    @SerialName("height")
+    @param:JsonProperty(value = "height", required = true)
+    @get:JsonProperty("height")
     val height: Long,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("slot")
+    @param:JsonProperty(value = "slot", required = true)
+    @get:JsonProperty("slot")
     val slot: Long,
 )

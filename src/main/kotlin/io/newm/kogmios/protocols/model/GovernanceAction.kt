@@ -1,109 +1,107 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
-@JsonClassDiscriminator("type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 sealed interface GovernanceAction
 
-@Serializable
-@SerialName("protocolParametersUpdate")
+@JsonTypeName("protocolParametersUpdate")
 data class ProtocolParametersUpdateGovernanceAction(
-    @SerialName("ancestor")
     val ancestor: UtxoInput? = null,
-    @SerialName("parameters")
+    @param:JsonProperty(value = "parameters", required = true)
+    @get:JsonProperty("parameters")
     val parameters: ProposedProtocolParameters,
-    @SerialName("guardrails")
     val guardrails: GuardrailsHash? = null,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("hardForkInitiation")
+@JsonTypeName("hardForkInitiation")
 data class HardForkInitiationGovernanceAction(
-    @SerialName("ancestor")
     val ancestor: UtxoInput? = null,
-    @SerialName("version")
+    @param:JsonProperty(value = "version", required = true)
+    @get:JsonProperty("version")
     val version: Version,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("treasuryTransfer")
+@JsonTypeName("treasuryTransfer")
 data class TreasuryTransferGovernanceAction(
-    @SerialName("source")
+    @param:JsonProperty(value = "source", required = true)
+    @get:JsonProperty("source")
     val source: String,
-    @SerialName("target")
+    @param:JsonProperty(value = "target", required = true)
+    @get:JsonProperty("target")
     val target: String,
-    @SerialName("value")
+    @param:JsonProperty(value = "value", required = true)
+    @get:JsonProperty("value")
     val value: Ada,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("treasuryWithdrawals")
+@JsonTypeName("treasuryWithdrawals")
 data class TreasuryWithdrawalsGovernanceAction(
-    @SerialName("withdrawals")
+    @param:JsonProperty(value = "withdrawals", required = true)
+    @get:JsonProperty("withdrawals")
     val withdrawals: Map<String, Ada>,
-    @SerialName("guardrails")
     val guardrails: GuardrailsHash? = null,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("constitutionalCommittee")
+@JsonTypeName("constitutionalCommittee")
 data class ConstitutionalCommitteeGovernanceAction(
-    @SerialName("ancestor")
     val ancestor: UtxoInput? = null,
-    @SerialName("members")
+    @param:JsonProperty(value = "members", required = true)
+    @get:JsonProperty("members")
     val members: ConstitutionalCommitteeMembers,
-    @SerialName("quorum")
-    @Contextual
+    @param:JsonProperty(value = "quorum", required = true)
+    @get:JsonProperty("quorum")
     val quorum: BigFraction,
 ) : GovernanceAction
 
-@Serializable
 data class ConstitutionalCommitteeMembers(
-    @SerialName("added")
+    @param:JsonProperty(value = "added", required = true)
+    @get:JsonProperty("added")
     val added: List<AddedConstitutionalCommitteeMember>,
-    @SerialName("removed")
+    @param:JsonProperty(value = "removed", required = true)
+    @get:JsonProperty("removed")
     val removed: List<IdHash>,
 )
 
-@Serializable
 data class AddedConstitutionalCommitteeMember(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
-    @SerialName("from")
+    @param:JsonProperty(value = "from", required = true)
+    @get:JsonProperty("from")
     val from: String,
-    @SerialName("mandate")
+    @param:JsonProperty(value = "mandate", required = true)
+    @get:JsonProperty("mandate")
     val mandate: Mandate,
 )
 
-@Serializable
 data class Mandate(
-    @SerialName("epoch")
+    @param:JsonProperty(value = "epoch", required = true)
+    @get:JsonProperty("epoch")
     val epoch: Long,
 )
 
-@Serializable
-@SerialName("constitution")
+@JsonTypeName("constitution")
 data class ConstitutionGovernanceAction(
-    @SerialName("ancestor")
     val ancestor: UtxoInput? = null,
-    @SerialName("guardrails")
+    @param:JsonProperty(value = "guardrails", required = true)
+    @get:JsonProperty("guardrails")
     val guardrails: GuardrailsHash?,
-    @SerialName("metadata")
+    @param:JsonProperty(value = "metadata", required = true)
+    @get:JsonProperty("metadata")
     val metadata: AnchorMetadata,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("noConfidence")
+@JsonTypeName("noConfidence")
 data class NoConfidenceGovernanceAction(
-    @SerialName("ancestor")
     val ancestor: UtxoInput? = null,
 ) : GovernanceAction
 
-@Serializable
-@SerialName("information")
+@JsonTypeName("information")
 data object InformationGovernanceAction : GovernanceAction

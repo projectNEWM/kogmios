@@ -1,16 +1,18 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import io.newm.kogmios.protocols.model.PointDetail
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * A point has been successfully acquired for querying the ledger state.
  */
-@Serializable
+
 data class AcquireResult(
-    @SerialName("acquired")
+    @param:JsonProperty(value = "acquired", required = true)
+    @get:JsonProperty("acquired")
     val acquired: String,
-    @SerialName("point")
+    @param:JsonProperty(value = "point", required = true)
+    @get:JsonProperty("point")
     val point: PointDetail,
 ) : OgmiosResult

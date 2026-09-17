@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class MetadataResult(
-    @SerialName("url")
+    @param:JsonProperty(value = "url", required = true)
+    @get:JsonProperty("url")
     val url: String,
-    @SerialName("hash")
+    @param:JsonProperty(value = "hash", required = true)
+    @get:JsonProperty("hash")
     val hash: String,
 )

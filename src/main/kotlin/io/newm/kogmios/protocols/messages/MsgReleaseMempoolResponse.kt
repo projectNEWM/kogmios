@@ -1,17 +1,21 @@
 package io.newm.kogmios.protocols.messages
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.result.ReleaseMempoolResult
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * Response that comes back from Ogmios after a release mempool message is sent.
  */
-@Serializable
-@SerialName(MsgReleaseMempool.METHOD_NAME)
+
+@JsonTypeName(MsgReleaseMempool.METHOD_NAME)
 data class MsgReleaseMempoolResponse(
-    @SerialName("result")
+    @param:JsonProperty(value = "result", required = true)
+    @get:JsonProperty("result")
     override val result: ReleaseMempoolResult,
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     override val id: String,
 ) : JsonRpcSuccessResponse()

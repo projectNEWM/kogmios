@@ -1,13 +1,11 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.math.BigInteger
 
-@Serializable
 data class Seconds(
-    @SerialName("seconds")
-    @Contextual
+    @param:JsonProperty(value = "seconds", required = true)
+    @get:JsonProperty("seconds")
     val seconds: BigInteger,
 )

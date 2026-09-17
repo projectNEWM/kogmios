@@ -78,10 +78,8 @@ import io.newm.kogmios.protocols.model.StakePool
 import io.newm.kogmios.protocols.model.fault.InternalErrorFault
 import io.newm.kogmios.protocols.model.fault.StringFaultData
 import io.newm.kogmios.protocols.model.result.HealthResult
-import io.newm.kogmios.serializers.BigFractionSerializer
-import io.newm.kogmios.serializers.BigIntegerSerializer
+import io.newm.kogmios.serializers.OgmiosJson
 import java.io.IOException
-import java.math.BigInteger
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -104,9 +102,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import org.apache.commons.numbers.fraction.BigFraction
 import org.slf4j.LoggerFactory
 
 internal class ClientImpl(
@@ -159,7 +154,7 @@ internal class ClientImpl(
                             return Frame.Text(
                                 when (value) {
                                     is JsonRpcRequest -> {
-                                        json.encodeToString(value).also {
+                                        OgmiosJson.mapper.writeValueAsString(value).also {
                                             // temporary while we need to figure out how all the requests look
                                             log.debug("sending: {}", it)
                                         }
@@ -186,7 +181,7 @@ internal class ClientImpl(
                             val jsonString = (content as Frame.Text).readText()
                             log.debug("received: {}", jsonString)
                             return try {
-                                json.decodeFromString<JsonRpcResponse>(jsonString)
+                                OgmiosJson.mapper.readValue(jsonString, JsonRpcResponse::class.java)
                             } catch (e: Throwable) {
                                 // This should never happen unless WE have made an error in our parsers somewhere.
                                 val idRegex =
@@ -602,7 +597,7 @@ internal class ClientImpl(
     override suspend fun health(): HealthResult {
         val response = httpClient.get("http://$websocketHost:$websocketPort/health")
         val jsonBody = response.bodyAsText()
-        return json.decodeFromString(jsonBody)
+        return OgmiosJson.mapper.readValue(jsonBody, HealthResult::class.java)
     }
 
     override suspend fun acquireMempool(timeoutMs: Long): MsgAcquireMempoolResponse {
@@ -763,21 +758,5 @@ internal class ClientImpl(
     private val job by lazy { SupervisorJob() }
     override val coroutineContext: CoroutineContext by lazy {
         job + Dispatchers.IO + DefaultCoroutineExceptionHandler(log)
-    }
-
-    companion object {
-        internal val json =
-            Json {
-                // classDiscriminator = "type"
-                encodeDefaults = true
-                explicitNulls = true
-                ignoreUnknownKeys = true
-                isLenient = true
-                serializersModule =
-                    SerializersModule {
-                        contextual(BigInteger::class, BigIntegerSerializer)
-                        contextual(BigFraction::class, BigFractionSerializer)
-                    }
-            }
     }
 }

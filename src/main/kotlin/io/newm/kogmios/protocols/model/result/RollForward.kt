@@ -1,18 +1,22 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.Block
 import io.newm.kogmios.protocols.model.Tip
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The next block has been received.
  */
-@Serializable
-@SerialName("forward")
+
+@JsonTypeName("forward")
 data class RollForward(
-    @SerialName("tip")
+    @param:JsonProperty(value = "tip", required = true)
+    @get:JsonProperty("tip")
     val tip: Tip,
-    @SerialName("block")
+    @param:JsonProperty(value = "block", required = true)
+    @get:JsonProperty("block")
     val block: Block
 ) : NextBlockResult

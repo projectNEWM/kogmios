@@ -1,37 +1,38 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
-@JsonClassDiscriminator("role")
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "role")
 sealed interface Voter
 
-@Serializable
-@SerialName("genesisDelegate")
+@JsonTypeName("genesisDelegate")
 data class GenesisDelegateVoter(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : Voter
 
-@Serializable
-@SerialName("constitutionalCommittee")
+@JsonTypeName("constitutionalCommittee")
 data class ConstitutionalCommitteeVoter(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : Voter
 
-@Serializable
-@SerialName("delegateRepresentative")
+@JsonTypeName("delegateRepresentative")
 data class DelegateRepresentativeVoter(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : Voter
 
-@Serializable
-@SerialName("stakePoolOperator")
+@JsonTypeName("stakePoolOperator")
 data class StakePoolOperatorVoter(
-    @SerialName("id")
+    @param:JsonProperty(value = "id", required = true)
+    @get:JsonProperty("id")
     val id: String,
 ) : Voter

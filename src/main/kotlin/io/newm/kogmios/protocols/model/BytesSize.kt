@@ -1,11 +1,11 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import java.math.BigInteger
 
-@Serializable
 data class BytesSize(
-    @Contextual
+    @param:JsonProperty(value = "bytes", required = true)
+    @get:JsonProperty("bytes")
     val bytes: BigInteger,
 )

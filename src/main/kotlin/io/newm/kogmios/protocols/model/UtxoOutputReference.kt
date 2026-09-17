@@ -1,12 +1,12 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class UtxoOutputReference(
-    @SerialName("transaction")
+    @param:JsonProperty(value = "transaction", required = true)
+    @get:JsonProperty("transaction")
     val transaction: Transaction,
-    @SerialName("index")
+    @param:JsonProperty(value = "index", required = true)
+    @get:JsonProperty("index")
     val index: Long,
 )

@@ -1,10 +1,9 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class GuardrailsHash(
-    @SerialName("hash")
+    @param:JsonProperty(value = "hash", required = true)
+    @get:JsonProperty("hash")
     val hash: String,
 )

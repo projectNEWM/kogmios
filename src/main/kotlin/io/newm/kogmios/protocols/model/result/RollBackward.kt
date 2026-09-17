@@ -1,18 +1,22 @@
 package io.newm.kogmios.protocols.model.result
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
+import com.fasterxml.jackson.annotation.JsonTypeName
+
 import io.newm.kogmios.protocols.model.PointDetailOrOrigin
 import io.newm.kogmios.protocols.model.Tip
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 
 /**
  * The blockchain has been rolled back to the specified point.
  */
-@Serializable
-@SerialName("backward")
+
+@JsonTypeName("backward")
 data class RollBackward(
-    @SerialName("point")
+    @param:JsonProperty(value = "point", required = true)
+    @get:JsonProperty("point")
     val point: PointDetailOrOrigin,
-    @SerialName("tip")
+    @param:JsonProperty(value = "tip", required = true)
+    @get:JsonProperty("tip")
     val tip: Tip
 ) : NextBlockResult

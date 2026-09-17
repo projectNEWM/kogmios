@@ -1,24 +1,30 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Serializable
 data class ConwayGenesisProtocolParameters(
-    @SerialName("stakePoolVotingThresholds")
+    @param:JsonProperty(value = "stakePoolVotingThresholds", required = true)
+    @get:JsonProperty("stakePoolVotingThresholds")
     val stakePoolVotingThresholds: StakePoolVotingThresholds,
-    @SerialName("constitutionalCommitteeMinSize")
+    @param:JsonProperty(value = "constitutionalCommitteeMinSize", required = true)
+    @get:JsonProperty("constitutionalCommitteeMinSize")
     val constitutionalCommitteeMinSize: Long,
-    @SerialName("constitutionalCommitteeMaxTermLength")
+    @param:JsonProperty(value = "constitutionalCommitteeMaxTermLength", required = true)
+    @get:JsonProperty("constitutionalCommitteeMaxTermLength")
     val constitutionalCommitteeMaxTermLength: Long,
-    @SerialName("governanceActionLifetime")
+    @param:JsonProperty(value = "governanceActionLifetime", required = true)
+    @get:JsonProperty("governanceActionLifetime")
     val governanceActionLifetime: Long,
-    @SerialName("governanceActionDeposit")
+    @param:JsonProperty(value = "governanceActionDeposit", required = true)
+    @get:JsonProperty("governanceActionDeposit")
     val governanceActionDeposit: Ada,
-    @SerialName("delegateRepresentativeVotingThresholds")
+    @param:JsonProperty(value = "delegateRepresentativeVotingThresholds", required = true)
+    @get:JsonProperty("delegateRepresentativeVotingThresholds")
     val delegateRepresentativeVotingThresholds: DelegateRepresentativeVotingThresholds,
-    @SerialName("delegateRepresentativeDeposit")
+    @param:JsonProperty(value = "delegateRepresentativeDeposit", required = true)
+    @get:JsonProperty("delegateRepresentativeDeposit")
     val delegateRepresentativeDeposit: Ada,
-    @SerialName("delegateRepresentativeMaxIdleTime")
+    @param:JsonProperty(value = "delegateRepresentativeMaxIdleTime", required = true)
+    @get:JsonProperty("delegateRepresentativeMaxIdleTime")
     val delegateRepresentativeMaxIdleTime: Long,
 )

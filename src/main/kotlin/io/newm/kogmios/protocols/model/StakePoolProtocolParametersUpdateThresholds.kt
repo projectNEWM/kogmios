@@ -1,13 +1,11 @@
 package io.newm.kogmios.protocols.model
 
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonProperty
+
 import org.apache.commons.numbers.fraction.BigFraction
 
-@Serializable
 data class StakePoolProtocolParametersUpdateThresholds(
-    @SerialName("security")
-    @Contextual
+    @param:JsonProperty(value = "security", required = true)
+    @get:JsonProperty("security")
     val security: BigFraction,
 )
